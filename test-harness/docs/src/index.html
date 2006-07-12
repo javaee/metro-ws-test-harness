@@ -1,0 +1,194 @@
+<html xmlns:j="jelly:core" xmlns:d="jelly:define" xmlns:l="layout" xmlns:x="jelly:xml" xmlns:jsl="jelly:jsl">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+	<title>JAX-WS/Tango Test Harness User Guide</title>
+	<style>
+		H1 {
+			text-align: center;
+		}
+		
+		PRE.cmd {
+			background-color: #eee;
+			border: solid 1px gray;
+			font-weight: bold;
+			padding: 0.2em;
+		}
+		
+		DIV.tip {
+			padding: 0.2em;
+			margin: 1em;
+			margin-left: 3em;
+			border: 1px dashed black;
+			background-color: #ddf;
+		}
+	</style>
+</head>
+<body>
+	<!-- taglib definition -->
+  <d:taglib uri="layout">
+  	<!-- command example -->
+	  <d:tag name="harness-cmd">
+	  	<pre class="cmd">$$ java ${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
+	  </d:tag>
+  	<!-- "not yet" icon -->
+	  <d:tag name="not-yet">
+	  	<span style="color:red; font-weight:bold">(not yet implemented)</span>
+	  </d:tag>
+	  <!-- box that shows a tip -->
+	  <d:tag name="tip">
+	  	<div class=tip>
+	  		<table><tr>
+	  			<td>
+			  		<img src=tip.png>
+			  	</td><td>
+				  	<d:invokeBody />
+					</td>
+				</tr></table>
+		  </div>
+	  </d:tag>
+	  <!-- section marker -->
+	  <d:tag name="section">
+			<j:set var="sectionNumber" value="${sectionNumber+1}" scope="parent" />
+			<j:set var="prefix" value="${prefix}${sectionNumber}." />
+			<j:set var="sectionNumber" value="0" /> <!-- start a new sequence for children -->
+			
+			<!-- name escaped for anchor and file names -->
+			<j:set var="safeName" value="${title.replaceAll('[^A-Za-z0-9]','_')}" />
+			
+			<j:choose>
+				<j:when test="${mode=='toc'}">
+					<!-- generate XML fragment for TOC -->
+					<TOC href="${safeName}" title="${title}">
+						<d:invokeBody />
+					</TOC>
+				</j:when>
+				<j:otherwise>
+					<a name="${safeName}">
+						<x:element name="h${depth+2}">
+							<a href="#${safeName}">${prefix}</a> ${title}
+						</x:element>
+					</a>
+					
+					<j:set var="depth" value="${depth+1}" />
+			  	<d:invokeBody />
+					<j:set var="depth" value="${depth-1}" />
+				</j:otherwise>
+			</j:choose>
+	  </d:tag>
+	  <d:tag name="document">
+	  	<x:parse var="tocTree">
+	  		<j:scope>
+		  		<j:set var="mode" value="toc" />
+		  		<d:invokeBody />
+		  	</j:scope>
+	  	</x:parse>
+	  	<jsl:stylesheet var="tocStylesheet">
+	  		<jsl:template match="TOC">
+	  			<x:set var="href" select="string(@href)" />
+	  			<x:set var="title" select="string(@title)" />
+	  			<li><a href="#${href}">${title}</a></li>
+	  			<ol>
+	  				<jsl:applyTemplates select="TOC" />
+	  			</ol>
+	  		</jsl:template>
+	  	</jsl:stylesheet>
+	  	<h2>Table of contents</h2>
+	  	<ol>
+	  		<jsl:style stylesheet="${tocStylesheet}" select="$tocTree" />
+	  	</ol>
+	  	<d:invokeBody />
+	  </d:tag>
+	</d:taglib>
+
+
+
+
+
+
+
+
+
+
+<h1>JAX-WS/Tango Test Harness User Guide</h1>
+
+<l:document>
+
+<l:section title="Running Tests">
+	<l:section title="Running Tests Manually">
+		<p>
+			Each test is packaged in a directory. The following command runs a single test stored in <tt>testdata/abc/def</tt>:
+		</p>
+		<l:harness-cmd>testdata/abc/def</l:harness-cmd>
+		<p>
+			If you specify multiple directories, all the tests in the specified directories are run.
+		</p>
+		<l:harness-cmd>testdata/abc/*</l:harness-cmd>
+		<p>
+			The <tt>-r</tt> option tells the harness to recursively search for all tests inside the given directory:
+		</p>
+		<l:harness-cmd>-r testdata/addressing</l:harness-cmd>
+		<l:tip>
+			Consider defining an alias to <tt>java -jar path/to/harness.jar</tt> or a wrapper shell script so that you don't have to type the path name manually.
+		</l:tip>
+	</l:section>
+	
+	<l:section title="Debugging Test Failures">
+		<p>
+			The following command executes a test with debugger support enabled. Run this command from a console, then set up a remote debugging with your IDE to port 8000. This allows you to set breakpoints anywhere both on the client and the server.
+		</p>
+		<l:harness-cmd jvmargs="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000">testdata/abc/def</l:harness-cmd>
+		<l:tip>
+			You'll use this command very often, so consider defining an alias to <tt>java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000 -jar path/to/harness.jar</tt>
+		</l:tip>
+		<p>
+			If your test data resides in the Tango workspace or the JAX-WS workspace, the harness recognizes their directory layouts and pick up classes from respective <tt>build/class</tt> directories and libraries. So if you make a change to the source code, all you need to do is to compile them to class files.
+		</p>
+		<l:tip>
+			Do not run any targets that generate jar files, as those unnecessary work will slow you down.
+		</l:tip>
+		<p>
+			If your change to the code is to the runtime and does not affect the code generation, then use the <tt>-skip</tt> option to skip the code generation. This allows you to quickly rerun the actual tests.
+		<l:harness-cmd>-skip testdata/abc/def</l:harness-cmd>
+	</l:section>
+	
+	<l:section title="Testing Different Transports/Containers">
+		<p>
+			The harness can run tests by using a variety of transports and containers.
+		</p>
+		<l:section title="local">
+			<p>
+				By default, the test harness uses the local transport, which is the preferred mode of testing because of its quick turn-around time.
+			</p>
+		</l:section>
+		<l:section title="Tomcat">
+			<p>
+				Run the following command to use Tomcat in the embedded mode. In this mode, the haress runs both Tomcat and clients in the same VM, allowing a single debugger to monitor both sides. You need to specify the location of Tomcat, so that the harness can find Tomcat jar files.
+			</p>
+			<l:harness-cmd>-tomcat path/to/tomcat ...</l:harness-cmd>
+			<p>
+				<l:not-yet />The following command causes tests to run by using Tomcat that's already running.
+			</p>
+			<l:harness-cmd>-remote-tomcat localhost:8080 ...</l:harness-cmd>
+		</l:section>
+		<l:section title="Glassfish">
+			<p>
+				<l:not-yet />
+			</p>
+		</l:section>
+	</l:section>
+	
+	<l:section title="Testing Different Delivery Vehicles">
+		<p>
+			The harness can be used to test different projects that use the JAX-WS RI.
+		</p>
+		<l:section title="JAX-WS RI">
+			<p>
+				The following option tells the harness to pick up the classes from the JAX-WS workspace. Specifically, with this option, the harness will look into various <tt>build/classes</tt> and library jars.
+			</p>
+			<l:harness-cmd>-cp:jaxws path/to/jaxws-ri ...</l:harness-cmd>
+		</l:section>
+	</l:section>
+</l:section>
+</l:document>
+</body>
+</html>

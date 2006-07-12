@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<j:jelly trim="false"
+    xmlns:j="jelly:core"
+    xmlns:x="jelly:xml"
+    xmlns:html="jelly:html">
+<endpoints xmlns='http://java.sun.com/xml/ns/jax-ws/ri/runtime' version='2.0'>
+
+<j:forEach items="${data.endpointInfoBeans}" var="endpoint">
+  <endpoint name="${endpoint.name}"
+      implementation="${endpoint.implementation}"
+      wsdl="${endpoint.wsdl}"         
+      service="${endpoint.service}"
+      port="${endpoint.port}"
+      url-pattern="${endpoint.urlPattern}">
+    <!-- TODO: handlers -->
+  </endpoint>
+</j:forEach>      
+
+</endpoints>
+</j:jelly>

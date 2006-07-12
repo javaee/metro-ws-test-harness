@@ -1,0 +1,138 @@
+<project name="test-harness" basedir="." default="dist">
+
+  <property name="name" value="test-harness-core" />
+
+
+  <!-- default build id -->
+  <tstamp>
+    <format property="now" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+  </tstamp>
+  <property name="build.id" value="${now}(${user.name})"/>
+
+  <path id="javac.classpath">
+    <fileset dir="." includes="lib/*.jar"/>
+  </path>
+  
+  <path id="runtime.classpath">
+    <path refid="javac.classpath"/>
+    <pathelement location="build/classes"/>
+    <pathelement location="${java.home}/../lib/tools.jar"/>
+  </path>
+
+  <target name="compile">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src"
+           destdir="build/classes"
+           debug="on">
+      <classpath refid="javac.classpath"/>
+    </javac>
+    <copy todir="build/classes">
+      <fileset dir="src">
+        <include name="**/*.jelly"/>
+        <include name="**/*.bsh"/>
+        <include name="**/*.rnc"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="build/${name}.jar">
+      <manifest>
+        <attribute name="Build-Id" value="${build.id}"/>
+      </manifest>
+      <fileset dir="build/classes"/>
+    </jar>
+  </target>
+
+  <target name="src-zip">
+    <jar jarfile="build/${name}-src.zip">
+      <fileset dir="src"/>
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="build"/>
+  </target>
+
+  <target name="dist" depends="jar, src-zip">
+    <ant dir="bootstrap" target="dist" inheritall="false"/>
+    <ant dir="docs" target="doc" inheritall="false"/>
+    <mkdir dir="build/dist/lib" />
+    <copy tofile="build/dist/harness.jar" file="bootstrap/build/bootstrap.jar" />
+    <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
+    <copy todir="build/dist/lib">
+      <fileset dir="lib" />
+      <fileset dir="build" includes="*.jar, *.zip" excludes="test-harness.zip"/>
+    </copy>
+    <copy todir="build/dist">
+      <fileset dir="docs/build" />
+    </copy>
+
+    <zip file="build/test-harness.zip">
+      <zipfileset dir="build/dist" prefix="test-harness"/>
+    </zip>
+  </target>
+
+  <target name="integrate-istack-commons">
+    <property name="istack.commons.runtime"
+              value="http://kohsuke.sfbay/hudson/job/istack-commons/lastSuccessfulBuild/artifact/runtime/build"/>
+    <property name="istack.commons.tools"
+              value="http://kohsuke.sfbay/hudson/job/istack-commons/lastSuccessfulBuild/artifact/tools/build"/>
+    <property name="istack.commons.test"
+              value="http://kohsuke.sfbay/hudson/job/istack-commons/lastSuccessfulBuild/artifact/test/build"/>
+
+    <!-- Unused right now
+    <get src="${istack.commons.tools}/istack-commons-tools.jar"
+         dest="lib/istack-commons-tools.jar"/>
+    <get src="${istack.commons.tools}/istack-commons-tools-src.zip"
+         dest="lib/istack-commons-tools-src.zip"/>-->
+
+    <get src="${istack.commons.runtime}/istack-commons-runtime.jar"
+         dest="lib/istack-commons-runtime.jar"/>
+    <get src="${istack.commons.runtime}/istack-commons-runtime-src.zip"
+         dest="lib/istack-commons-runtime-src.zip"/>
+
+    <get src="${istack.commons.test}/istack-commons-test.jar"
+         dest="lib/istack-commons-test.jar"/>
+    <get src="${istack.commons.test}/istack-commons-test-src.zip"
+         dest="lib/istack-commons-test-src.zip"/>
+  </target>
+  
+  <!-- ********** Target added for debugging in NetBeans ********** -->
+  <path id="debug.sourcepath">
+    <pathelement location="src"/>
+  </path>
+  
+  <target name="debug-harness" if="netbeans.home"
+      depends="dist"
+      description="Debug the test harness (from within NetBeans)">
+          
+    <echo message="starting harness with arguments: ${args}"/>
+    
+    <nbjpdastart name="WsTest" addressproperty="any.prop.name"
+        transport="dt_socket">
+      <classpath refid="runtime.classpath"/>
+      <sourcepath refid="debug.sourcepath"/>
+    </nbjpdastart>
+
+    <java fork="true" classname="WsTest">
+      <arg line="${args}"/>
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${any.prop.name}"/>
+      <classpath refid="runtime.classpath"/>
+    </java>
+  </target>
+    
+  <target name="run-harness" if="netbeans.home"
+      depends="dist"
+      description="Run the test harness with same options used for debug">
+          
+    <echo message="starting harness with arguments: ${args}"/>
+    
+    <java fork="true" classname="WsTest">
+      <arg line="${args}"/>
+      <classpath refid="runtime.classpath"/>
+    </java>
+  </target>
+    
+</project>
