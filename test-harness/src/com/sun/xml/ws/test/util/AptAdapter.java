@@ -39,7 +39,7 @@ public final class AptAdapter extends DefaultCompilerAdapter {
         try {
             Method m = World.tool.getClassLoader()
                 .loadClass("com.sun.tools.apt.Main")
-                .getMethod("main", String[].class);
+                .getMethod("process", String[].class);
             System.out.println("Using apt from "+ Which.which(m.getDeclaringClass()));
             return m;
         } catch( Throwable e ) {
