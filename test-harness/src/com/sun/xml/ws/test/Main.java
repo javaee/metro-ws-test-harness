@@ -294,7 +294,7 @@ public class Main {
 
 
         System.err.println("Testing with the local transport");
-        return new LocalApplicationContainer(wsimport);
+        return new LocalApplicationContainer(wsimport,debug);
     }
 
     private static String defaultsTo( String value, String defaultValue ) {

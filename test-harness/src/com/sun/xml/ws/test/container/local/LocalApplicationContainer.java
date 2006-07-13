@@ -8,9 +8,6 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
-import com.sun.xml.ws.test.model.TestEndpoint;
-import com.sun.xml.ws.test.model.TestService;
-import com.sun.xml.ws.test.util.AptWrapper;
 import com.sun.xml.ws.test.util.JavacWrapper;
 import com.sun.xml.ws.test.wsimport.WsTool;
 import org.apache.commons.jelly.JellyContext;
@@ -40,8 +37,14 @@ public class LocalApplicationContainer implements ApplicationContainer {
     private final WsTool wsimport;
     private final JellyContext jellyContext = new JellyContext();
 
-    public LocalApplicationContainer(WsTool wscompile) {
+    /**
+     * Produce output for debugging the harness.
+     */
+    private final boolean debug;
+
+    public LocalApplicationContainer(WsTool wscompile, boolean debug) {
         this.wsimport = wscompile;
+        this.debug = debug;
     }
 
     public void start() {
@@ -109,12 +112,14 @@ public class LocalApplicationContainer implements ApplicationContainer {
                 //for (TestEndpoint endpt : service.service.endpoints) {
                     ArrayList<String> options = new ArrayList<String>();
                     options.add("-wsdl");
-                    options.add("-verbose");
+                    if(debug)
+                        options.add("-verbose");
                     options.add("-r");
                     options.add(service.buildClassesDir.getAbsolutePath());
                     options.add("-cp");
                     String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
-                    System.out.println("wsgen classpath arg = " + path);
+                    if(debug)
+                        System.out.println("wsgen classpath arg = " + path);
                     options.add(path);
                     options.add("-s");
                     options.add(service.buildClassesDir.getAbsolutePath());
