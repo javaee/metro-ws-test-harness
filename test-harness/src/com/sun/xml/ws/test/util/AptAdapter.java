@@ -26,4 +26,8 @@ public final class AptAdapter extends JDKToolAdapter {
     protected String getMainClass() {
         return "com.sun.tools.apt.Main";
     }
+
+    protected String getToolName() {
+        return "APT";
+    }
 }

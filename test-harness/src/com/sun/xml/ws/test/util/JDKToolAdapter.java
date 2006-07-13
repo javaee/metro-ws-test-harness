@@ -46,18 +46,19 @@ abstract class JDKToolAdapter extends DefaultCompilerAdapter {
 
             if(reported.add(clazz))
                 // report where we loaded tools to assist classpath related issues
-                System.out.println("Using "+ Which.which(clazz));
+                System.out.println("Using "+getToolName()+" from "+ Which.which(clazz));
 
             return clazz.getMethod(getMainMethod(), String[].class);
         } catch( Throwable e ) {
             e.printStackTrace();
-            throw new AssertionError("Unable to find apt in the same VM. Have you set JAVA_HOME?");
+            throw new AssertionError("Unable to locate "+getToolName()+". Maybe you are using JRE?");
         }
 
     }
 
     protected abstract String getMainMethod();
     protected abstract String getMainClass();
+    protected abstract String getToolName();
 
     private static Set<Class> reported = Collections.synchronizedSet(new HashSet<Class>());
 }

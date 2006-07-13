@@ -19,4 +19,8 @@ public final class JavacAdapter extends JDKToolAdapter {
     protected String getMainClass() {
         return "com.sun.tools.javac.Main";
     }
+
+    protected String getToolName() {
+        return "javac";
+    }
 }
