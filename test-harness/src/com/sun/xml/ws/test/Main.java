@@ -81,6 +81,8 @@ public class Main {
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
+    @Option(name="-debug",usage="Generate output for debugging harness")
+    boolean debug;
 
     /*
       Container variables
@@ -213,8 +215,9 @@ public class Main {
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
         }
         if(jaxwsImage!=null) {
-            // TODO: ideally we should exclude jaxws-tools.jar, jaxb-xjc.jar, etc.
-            runtime.addJarFolder(   new File(jaxwsImage,"lib"));
+            tool.addJar(            new File(jaxwsWs,"lib/jaxws-tools.jar"));
+            tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
+            runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
         }
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
@@ -222,8 +225,8 @@ public class Main {
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/src"));
             tool.addClassFolder(    new File(jaxwsWs,"tools/wscompile/build/classes"));
-            // TODO: ideally we should exclude jaxws-tools.jar, jaxb-xjc.jar, etc.
-            runtime.addJarFolder(   new File(jaxwsWs,"lib"));
+            tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
+            runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
         }
 
         // put tools.jar in the tools classpath
@@ -233,6 +236,13 @@ public class Main {
         
         World.runtimeClasspath = runtime.getClasspath();
         World.toolClasspath = tool.getClasspath();
+
+        if(debug) {
+            System.err.println("runtime realm");
+            runtime.dump(System.err);
+            System.err.println("tool realm");
+            tool.dump(System.err);
+        }
         
         // TODO: if none is given, wouldn't it be nice if we can guess?
         // TODO: don't we need a better way to discover local transport.

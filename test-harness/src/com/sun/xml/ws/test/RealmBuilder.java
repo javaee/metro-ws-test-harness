@@ -5,6 +5,8 @@ import org.codehaus.classworlds.ClassRealm;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileFilter;
+import java.io.PrintStream;
+import java.util.Arrays;
 
 import com.sun.xml.ws.test.World;
 
@@ -53,19 +55,31 @@ public final class RealmBuilder {
      *
      * @param folder
      *      A directory that contains a bunch of jar files.
+     * @param excludes
+     *      List of jars to be excluded
      */
-    public void addJarFolder(File folder) throws IOException {
+    public void addJarFolder(File folder, final String... excludes) throws IOException {
         if(!folder.isDirectory())
             throw new IOException("Not a directory "+folder);
 
         File[] children = folder.listFiles(new FileFilter() {
             public boolean accept(File pathname) {
+                for (String name : excludes) {
+                    if(pathname.getName().equals(name))
+                        return false;   // excluded
+                }
                 return pathname.getPath().endsWith(".jar");
             }
         });
 
         for (File child : children) {
             addJar(child);
+        }
+    }
+
+    public void dump(PrintStream out) {
+        for( String item : classPath.split(File.pathSeparator)) {
+            out.println("  "+item);
         }
     }
 }
