@@ -1,6 +1,7 @@
 package com.sun.xml.ws.test.container.local;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -71,8 +72,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
         String sourceDir = service.service.baseDir.getAbsolutePath();
         String destDir = service.buildClassesDir.getAbsolutePath();
 
+        // Service starting from WSDL
         if(service.service.wsdl!=null) {
-            // Service starting from WSDL
             //   Use 'wsimport' and 'javac'
             ArrayList<String> options = new ArrayList<String>();
             //Add customization files
@@ -88,20 +89,17 @@ public class LocalApplicationContainer implements ApplicationContainer {
             options.add(service.service.wsdl.getAbsolutePath());
             System.out.println("wsdl = " + service.service.wsdl.getAbsolutePath());
             wsimport.invoke(options.toArray(new String[0]));
-
-            if(!wsimport.isNoop()) {
-                JavacWrapper javacWrapper = new JavacWrapper();
-                javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), destDir);
-                javacWrapper.execute();
-            }
         }
-        else {
-            // Service starting from Java
-            //    Use 'apt'
+        // both cases
+        if(!wsimport.isNoop()) {
+            JavacWrapper javacWrapper = new JavacWrapper();
+            javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), destDir);
+            javacWrapper.execute();
+        }
+        // Service starting from Java
+        if(service.service.wsdl==null) {
+            // Use wsgen to generate the artifacts
             if(!wsimport.isNoop()) {
-                AptWrapper aptWrapper = new AptWrapper();
-                aptWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), destDir);
-                aptWrapper.execute();
             }
         }
     }
