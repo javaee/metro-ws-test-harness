@@ -31,7 +31,7 @@ public final class RealmBuilder {
         realm.addConstituent(jar.toURL());
 
         if (classPath != null) {
-            classPath += ":" + jar.toString();
+            classPath += File.pathSeparatorChar + jar.toString();
         } else {
             classPath = jar.toString();
         }

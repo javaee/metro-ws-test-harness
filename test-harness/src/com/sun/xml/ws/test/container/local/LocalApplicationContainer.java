@@ -113,8 +113,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
                     options.add("-r");
                     options.add(service.buildClassesDir.getAbsolutePath());
                     options.add("-cp");
-                    System.out.println("wsgen classpath arg = " + service.buildClassesDir.getAbsolutePath() + ":" + World.toolClasspath + ":" + World.runtimeClasspath);
-                    options.add(service.buildClassesDir.getAbsolutePath() + ":" + World.toolClasspath + ":" + World.runtimeClasspath);
+                    String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
+                    System.out.println("wsgen classpath arg = " + path);
+                    options.add(path);
                     options.add("-s");
                     options.add(service.buildClassesDir.getAbsolutePath());
                     options.add("-d");
