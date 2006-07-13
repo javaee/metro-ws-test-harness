@@ -18,34 +18,12 @@ import java.lang.reflect.Method;
  *
  * @author WSIT Test Harness Team
  */
-public final class AptAdapter extends DefaultCompilerAdapter {
-    /**
-     * Run the compilation.
-     *
-     * @exception BuildException if the compilation has problems.
-     */
-    public boolean execute() throws BuildException {
-        Commandline cmd = setupModernJavacCommand();
-
-        try {
-            int result = (Integer) getApt().invoke(null, (Object)cmd.getArguments());
-            return result == 0;
-        } catch (Exception ex) {
-            throw new BuildException("Error compiling code", ex);
-        }
+public final class AptAdapter extends JDKToolAdapter {
+    protected String getMainMethod() {
+        return "process";
     }
 
-    private static Method getApt() {
-        try {
-            Method m = World.tool.getClassLoader()
-                .loadClass("com.sun.tools.apt.Main")
-                .getMethod("process", String[].class);
-            System.out.println("Using apt from "+ Which.which(m.getDeclaringClass()));
-            return m;
-        } catch( Throwable e ) {
-            e.printStackTrace();
-            throw new AssertionError("Unable to find apt in the same VM. Have you set JAVA_HOME?");
-        }
-
+    protected String getMainClass() {
+        return "com.sun.tools.apt.Main";
     }
 }

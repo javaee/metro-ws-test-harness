@@ -25,7 +25,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/classworlds-1.0-src.zip!/classworlds-1.0/src/java/main" />
+          <root url="jar://$MODULE_DIR$/lib/classworlds-1.0-src.zip!/" />
         </SOURCES>
       </library>
     </orderEntry>
