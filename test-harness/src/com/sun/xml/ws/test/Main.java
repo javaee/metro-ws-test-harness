@@ -13,6 +13,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter;
 import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.classworlds.NoSuchRealmException;
 import org.dom4j.DocumentException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -243,7 +244,16 @@ public class Main {
             System.err.println("tool realm");
             tool.dump(System.err);
         }
-        
+
+        // jaxb-xjc.jar will suck in JAXB runtime and API through Class-Path manifest entries
+        // into the tool realm, so we'll end up loading two JAXB API.
+        // avoid this by importing API from runtime. This isn't the best fix, however.
+        try {
+            World.tool.importFrom("runtime","javax.xml.bind");
+        } catch (NoSuchRealmException e) {
+            throw new AssertionError(e);
+        }
+
         // TODO: if none is given, wouldn't it be nice if we can guess?
         // TODO: don't we need a better way to discover local transport.
     }
