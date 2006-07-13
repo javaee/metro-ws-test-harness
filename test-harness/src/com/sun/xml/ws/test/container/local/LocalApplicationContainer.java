@@ -102,20 +102,27 @@ public class LocalApplicationContainer implements ApplicationContainer {
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
             if(!wsimport.isNoop()) {
-                for (TestEndpoint endpt : service.service.endpoints) {
+                // TODO: UNHACKIFY
+                WsTool wsgen = WsTool.createWsGen(null);
+                System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
+//                SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
+                //for (TestEndpoint endpt : service.service.endpoints) {
                     ArrayList<String> options = new ArrayList<String>();
                     options.add("-wsdl");
+                    options.add("-verbose");
                     options.add("-r");
-                    options.add(service.workDir.getAbsolutePath());
+                    options.add(service.buildClassesDir.getAbsolutePath());
                     options.add("-cp");
-                    options.add(service.workDir.getAbsolutePath());
+                    System.out.println("wsgen classpath arg = " + service.buildClassesDir.getAbsolutePath() + ":" + World.toolClasspath + ":" + World.runtimeClasspath);
+                    options.add(service.buildClassesDir.getAbsolutePath() + ":" + World.toolClasspath + ":" + World.runtimeClasspath);
                     options.add("-s");
-                    options.add(service.workDir.getAbsolutePath());
+                    options.add(service.buildClassesDir.getAbsolutePath());
                     options.add("-d");
-                    options.add(service.workDir.getAbsolutePath());
-                    options.add(endpt.className);
-                    wsimport.invoke(options.toArray(new String[0]));
-                }
+                    options.add(service.buildClassesDir.getAbsolutePath());
+                    // options.add(endpt.className);
+                    options.add("fromjava.server.AddNumbersImpl");
+                    wsgen.invoke(options.toArray(new String[0]));
+                //}
             }
         }
     }
