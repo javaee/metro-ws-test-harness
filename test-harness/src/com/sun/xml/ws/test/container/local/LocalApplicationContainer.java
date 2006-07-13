@@ -8,6 +8,8 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
+import com.sun.xml.ws.test.model.TestEndpoint;
+import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.AptWrapper;
 import com.sun.xml.ws.test.util.JavacWrapper;
 import com.sun.xml.ws.test.wsimport.WsTool;
@@ -100,6 +102,20 @@ public class LocalApplicationContainer implements ApplicationContainer {
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
             if(!wsimport.isNoop()) {
+                for (TestEndpoint endpt : service.service.endpoints) {
+                    ArrayList<String> options = new ArrayList<String>();
+                    options.add("-wsdl");
+                    options.add("-r");
+                    options.add(service.workDir.getAbsolutePath());
+                    options.add("-cp");
+                    options.add(service.workDir.getAbsolutePath());
+                    options.add("-s");
+                    options.add(service.workDir.getAbsolutePath());
+                    options.add("-d");
+                    options.add(service.workDir.getAbsolutePath());
+                    options.add(endpt.className);
+                    wsimport.invoke(options.toArray(new String[0]));
+                }
             }
         }
     }
