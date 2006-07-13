@@ -26,7 +26,7 @@ public final class AptWrapper extends Javac {
         setDestdir(new File(destDirName));
 
         Path classPath = new Path(getProject());
-        classPath.setPath(destDirName + ":" + World.runtimeClasspath);
+        classPath.setPath(destDirName + ":" + World.runtimeClasspath + ":" + World.toolClasspath);
         setClasspath(classPath);
     }
 }
