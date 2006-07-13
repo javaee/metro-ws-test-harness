@@ -225,6 +225,12 @@ public class Main {
             // TODO: ideally we should exclude jaxws-tools.jar, jaxb-xjc.jar, etc.
             runtime.addJarFolder(   new File(jaxwsWs,"lib"));
         }
+
+        // put tools.jar in the tools classpath
+        File jreHome = new File(System.getProperty("java.home"));
+        File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
+        tool.addJar(toolsJar);
+        
         World.runtimeClasspath = runtime.getClasspath();
         World.toolClasspath = tool.getClasspath();
         
