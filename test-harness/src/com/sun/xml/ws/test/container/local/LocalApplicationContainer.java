@@ -79,6 +79,14 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
+            
+            // TODO: Generate jaxws binding customization file
+            
+            // TODO: Get target namespace from WSDL for generating 
+            // server schema customization file.
+
+            // TODO: Generate jaxb schema binding customization file
+            
             //   Use 'wsimport' and 'javac'
             ArrayList<String> options = new ArrayList<String>();
             //Add customization files
