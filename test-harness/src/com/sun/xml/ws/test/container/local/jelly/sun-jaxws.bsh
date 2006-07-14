@@ -10,21 +10,22 @@ if (!fromWsdl) {
             if (!clazz.isInterface()) {
                 implClass = clazz.getName();
             }
-            if (a.name() != null) {
-                name = a.name();
+            name = a.name();
+            if (name=="") {
+                throw new IllegalArgumentException(className+" doesn't have @WebService.name set");
             }
+
+            bean = create(
+                name,
+                implClass,
+                null,
+                null,
+                null,
+                null,
+                "/pattern");
+            beans.add(bean);
         }
     }
-
-    bean = create(
-        name,
-        implClass,
-        null,
-        null,
-        null,
-        null,
-        "/pattern");
-    beans.add(bean);
 } else {
     portNames = new ArrayList();
 
