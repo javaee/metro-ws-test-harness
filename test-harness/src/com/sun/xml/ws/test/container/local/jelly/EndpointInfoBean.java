@@ -54,11 +54,11 @@ public class EndpointInfoBean {
     }
     
     public String getService() {
-        return service.toString();
+        return (service == null ? null : service.toString());
     }
     
     public String getPort() {
-        return port.toString();
+        return (port == null ? null : port.toString());
     }
     
     public String getBinding() {
