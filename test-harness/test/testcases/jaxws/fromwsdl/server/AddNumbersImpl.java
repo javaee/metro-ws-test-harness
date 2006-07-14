@@ -19,7 +19,7 @@
  * 
  * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
  */
-package fromwsdl.server;
+package jaxws.fromwsdl.server;
 
 
 /*
@@ -28,7 +28,7 @@ package fromwsdl.server;
  * endpointInteface as the compiler will catch errors in the methods signatures of the 
  * implementation class.
  */
-@javax.jws.WebService (endpointInterface="fromwsdl.server.AddNumbersPortType")
+@javax.jws.WebService (endpointInterface="jaxws.fromwsdl.server.AddNumbersPortType")
 public class AddNumbersImpl {
     
     /**
