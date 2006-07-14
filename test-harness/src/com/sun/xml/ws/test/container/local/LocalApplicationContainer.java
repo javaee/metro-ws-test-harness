@@ -36,6 +36,7 @@ import java.util.List;
 public class LocalApplicationContainer implements ApplicationContainer {
 
     private final WsTool wsimport;
+    private final WsTool wsgen;
     private final JellyContext jellyContext = new JellyContext();
 
     /**
@@ -43,8 +44,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
      */
     private final boolean debug;
 
-    public LocalApplicationContainer(WsTool wscompile, boolean debug) {
+    public LocalApplicationContainer(WsTool wscompile, WsTool wsgen, boolean debug) {
         this.wsimport = wscompile;
+        this.wsgen = wsgen;
         this.debug = debug;
     }
 
@@ -80,11 +82,11 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
-            
+
             // Generate jaxws + jaxb binding customization file
             File serverCustomizationFile = genServerCustomizationFile(service);
             service.service.customizations.add(serverCustomizationFile);
-            
+
             //   Use 'wsimport' and 'javac'
             ArrayList<String> options = new ArrayList<String>();
             //Add customization files
@@ -112,9 +114,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
         // Service starting from Java
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
-            if(!wsimport.isNoop()) {
+            if(!wsgen.isNoop()) {
                 // TODO: UNHACKIFY
-                WsTool wsgen = WsTool.createWsGen(null);
                 System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
 //                SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
                 //for (TestEndpoint endpt : service.service.endpoints) {
@@ -224,7 +225,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
             output);
         output.flush();
     }
-    
+
     private File genServerCustomizationFile(DeployedService service) throws Exception {
 
         File serverCustomizationFile = new File(service.workDir, "custom-server.xml");
@@ -245,7 +246,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
         jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
             output);
         output.flush();
-        
+
         return serverCustomizationFile;
 }
     /**

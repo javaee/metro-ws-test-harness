@@ -79,6 +79,9 @@ public class Main {
     @Option(name="-external-wsimport",usage="use external wsimport.sh/.bat")
     File externalWsImport = null;
 
+    @Option(name="-external-wsgen",usage="use external wsgen.sh/.bat")
+    File externalWsGen = null;
+
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
@@ -141,14 +144,15 @@ public class Main {
         fillWorld();
 
         // set up objects that represent test environment.
-        WsTool wsimport;
+        WsTool wsimport,wsgen;
         if(skipCompilation) {
             System.err.println("Skipping compilation");
-            wsimport = WsTool.NOOP;
+            wsimport = wsgen = WsTool.NOOP;
         } else {
             wsimport = WsTool.createWsImport(externalWsImport);
+            wsgen = WsTool.createWsGen(externalWsGen);
         }
-        ApplicationContainer container = createContainer(wsimport);
+        ApplicationContainer container = createContainer(wsimport,wsgen);
 
         // build up test plan
         TestSuite suite = createTestSuite();
@@ -262,7 +266,7 @@ public class Main {
      * Determines the container to be used for tests.
      * @param wsimport
      */
-    private ApplicationContainer createContainer(WsTool wsimport) throws Exception {
+    private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
             return new InstalledCargoApplicationContainer("tomcat5x",tomcat);
@@ -294,7 +298,7 @@ public class Main {
 
 
         System.err.println("Testing with the local transport");
-        return new LocalApplicationContainer(wsimport,debug);
+        return new LocalApplicationContainer(wsimport,wsgen,debug);
     }
 
     private static String defaultsTo( String value, String defaultValue ) {
