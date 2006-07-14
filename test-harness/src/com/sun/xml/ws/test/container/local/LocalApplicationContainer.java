@@ -114,34 +114,32 @@ public class LocalApplicationContainer implements ApplicationContainer {
         // Service starting from Java
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
-            if(!wsgen.isNoop()) {
-                File wsdlDir = new File(service.webInfDir, "wsdl");
-                wsdlDir.mkdirs();
-                
-                // TODO: UNHACKIFY
-                System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
+            File wsdlDir = new File(service.webInfDir, "wsdl");
+            wsdlDir.mkdirs();
+
+            // TODO: UNHACKIFY
+            System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
 //                SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
-                //for (TestEndpoint endpt : service.service.endpoints) {
-                    ArrayList<String> options = new ArrayList<String>();
-                    options.add("-wsdl");
-                    if(debug)
-                        options.add("-verbose");
-                    options.add("-r");
-                    options.add(wsdlDir.getAbsolutePath());
-                    options.add("-cp");
-                    String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
-                    if(debug)
-                        System.out.println("wsgen classpath arg = " + path);
-                    options.add(path);
-                    options.add("-s");
-                    options.add(service.buildClassesDir.getAbsolutePath());
-                    options.add("-d");
-                    options.add(service.buildClassesDir.getAbsolutePath());
-                    // options.add(endpt.className);
-                    options.add("fromjava.server.AddNumbersImpl");
-                    wsgen.invoke(options.toArray(new String[0]));
-                //}
-            }
+            //for (TestEndpoint endpt : service.service.endpoints) {
+                ArrayList<String> options = new ArrayList<String>();
+                options.add("-wsdl");
+                if(debug)
+                    options.add("-verbose");
+                options.add("-r");
+                options.add(wsdlDir.getAbsolutePath());
+                options.add("-cp");
+                String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
+                if(debug)
+                    System.out.println("wsgen classpath arg = " + path);
+                options.add(path);
+                options.add("-s");
+                options.add(service.buildClassesDir.getAbsolutePath());
+                options.add("-d");
+                options.add(service.buildClassesDir.getAbsolutePath());
+                // options.add(endpt.className);
+                options.add("fromjava.server.AddNumbersImpl");
+                wsgen.invoke(options.toArray(new String[0]));
+            //}
         }
     }
 
