@@ -13,12 +13,10 @@ public class CustomizationBean {
     
     private String packageName;
     private String wsdlFileName;
-    private String targetNameSpace;
 
-    public CustomizationBean(String packageName, String wsdlFileName, String targetNameSpace) {
+    public CustomizationBean(String packageName, String wsdlFileName) {
         this.packageName = packageName;
         this.wsdlFileName = wsdlFileName;
-        this.targetNameSpace = targetNameSpace;
     }
     
     public String getPackageName() {
@@ -27,9 +25,5 @@ public class CustomizationBean {
     
     public String getWsdlFileName() {
         return wsdlFileName;
-    }
-    
-    public String targetNameSpace() {
-        return targetNameSpace;
     }
 }

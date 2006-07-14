@@ -240,8 +240,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
             packageName = service.service.parent.shortName + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
-            service.service.wsdl.getCanonicalPath().toString(),
-            "http://example.org");
+            service.service.wsdl.getCanonicalPath().toString());
         jellyContext.setVariable("data", infoBean);
         jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
             output);
