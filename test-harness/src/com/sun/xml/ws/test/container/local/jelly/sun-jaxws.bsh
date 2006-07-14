@@ -28,6 +28,8 @@ if (!fromWsdl) {
 } else {
     portNames = new ArrayList();
 
+    wsca = null;
+
     for( className : classNames ) {
         clazz = loader.loadClass(className);
         a = clazz.getAnnotation(WebServiceClient.class);
