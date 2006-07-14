@@ -115,6 +115,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
             if(!wsgen.isNoop()) {
+                File wsdlDir = new File(service.webInfDir, "wsdl");
+                wsdlDir.mkdirs();
+                
                 // TODO: UNHACKIFY
                 System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
 //                SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
@@ -124,7 +127,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
                     if(debug)
                         options.add("-verbose");
                     options.add("-r");
-                    options.add(service.buildClassesDir.getAbsolutePath());
+                    options.add(wsdlDir.getAbsolutePath());
                     options.add("-cp");
                     String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
                     if(debug)
