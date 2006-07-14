@@ -37,6 +37,7 @@ public class SunJaxwsInfoBean {
 
         InterpreterEx i = new InterpreterEx(loader);
         i.getNameSpace().importStatic(EndpointInfoBean.class);
+        i.set("fromWsdl", service.service.wsdl != null);
         i.set("classNames", classNames);
         i.set("loader", loader);
         i.set("beans", endpointInfoBeans);

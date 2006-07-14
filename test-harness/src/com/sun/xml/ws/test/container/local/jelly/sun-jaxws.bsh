@@ -2,58 +2,82 @@ import javax.xml.ws.*;
 import javax.jws.*;
 import javax.xml.namespace.*;
 
-portNames = new ArrayList();
-
-for( className : classNames ) {
-    clazz = loader.loadClass(className);
-    a = clazz.getAnnotation(WebServiceClient.class);
-    if(a!=null) {
-        wsca = a;
-        for ( method : clazz.getMethods()) {
-            a = method.getAnnotation(WebEndpoint.class);
-            if (a != null) {
-                String name = a.name();
-                if (!name.equals("")) {
-                    portNames.add(name);
-                }
+if (!fromWsdl) {
+    for( className : classNames ) {
+        clazz = loader.loadClass(className);
+        a = clazz.getAnnotation(WebService.class);
+        if(a!=null) {
+            if (!clazz.isInterface()) {
+                implClass = clazz.getName();
+            }
+            if (a.name() != null) {
+                name = a.name();
             }
         }
     }
 
-    a = clazz.getAnnotation(WebService.class);
-    if(a!=null) {
-        sei = a.endpointInterface();
-        if(!sei.equals(""))
-          implClass = clazz.getName();
+    bean = create(
+        name,
+        implClass,
+        null,
+        null,
+        null,
+        null,
+        "/pattern");
+    beans.add(bean);
+} else {
+    portNames = new ArrayList();
+
+    for( className : classNames ) {
+        clazz = loader.loadClass(className);
+        a = clazz.getAnnotation(WebServiceClient.class);
+        if(a!=null) {
+            wsca = a;
+            for ( method : clazz.getMethods()) {
+                a = method.getAnnotation(WebEndpoint.class);
+                if (a != null) {
+                    String name = a.name();
+                    if (!name.equals("")) {
+                        portNames.add(name);
+                    }
+                }
+            }
+        }
+
+        a = clazz.getAnnotation(WebService.class);
+        if(a!=null) {
+            sei = a.endpointInterface();
+            if(!sei.equals(""))
+              implClass = clazz.getName();
+        }
+    }
+
+
+
+    // create endpoint info beans
+    int urlPatternNum = 0;
+    tns = wsca.targetNamespace();
+
+    // hacky
+    wsdlLocation = wsca.wsdlLocation();
+    wsdlLocation = wsdlLocation.replace('\\', '/');
+    wsdlLocation = "WEB-INF/wsdl/" +
+        wsdlLocation.substring(
+        wsdlLocation.lastIndexOf("/") + 1,
+        wsdlLocation.length());
+
+    for (String portName : portNames) {
+        // call EndpointInfoBean.create thanks to static import.
+        // this allows us to create an instance of class that's not visible to this classloader.
+        bean = create(
+            wsca.name(),
+            implClass,
+            wsdlLocation,
+            new QName(tns, wsca.name()),
+            new QName(tns, portName),
+            "binding",
+            "/pattern" + urlPatternNum);
+        urlPatternNum++;
+        beans.add(bean);
     }
 }
-
-
-
-// create endpoint info beans
-int urlPatternNum = 0;
-tns = wsca.targetNamespace();
-
-// hacky
-wsdlLocation = wsca.wsdlLocation();
-wsdlLocation = wsdlLocation.replace('\\', '/');
-wsdlLocation = "WEB-INF/wsdl/" +
-    wsdlLocation.substring(
-    wsdlLocation.lastIndexOf("/") + 1,
-    wsdlLocation.length());
-
-for (String portName : portNames) {
-    // call EndpointInfoBean.create thanks to static import.
-    // this allows us to create an instance of class that's not visible to this classloader.
-    bean = create(
-        wsca.name(),
-        implClass,
-        wsdlLocation,
-        new QName(tns, wsca.name()),
-        new QName(tns, portName),
-        "binding",
-        "/pattern" + urlPatternNum);
-    urlPatternNum++;
-    beans.add(bean);
-}
-

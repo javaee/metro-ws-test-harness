@@ -23,7 +23,7 @@ package fromjava.server;
 
 import javax.jws.WebService;
 
-@WebService
+@WebService(name="TestService")
 public class AddNumbersImpl {
     
     /**
