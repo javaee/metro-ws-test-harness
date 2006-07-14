@@ -6,6 +6,7 @@ import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
+import com.sun.xml.ws.test.container.local.jelly.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.util.JavacWrapper;
@@ -80,12 +81,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
             
-            // TODO: Generate jaxws binding customization file
-            
-            // TODO: Get target namespace from WSDL for generating 
-            // server schema customization file.
-
-            // TODO: Generate jaxb schema binding customization file
+            // Generate jaxws + jaxb binding customization file
+            File serverCustomizationFile = genServerCustomizationFile(service);
+            service.service.customizations.add(serverCustomizationFile);
             
             //   Use 'wsimport' and 'javac'
             ArrayList<String> options = new ArrayList<String>();
@@ -96,6 +94,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
             }
 
             //Other options
+            if(debug)
+                options.add("-verbose");
             options.add("-s");
             options.add(service.workDir.getAbsolutePath());
             options.add("-Xnocompile");
@@ -224,7 +224,31 @@ public class LocalApplicationContainer implements ApplicationContainer {
             output);
         output.flush();
     }
+    
+    private File genServerCustomizationFile(DeployedService service) throws Exception {
 
+        File serverCustomizationFile = new File(service.workDir, "custom-server.xml");
+        OutputStream outputStream =
+            new FileOutputStream(serverCustomizationFile);
+        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+        // TODO: Get correct targetnamespace from wsdl!
+        String packageName;
+        if (service.service.name == "") {
+            packageName = service.service.parent.shortName;
+        }
+        else {
+            packageName = service.service.parent.shortName + "." + service.service.name;
+        }
+        CustomizationBean infoBean = new CustomizationBean(packageName,
+            service.service.wsdl.getCanonicalPath().toString(),
+            "http://example.org");
+        jellyContext.setVariable("data", infoBean);
+        jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
+            output);
+        output.flush();
+        
+        return serverCustomizationFile;
+}
     /**
      * This is ugly but needed to be working quickly. A faster
      * way to do this would be to read in the old wsdl in stax

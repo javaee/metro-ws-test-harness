@@ -159,7 +159,9 @@ public class TestDescriptor {
         this.applicableVersions =  new VersionProcessor(root);
 
         String path = testDir.getCanonicalPath();
-        int testCaseIndex = path.indexOf("testcases");
+        String testCasesPattern = "testcases" + File.separatorChar;
+        int testCaseIndex = path.lastIndexOf(testCasesPattern);
+        testCaseIndex += testCasesPattern.length();
         /**
          * For something like this 'testcases.policy.parsing.someSpecificTest'
          * I think the shortName should be policy.parsing
