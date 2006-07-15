@@ -68,20 +68,22 @@ public final class DeployedService {
         this.parent = parent;
         this.service = service;
 
-        assert !parent.services.containsKey(service);
-        parent.services.put(service,this);
-
         // create work directory
         String rel = "services";
         if(service.name.length()>0)
             rel += '/' + service.name;
         this.workDir = new File(parent.workDir,rel);
-        workDir.mkdirs();
 
         buildClassesDir = new File(workDir, "build/classes");
-        buildClassesDir.mkdirs();
 
         webInfDir = new File(workDir, "WEB-INF");
+    }
+
+    /**
+     * Creates working directory
+     */
+    /*package*/ void prepare() {
+        buildClassesDir.mkdirs();
         webInfDir.mkdirs();
     }
 }

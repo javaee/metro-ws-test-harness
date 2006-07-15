@@ -329,7 +329,7 @@ public class Main {
         File descriptor = new File(dir,"test-descriptor.xml");
 
         if(descriptor.exists()) {
-            new TestDescriptor(descriptor).build(container,wsimport,suite);
+            suite.addTest(new TestDescriptor(descriptor).build(container,wsimport));
             return;
         }
 

@@ -4,11 +4,13 @@ import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.wsimport.WsTool;
+import com.sun.xml.ws.test.util.FileUtil;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * State of running {@link TestDescriptor} execution.
@@ -67,15 +69,29 @@ public class DeploymentContext {
 
         // create workspace
         this.workDir = new File(descriptor.home,"work");
-        workDir.mkdirs();
 
         // create DeployedService objects
-
-        this.services = new HashMap<TestService, DeployedService>();
-
+        Map<TestService,DeployedService> services = new HashMap<TestService, DeployedService>();
         for (TestService svc : descriptor.services) {
-            this.services.put(svc, new DeployedService(this,svc));
+            services.put(svc, new DeployedService(this,svc));
         }
-       // this.services = Collections.unmodifiableMap(this.services);
+        this.services = Collections.unmodifiableMap(services);
+    }
+
+    /**
+     * Creates working directories.
+     *
+     * @param clean
+     *      if true, all the previous left-over files in the working directory
+     *      will be deleted.
+     */
+    public void prepare(boolean clean) {
+        if(clean) {
+            FileUtil.deleteRecursive(workDir);
+        }
+        workDir.mkdirs();
+
+        for (DeployedService ds : services.values())
+            ds.prepare();
     }
 }

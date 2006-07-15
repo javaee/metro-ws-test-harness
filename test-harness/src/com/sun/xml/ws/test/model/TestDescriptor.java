@@ -10,6 +10,7 @@ import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.exec.ClientExecutor;
 import com.sun.xml.ws.test.exec.DeploymentExecutor;
+import com.sun.xml.ws.test.exec.PrepareExecutor;
 import com.sun.xml.ws.test.wsimport.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
@@ -251,12 +252,23 @@ public class TestDescriptor {
      * is executed, you execute this test.
      *
      * @param container The container to host the services.
+     *
+     * @return
+     *      {@link TestSuite} that contains test execution plan for this test.
      */
-    public void build(ApplicationContainer container, WsTool wsimport, TestSuite suite) {
+    public TestSuite build(ApplicationContainer container, WsTool wsimport) {
+
+        TestSuite suite = new TestSuite();
 
         DeploymentContext context = new DeploymentContext(this,container,wsimport);
 
         List<DeploymentExecutor> deployTests = new ArrayList<DeploymentExecutor>();
+
+        // first prepare the working directories.
+        // we shouldn't do it after the run, or else developers won't be able to
+        // see what's generated to debug problems
+        // in the -skip mode, don't clean
+        suite.addTest(new PrepareExecutor(context, !wsimport.isNoop()));
 
         // deploy all services
         for (DeployedService s : context.services.values()) {
@@ -274,6 +286,8 @@ public class TestDescriptor {
         for (DeploymentExecutor dt : deployTests) {
             suite.addTest(dt.createUndeployer());
         }
+
+        return suite;
     }
 
     /**
