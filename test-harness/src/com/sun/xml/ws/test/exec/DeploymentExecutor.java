@@ -43,9 +43,15 @@ public class DeploymentExecutor extends Executor {
         File gensrcDir = makeWorkDir("client-source");
         File classDir = makeWorkDir("client-classes");
 
-        // compile WSDL to generate client-side artifact
+        // compile WSDL to generate client-side artifacts.
+        // TODO for ken: replace this hard-coded client customization file with the generated one
         context.parent.wsimport.invoke("-s", gensrcDir.getAbsolutePath(),
-                "-Xnocompile", context.app.getWSDL().getPath() );
+
+            // customization file
+            "-b",
+            new File(context.parent.descriptor.home,"custom-client.xml").getAbsolutePath(),
+
+            "-Xnocompile", context.app.getWSDL().getPath() );
 
         // compile the generated source files to javac
         JavacWrapper javacWrapper = new JavacWrapper();
@@ -109,7 +115,7 @@ public class DeploymentExecutor extends Executor {
      * that extends from "Service".
      *
      * @return
-     *      fully qualified class name. 
+     *      fully qualified class name.
      */
     private String findServiceClass(File dir) throws Exception {
         for (File child : dir.listFiles()) {
