@@ -226,10 +226,13 @@ public class Main {
         }
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
+            runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
             runtime.addClassFolder( new File(jaxwsWs,"rt-fi/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/src"));
             tool.addClassFolder(    new File(jaxwsWs,"tools/wscompile/build/classes"));
+            // this is needed for Localizer (which lives in runtime) to find message resources of wsimport
+            runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
         }
