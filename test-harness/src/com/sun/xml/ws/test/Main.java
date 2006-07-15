@@ -164,8 +164,6 @@ public class Main {
             return -1;
         }
 
-        // needs to be created before test starts to run,
-
         // run the tests
         try {
             container.start();
