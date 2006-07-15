@@ -15,6 +15,7 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URL;
+import java.io.File;
 
 /**
  * {@link Application} implementation for {@link LocalApplicationContainer}.
@@ -22,12 +23,18 @@ import java.net.URL;
  * @author ken
  */
 final class LocalApplication implements Application {
-    
+
+    /**
+     * Generated or provided WSDL.
+     */
+    private final File wsdl;
+
     /** Creates a new instance of LocalApplication */
-    LocalApplication(@NotNull DeployedService service) {
+    LocalApplication(@NotNull DeployedService service, @NotNull File wsdl) {
         this.service = service;
+        this.wsdl = wsdl;
     }
-    
+
     private final DeployedService service;
 
     /**
@@ -47,7 +54,7 @@ final class LocalApplication implements Application {
      */
     @NotNull
     public URL getWSDL() throws Exception {
-        return new URL(service.workDir.toURL(),"WEB-INF/wsdl/" + service.service.wsdl.getName());
+        return wsdl.toURL();
     }
 
     /**

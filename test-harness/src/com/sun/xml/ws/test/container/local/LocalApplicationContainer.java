@@ -66,9 +66,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
         //    FileUtil.deleteRecursive(service.workDir);
         //}
 
-        compileServer(service);
+        File wsdl = compileServer(service);
         prepareWarFile(service);
-        return new LocalApplication(service);
+        return new LocalApplication(service,wsdl);
     }
 
     /**
@@ -79,8 +79,12 @@ public class LocalApplicationContainer implements ApplicationContainer {
      * regardless of the direction.
      *
      * The compiled class files will be stored inside {@link DeploymentContext#workDir}.
+     *
+     * @return
+     *      the WSDL file (this is the one provided in the test data if this is "fromwsdl",
+     *      and it is the generated one if the test is "fromjava".
      */
-    private void compileServer(DeployedService service) throws Exception {
+    private @NotNull File compileServer(DeployedService service) throws Exception {
         String sourceDir = service.service.baseDir.getAbsolutePath();
         String destDir = service.buildClassesDir.getAbsolutePath();
 
@@ -109,17 +113,24 @@ public class LocalApplicationContainer implements ApplicationContainer {
             System.out.println("wsdl = " + service.service.wsdl.getAbsolutePath());
             wsimport.invoke(options.toArray(new String[0]));
         }
+
         // both cases
         if(!wsimport.isNoop()) {
             JavacWrapper javacWrapper = new JavacWrapper();
             javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), destDir);
             javacWrapper.execute();
         }
+
         // Service starting from Java
         if(service.service.wsdl==null) {
             // Use wsgen to generate the artifacts
             File wsdlDir = new File(service.webInfDir, "wsdl");
             wsdlDir.mkdirs();
+
+            // for fromjava tests, we can't really support multiple endpoints in one service
+            // because wsgen isn't capable of generating them into one WSDL.
+            assert service.service.endpoints.size()==1;
+            File generatedWsdl=null;
 
             System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
             for (TestEndpoint endpt : service.service.endpoints) {
@@ -145,9 +156,15 @@ public class LocalApplicationContainer implements ApplicationContainer {
                 options.add(report.getAbsolutePath());
 
                 options.add(endpt.className);
-                // options.add("fromjava.server.AddNumbersImpl");
                 wsgen.invoke(options.toArray(new String[0]));
+
+                // parse report
+                Document dom = new SAXReader().read(report);
+                generatedWsdl = new File(dom.getRootElement().elementTextTrim("wsdl"));
             }
+            return generatedWsdl;
+        } else {
+            return patchWsdl(service);
         }
     }
 
@@ -176,10 +193,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
         copy.addFileset(classesSet);
         copy.setTodir(new File(service.webInfDir,"classes"));
         copy.execute();
-
-        if (service.service.wsdl != null) {
-            patchWsdl(service);
-        }
 
         /* Not really necessary for local transport case
          *
@@ -250,7 +263,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
             packageName = service.service.parent.shortName + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
-            service.service.wsdl.getCanonicalPath()));
+        service.service.wsdl.getCanonicalPath());
         jellyContext.setVariable("data", infoBean);
         jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
             output);
@@ -270,8 +283,11 @@ public class LocalApplicationContainer implements ApplicationContainer {
      * to parse the sun-jaxws.xml file, or keep the bean
      * around used by the Jelly code to query it. Maybe good
      * into to put in our memory model.
+     *
+     * @return
+     *      The patched WSDL file in WEB-INF/wsdl
      */
-    private void patchWsdl(DeployedService service) throws Exception {
+    private File patchWsdl(DeployedService service) throws Exception {
         File wsdlDir = new File(service.webInfDir,"wsdl");
         wsdlDir.mkdir();
         File wsdl = service.service.wsdl;
@@ -297,6 +313,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
         FileOutputStream os = new FileOutputStream(dest);
         new XMLWriter(os).write(doc);
         os.close();
+
+        return wsdl;
     }
 
 }
