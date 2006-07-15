@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.container.local;
 
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -72,7 +73,10 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
     /**
      * Generates artifacts from WSDL (if any), then compile them
-     * to javac.
+     * to javac, and invoke wsgen (if this is from java.)
+     *
+     * At the end of this method, we should have WSDL and compiled classes
+     * regardless of the direction.
      *
      * The compiled class files will be stored inside {@link DeploymentContext#workDir}.
      */
@@ -117,10 +121,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
             File wsdlDir = new File(service.webInfDir, "wsdl");
             wsdlDir.mkdirs();
 
-            // TODO: UNHACKIFY
             System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
-//                SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
-            //for (TestEndpoint endpt : service.service.endpoints) {
+            for (TestEndpoint endpt : service.service.endpoints) {
                 ArrayList<String> options = new ArrayList<String>();
                 options.add("-wsdl");
                 if(debug)
@@ -136,10 +138,16 @@ public class LocalApplicationContainer implements ApplicationContainer {
                 options.add(service.buildClassesDir.getAbsolutePath());
                 options.add("-d");
                 options.add(service.buildClassesDir.getAbsolutePath());
-                // options.add(endpt.className);
-                options.add("fromjava.server.AddNumbersImpl");
+
+                // obtain a report file from wsgen
+                File report = new File(wsdlDir,"wsgen.report");
+                options.add("-XwsgenReport");
+                options.add(report.getAbsolutePath());
+
+                options.add(endpt.className);
+                // options.add("fromjava.server.AddNumbersImpl");
                 wsgen.invoke(options.toArray(new String[0]));
-            //}
+            }
         }
     }
 
@@ -235,14 +243,14 @@ public class LocalApplicationContainer implements ApplicationContainer {
         XMLOutput output = XMLOutput.createXMLOutput(outputStream);
         // TODO: Get correct targetnamespace from wsdl!
         String packageName;
-        if (service.service.name == "") {
+        if (service.service.name.equals("")) {
             packageName = service.service.parent.shortName;
         }
         else {
             packageName = service.service.parent.shortName + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
-            service.service.wsdl.getCanonicalPath().toString());
+            service.service.wsdl.getCanonicalPath()));
         jellyContext.setVariable("data", infoBean);
         jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
             output);
