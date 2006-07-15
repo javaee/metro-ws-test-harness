@@ -41,17 +41,16 @@ public class DeploymentExecutor extends Executor {
     }
 
     private void generateClientArtifacts() throws Exception {
-        // TODO: compile the generated source files to javac
-        // suppose if we generated it in $WORK/client-classes
-        File classDir = new File(context.parent.workDir, "client-classes");
-        classDir.mkdirs();
+        File gensrcDir = makeWorkDir("client-source");
+        File classDir = makeWorkDir("client-classes");
 
-        // TODO: compile WSDL to generate client-side artifact
-        context.parent.wsimport.invoke("-s", classDir.getAbsolutePath(),
+        // compile WSDL to generate client-side artifact
+        context.parent.wsimport.invoke("-s", gensrcDir.getAbsolutePath(),
                 "-Xnocompile", context.app.getWSDL().getPath() );
 
+        // compile the generated source files to javac
         JavacWrapper javacWrapper = new JavacWrapper();
-        javacWrapper.init(classDir.getAbsolutePath(), classDir.getAbsolutePath());
+        javacWrapper.init(gensrcDir.getAbsolutePath(), classDir.getAbsolutePath());
         javacWrapper.execute();
 
         // load the generated classes
@@ -82,10 +81,15 @@ public class DeploymentExecutor extends Executor {
         if (serviceClazzName != null)
             context.serviceClass = cl.loadClass(serviceClazzName);
         else {
-            //Todo is this right as it may block all the execution how to proceed further
-            throw new RuntimeException ("Cannot find the service class" + serviceClazzName);
+            throw new RuntimeException ("Cannot find the service class " + serviceClazzName);
         }
 
+    }
+
+    private File makeWorkDir(String dirName) {
+        File gensrcDir = new File(context.parent.workDir, dirName);
+        gensrcDir.mkdirs();
+        return gensrcDir;
     }
 
     /**
