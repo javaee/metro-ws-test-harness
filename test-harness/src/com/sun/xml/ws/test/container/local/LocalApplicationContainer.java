@@ -162,9 +162,23 @@ public class LocalApplicationContainer implements ApplicationContainer {
                 Document dom = new SAXReader().read(report);
                 generatedWsdl = new File(dom.getRootElement().elementTextTrim("wsdl"));
             }
+
+            // patch this WSDL to point to the right local endpoint URL.
+            // this WSDL is already placed in WEB-INF/wsdl, so no need for moving it
+            patchWsdl(service, generatedWsdl, generatedWsdl);
+
             return generatedWsdl;
         } else {
-            return patchWsdl(service);
+            // patch the WSDL and copy it to WEB-INF/wsdl at the same time.
+            File wsdlDir = new File(service.webInfDir,"wsdl");
+            wsdlDir.mkdirs();
+
+            File wsdl = service.service.wsdl;
+            File dest = new File(wsdlDir, wsdl.getName());
+
+            patchWsdl(service, wsdl,dest);
+
+            return dest;
         }
     }
 
@@ -283,18 +297,9 @@ public class LocalApplicationContainer implements ApplicationContainer {
      * to parse the sun-jaxws.xml file, or keep the bean
      * around used by the Jelly code to query it. Maybe good
      * into to put in our memory model.
-     *
-     * @return
-     *      The patched WSDL file in WEB-INF/wsdl
      */
-    private File patchWsdl(DeployedService service) throws Exception {
-        File wsdlDir = new File(service.webInfDir,"wsdl");
-        wsdlDir.mkdir();
-        File wsdl = service.service.wsdl;
-
-        File dest = new File(wsdlDir, wsdl.getName());
-
-        Document doc = new SAXReader().read(wsdl);
+    private void patchWsdl(DeployedService service, File src, File dest) throws Exception {
+        Document doc = new SAXReader().read(src);
         List<Element> ports = doc.getRootElement().element("service").elements("port");
 
         for (Element port : ports) {
@@ -313,8 +318,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
         FileOutputStream os = new FileOutputStream(dest);
         new XMLWriter(os).write(doc);
         os.close();
-
-        return wsdl;
     }
 
 }
