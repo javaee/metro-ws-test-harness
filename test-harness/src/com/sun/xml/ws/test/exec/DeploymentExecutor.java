@@ -10,7 +10,6 @@ import junit.framework.TestCase;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -76,12 +75,12 @@ public class DeploymentExecutor extends Executor {
         // whether a single wsimport invocation may create multiple Service classes
         //Class c = Class.forName(sourceFile.getAbsolutePath());
         //context.serviceClass = c; // TODO: set the discovered service class here
-        String serviceClazzName = recurseClientArtifacts(classDir);
+        String serviceClazzName = findServiceClass(gensrcDir);
 
         if (serviceClazzName != null)
             context.serviceClass = cl.loadClass(serviceClazzName);
         else {
-            throw new RuntimeException ("Cannot find the service class " + serviceClazzName);
+            throw new RuntimeException ("Cannot find the generated 'service' class that extends from javax.xml.ws.Service");
         }
 
     }
@@ -105,63 +104,46 @@ public class DeploymentExecutor extends Executor {
         };
     }
 
-    private String recurseClientArtifacts(File dir) throws Exception {
+    /**
+     * Recursively scans the Java source directory and find a class
+     * that extends from "Service".
+     *
+     * @return
+     *      fully qualified class name. 
+     */
+    private String findServiceClass(File dir) throws Exception {
+        for (File child : dir.listFiles()) {
+            if (child.isDirectory()) {
+                String serviceClazzName = findServiceClass(child);
+                if(serviceClazzName!=null)
+                    return serviceClazzName; // found it
+            } else
+            if (child.getName().endsWith(".java")) {
+                // check if this is the class that extends from "Service"
 
-        File[] children = dir.listFiles();
-        if (children != null) {
-            for (File aChildren : children) {
-                // Get filename of file or directory
-                String serviceClazzName;
+                BufferedReader reader = new BufferedReader(new FileReader(child));
+                String pkg = null;  // this variable becomes Java package of this source file
+                String line;
+                while ((line =reader.readLine()) != null){
+                    if(line.startsWith("package ")) {
+                        pkg = line.substring(8,line.indexOf(';'));
+                    }
+                    if (line.contains("extends Service")){
+                        // found it.
+                        reader.close();
 
-                if (aChildren.isDirectory()) {
-                    serviceClazzName = recurseClientArtifacts(aChildren);
-
-                } else {
-                    serviceClazzName = checkFiles(aChildren.getParentFile());
+                        String className = child.getName();
+                        // remove .java from the fileName
+                        className = className.substring(0,className.lastIndexOf('.'));
+                        //Get the package name for the file by taking a substring after
+                        // client-classes and replacing '/' by '.'
+                        return pkg+'.'+ className;
+                    }
                 }
-                if (serviceClazzName != null)
-                    return serviceClazzName;
+                reader.close();
             }
         }
         return null;
-    }
-
-    public String checkFiles(File dir) throws Exception{
-
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".java");
-            }
-        };
-        File[] javaFiles = dir.listFiles(filter);
-        File serviceClazzFile = null;
-
-        for (File sourceFile:javaFiles){
-
-            BufferedReader reader = new BufferedReader(new FileReader(sourceFile
-            ));
-            String line;
-            while ((line =reader.readLine()) != null){
-                if (line.contains("extends Service")){
-                    serviceClazzFile = sourceFile;
-                    break;
-                }
-            }
-        }
-        String serviceClazzName = null;
-        if (serviceClazzFile!=null){
-
-            String fileName = serviceClazzFile.getAbsolutePath();
-            //Remove .java from the fileName
-            fileName = fileName.substring(0,fileName.lastIndexOf('.'));
-            int o= fileName.indexOf("client-classes");
-            //Get the package name for the file by taking a substring after
-            // client-classes and replacing '/' by '.'
-            serviceClazzName =  fileName.substring(o+15).replace(File.separatorChar,'.');
-        }
-
-        return serviceClazzName;
-
     }
 }
 
