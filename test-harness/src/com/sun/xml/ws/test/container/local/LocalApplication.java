@@ -16,6 +16,7 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URL;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * {@link Application} implementation for {@link LocalApplicationContainer}.
@@ -30,9 +31,11 @@ final class LocalApplication implements Application {
     private final File wsdl;
 
     /** Creates a new instance of LocalApplication */
-    LocalApplication(@NotNull DeployedService service, @NotNull File wsdl) {
+    LocalApplication(@NotNull DeployedService service, @NotNull File wsdl) throws IOException {
         this.service = service;
-        this.wsdl = wsdl;
+        // make canonical so that when reference to WSDL is baked into
+        // the generated customization file, it works.
+        this.wsdl = wsdl.getCanonicalFile();
     }
 
     private final DeployedService service;
