@@ -32,7 +32,7 @@ public class ClientExecutor extends Executor {
 
     public void runBare() throws Throwable {
         if(context.clientClassLoader==null)
-            fail("client script is not ready to run");
+            fail("this test is skipped because of other failures");
 
         Interpreter engine = new InterpreterEx(context.clientClassLoader);
 
