@@ -5,7 +5,8 @@ import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestService;
-import com.sun.xml.ws.test.util.JavacWrapper;
+import com.sun.xml.ws.test.util.ArgumentListBuilder;
+import com.sun.xml.ws.test.util.JavacTask;
 import junit.framework.TestCase;
 
 import java.io.BufferedReader;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,13 +41,15 @@ public class DeploymentExecutor extends Executor {
         generateClientArtifacts();
     }
 
+    /**
+     * Generate & compile source files from service WSDL.
+     */
     private void generateClientArtifacts() throws Exception {
-        // generate & compile source files from service WSDL
-        
+
         File gensrcDir = makeWorkDir("client-source");
         File classDir = makeWorkDir("client-classes");
 
-        ArrayList<String> options = new ArrayList<String>();
+        ArgumentListBuilder options = new ArgumentListBuilder();
         // Generate cusomization file & add as wsimport option
 
         // we used to do this just to set the package name, but
@@ -56,36 +58,32 @@ public class DeploymentExecutor extends Executor {
         //options.add(genClientCustomizationFile(context).getAbsolutePath());
 
         // set package name. use 'client' to avoid collision between server artifacts
-        options.add("-p");
-        options.add(context.parent.descriptor.shortName+".client");
+        options.add("-p").add(context.parent.descriptor.shortName+".client");
         
         //Add user's additional customization files
         TestClient tc = context.parent.descriptor.clients.get(0);
         for (File custFile : tc.customizations) {
-            options.add("-b");
-            options.add(custFile.getAbsolutePath());
+            options.add("-b").add(custFile);
         }
 
         //Other options
         // TODO: only if debug
         // if (context.parent.descriptor.)
             options.add("-verbose");
-        options.add("-s");
-        options.add(gensrcDir.getAbsolutePath());
-        // CULL options.add("-b");
-        // CULL options.add(new File(context.parent.descriptor.home,"custom-client.xml").getAbsolutePath());
+        options.add("-s").add(gensrcDir);
         options.add("-Xnocompile");
-        options.add(context.app.getWSDL().getPath());
+        options.add(context.app.getWSDL());
         // TODO if (debug)
-            System.out.println("wsdl = " + context.app.getWSDL().getPath());
+            System.out.println("wsdl = " + context.app.getWSDL());
         // compile WSDL to generate client-side artifact
-        context.parent.wsimport.invoke(options.toArray(new String[0]));
+        options.invoke(context.parent.wsimport);
 
 
         // compile the generated source files to javac
-        JavacWrapper javacWrapper = new JavacWrapper();
-        javacWrapper.init(gensrcDir.getAbsolutePath(), classDir);
-        javacWrapper.execute();
+        JavacTask javac = new JavacTask();
+        javac.setSourceDir(gensrcDir);
+        javac.setDestdir(classDir);
+        javac.execute();
 
         // load the generated classes
         List<URL> classpath = context.clientClasspaths;

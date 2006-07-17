@@ -11,6 +11,7 @@ import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.util.JavacTask;
+import com.sun.xml.ws.test.util.ArgumentListBuilder;
 import com.sun.xml.ws.test.tool.WsTool;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
@@ -83,28 +84,26 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
+            // generate server artifacts from WSDL
 
             // Generate jaxws + jaxb binding customization file
             File serverCustomizationFile = genServerCustomizationFile(service);
             service.service.customizations.add(serverCustomizationFile);
 
-            //   Use 'wsimport' and 'javac'
-            ArrayList<String> options = new ArrayList<String>();
+            ArgumentListBuilder options = new ArgumentListBuilder();
             //Add customization files
             for (File custFile: service.service.customizations) {
-                options.add("-b");
-                options.add(custFile.getAbsolutePath());
+                options.add("-b").add(custFile);
             }
 
             //Other options
             if(debug)
                 options.add("-verbose");
-            options.add("-s");
-            options.add(service.workDir.getAbsolutePath());
+            options.add("-s").add(service.workDir);
             options.add("-Xnocompile");
-            options.add(service.service.wsdl.getAbsolutePath());
+            options.add(service.service.wsdl);
             System.out.println("Generating server artifacts from " + service.service.wsdl);
-            wsimport.invoke(options.toArray(new String[0]));
+            options.invoke(wsimport);
         }
 
         // both cases
@@ -127,31 +126,26 @@ public class LocalApplicationContainer implements ApplicationContainer {
             File generatedWsdl=null;
 
             for (TestEndpoint endpt : service.service.endpoints) {
-                ArrayList<String> options = new ArrayList<String>();
+                ArgumentListBuilder options = new ArgumentListBuilder();
                 options.add("-wsdl");
                 if(debug)
                     options.add("-verbose");
-                options.add("-r");
-                options.add(wsdlDir.getAbsolutePath());
-                options.add("-cp");
+                options.add("-r").add(wsdlDir);
                 String path = service.buildClassesDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
                 if(debug)
                     System.out.println("wsgen classpath arg = " + path);
-                options.add(path);
-                options.add("-s");
-                options.add(service.buildClassesDir.getAbsolutePath());
-                options.add("-d");
-                options.add(service.buildClassesDir.getAbsolutePath());
+                options.add("-cp").add(path);
+                options.add("-s").add(service.buildClassesDir);
+                options.add("-d").add(service.buildClassesDir);
 
                 // obtain a report file from wsgen
                 File report = new File(wsdlDir,"wsgen.report");
-                options.add("-XwsgenReport");
-                options.add(report.getAbsolutePath());
+                options.add("-XwsgenReport").add(report);
 
                 options.add(endpt.className);
 
                 System.out.println("Generating WSDL");
-                wsgen.invoke(options.toArray(new String[0]));
+                options.invoke(wsgen);
 
                 // parse report
                 Document dom = new SAXReader().read(report);
