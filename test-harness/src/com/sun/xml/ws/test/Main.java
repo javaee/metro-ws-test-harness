@@ -333,7 +333,7 @@ public class Main {
             return;
         }
 
-        if(recursive && descriptor.isDirectory()) {
+        if(recursive && dir.isDirectory()) {
             // find test data recursively
             File[] subdirs = descriptor.listFiles(new FileFilter() {
                 public boolean accept(File f) {
