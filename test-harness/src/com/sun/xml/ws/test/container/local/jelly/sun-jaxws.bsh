@@ -11,7 +11,7 @@ if (!fromWsdl) {
                 implClass = clazz.getName();
             }
             name = a.name();
-            if (name=="") {
+            if (name.equals("")) {
                 throw new IllegalArgumentException(className+" doesn't have @WebService.name set");
             }
 
