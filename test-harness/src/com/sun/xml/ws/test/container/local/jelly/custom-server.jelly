@@ -2,7 +2,7 @@
 <j:jelly trim="false"
     xmlns:j="jelly:core"
     xmlns:x="jelly:xml"
-    xmlns:html="jelly:html"><j:file omitXmlDeclaration="false" var="decl"/>${decl}
+    xmlns:html="jelly:html">
 <bindings 
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
