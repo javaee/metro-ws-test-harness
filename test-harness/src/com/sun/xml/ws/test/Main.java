@@ -209,11 +209,14 @@ public class Main {
 
         if(wsitImage!=null) {
             runtime.addJar(new File(wsitImage,"lib/webservices.jar"));
+            runtime.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
             tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
         }
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
             runtime.addJarFolder(   new File(wsitWs,"lib/runtime"));
+            runtime.addClassFolder(    new File(wsitWs,"tools/build/classes"));
+            runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));
             tool.addClassFolder(    new File(wsitWs,"tools/build/classes"));
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
         }
