@@ -3,7 +3,7 @@ package com.sun.xml.ws.test.container;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.model.TestService;
-import com.sun.xml.ws.test.wsimport.WsTool;
+import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.FileUtil;
 import junit.framework.TestCase;
 

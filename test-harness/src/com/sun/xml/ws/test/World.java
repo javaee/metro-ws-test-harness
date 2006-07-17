@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *     including lots of 3rd party jars.
  * <li>"runtime" realm that loads the classes that the client script will use
  *     to execute tests.
- * <li>"wsimport" realm that loads the wsimport/wsgen tools, if we invoke it
+ * <li>"wsimport" realm that loads the tool/wsgen tools, if we invoke it
  *     within the same VM. Otherwise this realm is empty.
  *
  * <p>

@@ -11,7 +11,7 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.exec.ClientExecutor;
 import com.sun.xml.ws.test.exec.DeploymentExecutor;
 import com.sun.xml.ws.test.exec.PrepareExecutor;
-import com.sun.xml.ws.test.wsimport.WsTool;
+import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
 import org.apache.tools.ant.Project;

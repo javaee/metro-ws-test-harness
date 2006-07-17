@@ -1,4 +1,4 @@
-package com.sun.xml.ws.test.wsimport;
+package com.sun.xml.ws.test.tool;
 
 import java.io.File;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ import java.util.List;
 final class RemoteWsTool extends WsTool {
 
     /**
-     * The path to the executable wsimport.bat or wsimport.sh
+     * The path to the executable tool.bat or wsimport.sh
      */
     private final File executable;
 

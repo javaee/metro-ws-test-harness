@@ -6,7 +6,7 @@ import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
-import com.sun.xml.ws.test.wsimport.WsTool;
+import com.sun.xml.ws.test.tool.WsTool;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.framework.Test;
@@ -76,7 +76,7 @@ public class Main {
     @Option(name="-cp:jaxws",usage="classpath option\npath to JAX-WS RI workspace",metaVar="JAXWS_HOME")
     File jaxwsWs = null;
 
-    @Option(name="-external-wsimport",usage="use external wsimport.sh/.bat")
+    @Option(name="-external-wsimport",usage="use external tool.sh/.bat")
     File externalWsImport = null;
 
     @Option(name="-external-wsgen",usage="use external wsgen.sh/.bat")

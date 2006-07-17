@@ -11,7 +11,7 @@ import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.util.JavacWrapper;
-import com.sun.xml.ws.test.wsimport.WsTool;
+import com.sun.xml.ws.test.tool.WsTool;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
 import org.apache.tools.ant.Project;
