@@ -28,7 +28,7 @@ public final class JavacWrapper extends Javac {
         setDestdir(destDir);
 
         Path classPath = new Path(getProject());
-        classPath.setPath(destDir.getPath() + ":" + World.runtimeClasspath);
+        classPath.setPath(World.runtimeClasspath);
         setClasspath(classPath);
     }
 }
