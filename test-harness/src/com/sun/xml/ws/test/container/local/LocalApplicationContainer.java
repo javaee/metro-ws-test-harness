@@ -2,17 +2,17 @@ package com.sun.xml.ws.test.container.local;
 
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.World;
-import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
-import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
-import com.sun.xml.ws.test.util.JavacTask;
-import com.sun.xml.ws.test.util.ArgumentListBuilder;
+import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
+import com.sun.xml.ws.test.util.ArgumentListBuilder;
+import com.sun.xml.ws.test.util.CustomizationBean;
+import com.sun.xml.ws.test.util.JavacTask;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
 import org.apache.tools.ant.Project;
@@ -27,7 +27,6 @@ import org.dom4j.io.XMLWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
