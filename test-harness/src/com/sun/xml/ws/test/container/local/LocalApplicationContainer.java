@@ -13,8 +13,7 @@ import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
 import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.util.JavacTask;
-import org.apache.commons.jelly.JellyContext;
-import org.apache.commons.jelly.XMLOutput;
+import com.sun.xml.ws.test.util.Jelly;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
@@ -26,7 +25,6 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -38,7 +36,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
     private final WsTool wsimport;
     private final WsTool wsgen;
-    private final JellyContext jellyContext = new JellyContext();
 
     /**
      * Produce output for debugging the harness.
@@ -219,15 +216,10 @@ public class LocalApplicationContainer implements ApplicationContainer {
      * @see com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean
      */
     private void generateSunJaxWsXml(DeployedService service) throws Exception {
-
-        OutputStream outputStream =
-            new FileOutputStream(new File(service.webInfDir, "sun-jaxws.xml"));
-        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+        Jelly jelly = new Jelly(getClass(),"jelly/sun-jaxws.jelly");
         SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(service);
-        jellyContext.setVariable("data", infoBean);
-        jellyContext.runScript(getClass().getResource("jelly/sun-jaxws.jelly"),
-            output);
-        output.flush();
+        jelly.set("data", infoBean);
+        jelly.run(new File(service.webInfDir, "sun-jaxws.xml"));
     }
 
     /**
@@ -239,37 +231,28 @@ public class LocalApplicationContainer implements ApplicationContainer {
      * @see com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean
      */
     private void generateWebXml(DeployedService service) throws Exception {
-
-        OutputStream outputStream =
-            new FileOutputStream(new File(service.webInfDir, "web.xml"));
-        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+        Jelly jelly = new Jelly(getClass(),"jelly/web.jelly");
         WebXmlInfoBean infoBean = new WebXmlInfoBean(service.parent);
-        jellyContext.setVariable("data", infoBean);
-        jellyContext.runScript(getClass().getResource("jelly/web.jelly"),
-            output);
-        output.flush();
+        jelly.set("data", infoBean);
+        jelly.run(new File(service.webInfDir, "web.xml"));
     }
 
     private File genServerCustomizationFile(DeployedService service) throws Exception {
-
         File serverCustomizationFile = new File(service.workDir, "custom-server.xml");
-        OutputStream outputStream =
-            new FileOutputStream(serverCustomizationFile);
-        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+
+        Jelly jelly = new Jelly(getClass(),"jelly/custom-server.jelly");
 
         String packageName;
         if (service.service.name.equals("")) {
             packageName = service.service.parent.shortName;
-        }
-        else {
+        } else {
             packageName = service.service.parent.shortName + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
             service.service.wsdl.getCanonicalPath());
-        jellyContext.setVariable("data", infoBean);
-        jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
-            output);
-        output.flush();
+        jelly.set("data", infoBean);
+
+        jelly.run(serverCustomizationFile);
 
         return serverCustomizationFile;
 }
