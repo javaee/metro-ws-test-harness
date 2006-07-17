@@ -103,7 +103,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
             options.add(service.workDir.getAbsolutePath());
             options.add("-Xnocompile");
             options.add(service.service.wsdl.getAbsolutePath());
-            System.out.println("wsdl = " + service.service.wsdl.getAbsolutePath());
+            System.out.println("Generating server artifacts from " + service.service.wsdl);
             wsimport.invoke(options.toArray(new String[0]));
         }
 
@@ -126,7 +126,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
             assert service.service.endpoints.size()==1;
             File generatedWsdl=null;
 
-            System.out.println("service workdir path = " + service.workDir.getAbsolutePath());
             for (TestEndpoint endpt : service.service.endpoints) {
                 ArrayList<String> options = new ArrayList<String>();
                 options.add("-wsdl");
@@ -150,6 +149,8 @@ public class LocalApplicationContainer implements ApplicationContainer {
                 options.add(report.getAbsolutePath());
 
                 options.add(endpt.className);
+
+                System.out.println("Generating WSDL");
                 wsgen.invoke(options.toArray(new String[0]));
 
                 // parse report
