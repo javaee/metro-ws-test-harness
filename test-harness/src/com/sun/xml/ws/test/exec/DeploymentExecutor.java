@@ -7,15 +7,9 @@ import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.JavacWrapper;
 import junit.framework.TestCase;
-import com.sun.xml.ws.test.util.CustomizationBean;
-
-import org.apache.commons.jelly.JellyContext;
-import org.apache.commons.jelly.XMLOutput;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -56,8 +50,14 @@ public class DeploymentExecutor extends Executor {
         ArrayList<String> options = new ArrayList<String>();
         // Generate cusomization file & add as wsimport option
 
-        options.add("-b");
-        options.add(genClientCustomizationFile(context).getAbsolutePath());
+        // we used to do this just to set the package name, but
+        // it turns out we can do it much easily with the -p option
+        //options.add("-b");
+        //options.add(genClientCustomizationFile(context).getAbsolutePath());
+
+        // set package name. use 'client' to avoid collision between server artifacts
+        options.add("-p");
+        options.add(context.parent.descriptor.shortName+".client");
         
         //Add user's additional customization files
         TestClient tc = context.parent.descriptor.clients.get(0);
@@ -180,29 +180,29 @@ public class DeploymentExecutor extends Executor {
         }
         return null;
     }
-    
-    private File genClientCustomizationFile(DeployedService service) throws Exception {
-        File customizationFile = new File(service.workDir, "custom-client.xml");
-        OutputStream outputStream =
-            new FileOutputStream(customizationFile);
-        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
 
-        String packageName;
-        //if (service.service.name.equals("")) {
-            packageName = service.service.parent.shortName;
-        //}
-        //else {
-        //    packageName = service.service.parent.shortName + "." + service.service.name;
-        //}
-        CustomizationBean infoBean = new CustomizationBean(packageName,
-                                            service.app.getWSDL().toString());
-        JellyContext jellyContext = new JellyContext();
-        jellyContext.setVariable("data", infoBean);
-        jellyContext.runScript(getClass().getResource("custom-client.jelly"),
-            output);
-        output.flush();
-
-        return customizationFile;
-    }
+    /**
+     * Generates a JAX-WS customization file for generating client artifacts.
+     */
+    //private File genClientCustomizationFile(DeployedService service) throws Exception {
+    //    File customizationFile = new File(service.workDir, "custom-client.xml");
+    //    OutputStream outputStream =
+    //        new FileOutputStream(customizationFile);
+    //    XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+    //
+    //    String packageName = service.service.parent.shortName;
+    //
+    //    // to avoid collision between the client artifacts and server artifacts
+    //    // when testing everything inside a single classloader (AKA local transport),
+    //    // put the client artifacts into a different package.
+    //    CustomizationBean infoBean = new CustomizationBean(packageName+".client",
+    //                                        service.app.getWSDL().toExternalForm());
+    //    JellyContext jellyContext = new JellyContext();
+    //    jellyContext.setVariable("data", infoBean);
+    //    jellyContext.runScript(getClass().getResource("custom-client.jelly"),output);
+    //    output.flush();
+    //
+    //    return customizationFile;
+    //}
 }
 
