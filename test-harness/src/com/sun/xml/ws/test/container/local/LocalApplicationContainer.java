@@ -10,7 +10,7 @@ import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
-import com.sun.xml.ws.test.util.JavacWrapper;
+import com.sun.xml.ws.test.util.JavacTask;
 import com.sun.xml.ws.test.tool.WsTool;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.XMLOutput;
@@ -61,11 +61,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
-        //if(!wsimport.isNoop()) {
-        //    // clean up the artifacts before
-        //    FileUtil.deleteRecursive(service.workDir);
-        //}
-
         File wsdl = compileServer(service);
         prepareWarFile(service);
         return new LocalApplication(service,wsdl);
@@ -85,7 +80,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
      *      and it is the generated one if the test is "fromjava".
      */
     private @NotNull File compileServer(DeployedService service) throws Exception {
-        String sourceDir = service.service.baseDir.getAbsolutePath();
 
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
@@ -115,9 +109,10 @@ public class LocalApplicationContainer implements ApplicationContainer {
 
         // both cases
         if(!wsimport.isNoop()) {
-            JavacWrapper javacWrapper = new JavacWrapper();
-            javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), service.buildClassesDir);
-            javacWrapper.execute();
+            JavacTask javac = new JavacTask();
+            javac.setSourceDir(service.service.baseDir, service.workDir);
+            javac.setDestdir(service.buildClassesDir);
+            javac.execute();
         }
 
         // Service starting from Java
