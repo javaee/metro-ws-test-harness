@@ -86,7 +86,6 @@ public class LocalApplicationContainer implements ApplicationContainer {
      */
     private @NotNull File compileServer(DeployedService service) throws Exception {
         String sourceDir = service.service.baseDir.getAbsolutePath();
-        String destDir = service.buildClassesDir.getAbsolutePath();
 
         // Service starting from WSDL
         if(service.service.wsdl!=null) {
@@ -117,7 +116,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
         // both cases
         if(!wsimport.isNoop()) {
             JavacWrapper javacWrapper = new JavacWrapper();
-            javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), destDir);
+            javacWrapper.init(sourceDir + ":" + service.workDir.getAbsolutePath(), service.buildClassesDir);
             javacWrapper.execute();
         }
 

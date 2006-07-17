@@ -84,7 +84,7 @@ public class DeploymentExecutor extends Executor {
 
         // compile the generated source files to javac
         JavacWrapper javacWrapper = new JavacWrapper();
-        javacWrapper.init(gensrcDir.getAbsolutePath(), classDir.getAbsolutePath());
+        javacWrapper.init(gensrcDir.getAbsolutePath(), classDir);
         javacWrapper.execute();
 
         // load the generated classes
