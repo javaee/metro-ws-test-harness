@@ -7,6 +7,9 @@
 package com.sun.xml.ws.test.util;
 
 /**
+ * Bean used to pass parameters to custom-client.xml/custom-server.xml
+ * generation.
+ *
  * @author WS Test Harness Team
  */
 public class CustomizationBean {
