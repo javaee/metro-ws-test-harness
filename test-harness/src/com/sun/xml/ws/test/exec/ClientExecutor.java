@@ -8,6 +8,7 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
 
+import java.beans.Introspector;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -89,8 +90,9 @@ public class ClientExecutor extends Executor {
                 Annotation endpoint = method.getAnnotation(webendpointAnnotation);
                 if (endpoint != null) {
                     //For multiple endpoints the convention for injecting the variables is
-                    //port+PortName obtained from the WebEndpoint annotation
-                    String portName = "port"+nameMethod.invoke(endpoint);
+                    // portName obtained from the WebEndpoint annotation,
+                    // which would be something like "addNumbersPort"
+                    String portName = Introspector.decapitalize((String)nameMethod.invoke(endpoint));
 
                     engine.set(portName, method.invoke(serviceInstance));
                     buf.append(' ').append(portName);
