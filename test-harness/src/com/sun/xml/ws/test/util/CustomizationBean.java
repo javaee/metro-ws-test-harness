@@ -4,7 +4,7 @@
  * Created on July 14, 2006, 9:59 AM
  */
 
-package com.sun.xml.ws.test.container.local.jelly;
+package com.sun.xml.ws.test.util;
 
 /**
  * @author WS Test Harness Team

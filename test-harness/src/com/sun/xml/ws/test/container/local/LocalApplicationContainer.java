@@ -7,7 +7,7 @@ import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
-import com.sun.xml.ws.test.container.local.jelly.CustomizationBean;
+import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.local.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.util.JavacWrapper;
@@ -268,7 +268,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
         OutputStream outputStream =
             new FileOutputStream(serverCustomizationFile);
         XMLOutput output = XMLOutput.createXMLOutput(outputStream);
-        // TODO: Get correct targetnamespace from wsdl!
+
         String packageName;
         if (service.service.name.equals("")) {
             packageName = service.service.parent.shortName;
@@ -277,7 +277,7 @@ public class LocalApplicationContainer implements ApplicationContainer {
             packageName = service.service.parent.shortName + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
-        service.service.wsdl.getCanonicalPath());
+            service.service.wsdl.getCanonicalPath());
         jellyContext.setVariable("data", infoBean);
         jellyContext.runScript(getClass().getResource("jelly/custom-server.jelly"),
             output);

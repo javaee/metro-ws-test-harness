@@ -3,15 +3,23 @@ package com.sun.xml.ws.test.exec;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.JavacWrapper;
 import junit.framework.TestCase;
+import com.sun.xml.ws.test.util.CustomizationBean;
+
+import org.apache.commons.jelly.JellyContext;
+import org.apache.commons.jelly.XMLOutput;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,18 +48,39 @@ public class DeploymentExecutor extends Executor {
     }
 
     private void generateClientArtifacts() throws Exception {
+        // generate & compile source files from service WSDL
+        
         File gensrcDir = makeWorkDir("client-source");
         File classDir = makeWorkDir("client-classes");
 
-        // compile WSDL to generate client-side artifacts.
-        // TODO for ken: replace this hard-coded client customization file with the generated one
-        context.parent.wsimport.invoke("-s", gensrcDir.getAbsolutePath(),
+        ArrayList<String> options = new ArrayList<String>();
+        // Generate cusomization file & add as wsimport option
 
-            // customization file
-            "-b",
-            new File(context.parent.descriptor.home,"custom-client.xml").getAbsolutePath(),
+        options.add("-b");
+        options.add(genClientCustomizationFile(context).getAbsolutePath());
+        
+        //Add user's additional customization files
+        TestClient tc = context.parent.descriptor.clients.get(0);
+        for (File custFile : tc.customizations) {
+            options.add("-b");
+            options.add(custFile.getAbsolutePath());
+        }
 
-            "-Xnocompile", context.app.getWSDL().getPath() );
+        //Other options
+        // TODO: only if debug
+        // if (context.parent.descriptor.)
+            options.add("-verbose");
+        options.add("-s");
+        options.add(gensrcDir.getAbsolutePath());
+        // CULL options.add("-b");
+        // CULL options.add(new File(context.parent.descriptor.home,"custom-client.xml").getAbsolutePath());
+        options.add("-Xnocompile");
+        options.add(context.app.getWSDL().getPath());
+        // TODO if (debug)
+            System.out.println("wsdl = " + context.app.getWSDL().getPath());
+        // compile WSDL to generate client-side artifact
+        context.parent.wsimport.invoke(options.toArray(new String[0]));
+
 
         // compile the generated source files to javac
         JavacWrapper javacWrapper = new JavacWrapper();
@@ -150,6 +179,30 @@ public class DeploymentExecutor extends Executor {
             }
         }
         return null;
+    }
+    
+    private File genClientCustomizationFile(DeployedService service) throws Exception {
+        File customizationFile = new File(service.workDir, "custom-client.xml");
+        OutputStream outputStream =
+            new FileOutputStream(customizationFile);
+        XMLOutput output = XMLOutput.createXMLOutput(outputStream);
+
+        String packageName;
+        //if (service.service.name.equals("")) {
+            packageName = service.service.parent.shortName;
+        //}
+        //else {
+        //    packageName = service.service.parent.shortName + "." + service.service.name;
+        //}
+        CustomizationBean infoBean = new CustomizationBean(packageName,
+                                            service.app.getWSDL().toString());
+        JellyContext jellyContext = new JellyContext();
+        jellyContext.setVariable("data", infoBean);
+        jellyContext.runScript(getClass().getResource("custom-client.jelly"),
+            output);
+        output.flush();
+
+        return customizationFile;
     }
 }
 
