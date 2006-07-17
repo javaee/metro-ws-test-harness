@@ -9,10 +9,10 @@
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     wsdlLocation="${data.wsdlFileName}"
     xmlns="http://java.sun.com/xml/ns/jaxws">
-    <bindings node="ns1:definitions" xmlns:ns1="http://schemas.xmlsoap.org/wsdl/">
+    <bindings node="wsdl:definitions" >
         <package name="${data.packageName}"/>
     </bindings>
-    <bindings node="ns1:definitions/ns1:types/xsd:schema[1]" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://schemas.xmlsoap.org/wsdl/">
+    <bindings node="wsdl:definitions/wsdl:types/xsd:schema[1]">
         <jaxb:schemaBindings>
             <jaxb:package name="${data.packageName}"/>
         </jaxb:schemaBindings>
