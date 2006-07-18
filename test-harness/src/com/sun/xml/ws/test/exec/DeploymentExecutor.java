@@ -67,13 +67,12 @@ public class DeploymentExecutor extends Executor {
         }
 
         //Other options
-        // TODO: only if debug
-        // if (context.parent.descriptor.)
+        if(World.debug)
             options.add("-verbose");
         options.add("-s").add(gensrcDir);
         options.add("-Xnocompile");
         options.add(context.app.getWSDL());
-        // TODO if (debug)
+        if(World.debug)
             System.out.println("wsdl = " + context.app.getWSDL());
         // compile WSDL to generate client-side artifact
         options.invoke(context.parent.wsimport);
