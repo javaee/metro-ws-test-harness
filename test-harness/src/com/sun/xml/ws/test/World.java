@@ -58,6 +58,11 @@ public final class World {
     public static Path toolClasspath = new Path(project);
 
     /**
+     * Realm optionally used to load the embedded application container.
+     */
+    public static final ClassRealm container = initRealm(runtime,"container");
+
+    /**
      * @see Main#debug
      */
     public static boolean debug = false;

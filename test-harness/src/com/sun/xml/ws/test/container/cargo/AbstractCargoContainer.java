@@ -23,11 +23,14 @@ import java.io.File;
  */
 abstract class AbstractCargoContainer<C extends Container> extends AbstractApplicationContainer {
 
-    protected final C container;
+    /**
+     * Expected to be set by the constructor of the derived class.
+     * Conceptually final --- no update after that.
+     */
+    protected C container;
 
-    protected AbstractCargoContainer(C container, WsTool wsimport, WsTool wsgen) {
+    protected AbstractCargoContainer(WsTool wsimport, WsTool wsgen) {
         super(wsimport, wsgen);
-        this.container = container;
     }
 
     @NotNull

@@ -37,13 +37,7 @@ import java.util.Random;
  *
  * @author Kohsuke Kawaguchi
  */
-public class InstalledCargoApplicationContainer extends AbstractApplicationContainer {
-    private final String containerId;
-
-    private InstalledLocalContainer container;
-
-    private final int httpPort;
-
+public class InstalledCargoApplicationContainer extends AbstractRunnableCargoContainer<InstalledLocalContainer> {
     /**
      *
      * @param containerId
@@ -54,8 +48,6 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
     public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir) {
         super(wsimport,wsgen);
 
-        this.containerId = containerId;
-
         ConfigurationFactory configurationFactory =
             new DefaultConfigurationFactory();
         //File containerWorkDir = new File("c:\\sandbox\\tomcat");
@@ -65,8 +57,6 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
                 containerId, ConfigurationType.STANDALONE );
                 //containerWorkDir);
 
-        // set TCP port to somewhere between 20000-30000
-        httpPort = new Random().nextInt(10000) + 20000;
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         configuration.setLogger(new SimpleLogger());
         // TODO: we should provide a mode to launch the container with debugger
@@ -77,39 +67,7 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
         container.setHome(homeDir);
     }
 
-    public void start() throws Exception {
-        System.out.println("Starting "+containerId);
-        container.start();
-    }
-
-    public void shutdown() throws Exception {
-        System.out.println("Stopping "+containerId);
-        container.stop();
-    }
-
-    @NotNull
-    public Application deploy(DeployedService service) throws Exception {
-        WAR assembly = assembleWar(service);
-        org.codehaus.cargo.container.deployable.WAR war = (org.codehaus.cargo.container.deployable.WAR)
-            new DefaultDeployableFactory().createDeployable(containerId, assembly.root, DeployableType.WAR);
-        String contextPath = service.service.getGlobalUniqueName();
-        war.setContext(contextPath);
-
-        Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.LOCAL);
-
-        URL serviceUrl = new URL("http", "localhost", httpPort, "/" + contextPath + "/");
-
-        System.out.println("Deploying a service to "+serviceUrl);
-        deployer.deploy(war);
-
-        return new CargoApplication(
-            deployer,
-            war,
-            serviceUrl,
-            service);
-    }
-
     public String toString() {
-        return "CargoContainer:"+containerId;
+        return "CargoLocalContainer:"+container.getId();
     }
 }

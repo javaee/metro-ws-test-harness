@@ -40,12 +40,10 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
      *      The password of the admin. Necessary to deploy a war remotely
      */
     public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, URL server, String userName, String password) throws Exception {
-        super(createContainer(containerId, userName, password, server), wsimport,wsgen);
+        super(wsimport,wsgen);
 
         this.serverUrl = server;
-    }
 
-    private static RemoteContainer createContainer(String containerId, String userName, String password, URL server) throws Exception {
         ConfigurationFactory configurationFactory =
             new DefaultConfigurationFactory();
         RuntimeConfiguration configuration =
@@ -60,7 +58,7 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
 
         // TODO: we should provide a mode to launch the container with debugger
 
-        return (RemoteContainer) new DefaultContainerFactory().createContainer(
+        super.container = (RemoteContainer) new DefaultContainerFactory().createContainer(
             containerId, ContainerType.REMOTE, configuration);
     }
 

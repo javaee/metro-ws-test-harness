@@ -2,7 +2,7 @@ package com.sun.xml.ws.test;
 
 import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
+import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
@@ -101,12 +101,16 @@ public class Main {
 
       If none is given we test in the local mode.
     */
-    @Option(name="-tomcat",usage="Test with embedded Tomcat",metaVar="TOMCAT_HOME")
+    @Option(name="-tomcat",usage="Launch Tomcat from the harness and test with it",metaVar="TOMCAT_HOME")
     File tomcat = null;
 
     @Option(name="-tomcat-remote",metaVar="[USER:PASS@]HOST[:PORT]",
         usage="Test with remote Tomcat\nNeeds login info for admin. Defaults: USER=admin, PASS=admin, PORT=8080")
     String remoteTomcat = null;
+
+    @Option(name="-tomcat-embedded",metaVar="TOMCAT_HOME",
+        usage="loads Tomcat into the harness VM and test with it.")
+    File embeddedTomcat = null;
 
     @Option(name="-glassfish",usage="Test with Glassfish",metaVar="GLASSFISH_HOME")
     File glassfish = null;
@@ -277,8 +281,13 @@ public class Main {
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
-            return new InstalledCargoApplicationContainer(
+            return new EmbeddedCargoApplicationContainer(
                 wsimport, wsgen, "tomcat5x",tomcat);
+        }
+
+        if(embeddedTomcat!=null) {
+            return new EmbeddedCargoApplicationContainer(
+                wsimport, wsgen, "tomcat5x", embeddedTomcat );
         }
 
         if(remoteTomcat!=null) {

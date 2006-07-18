@@ -26,6 +26,10 @@ public final class RealmBuilder {
         this.classPath = classPath;
     }
 
+    public RealmBuilder(ClassRealm realm) {
+        this(realm,new Path(World.project));
+    }
+
     /**
      * Adds a single jar.
      */
