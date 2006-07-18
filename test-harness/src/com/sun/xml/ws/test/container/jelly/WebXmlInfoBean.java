@@ -27,8 +27,8 @@ public class WebXmlInfoBean {
      */
     public WebXmlInfoBean(DeploymentContext context) {
         description = context.descriptor.description;
-        displayName = context.descriptor.shortName;
-        servletName = context.descriptor.shortName;
+        displayName = context.descriptor.name;
+        servletName = context.descriptor.name;
         urlPatterns = new String[1];
         urlPatterns[0] = "/pattern0";
     }

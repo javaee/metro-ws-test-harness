@@ -14,7 +14,6 @@ import com.sun.xml.ws.test.exec.PrepareExecutor;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -62,7 +61,7 @@ public class TestDescriptor {
      *
      */
     @NotNull
-    public final String shortName;
+    public final String name;
 
     /**
      * If non-null, this directory contains resources files used for tests.
@@ -131,7 +130,7 @@ public class TestDescriptor {
 
 
     public TestDescriptor(String shortName, File home, File resources, VersionProcessor applicableVersions, String description) {
-        this.shortName = shortName;
+        this.name = shortName;
         this.home = home;
         this.resources = resources;
         this.applicableVersions = applicableVersions;
@@ -169,7 +168,7 @@ public class TestDescriptor {
          * not testcases.policy.parsing as the above would conform to
          * a valid package name too
          */
-        this.shortName = path.substring(testCaseIndex).replace(File.separatorChar,'.');
+        this.name = path.substring(testCaseIndex).replace(File.separatorChar,'.');
 
         this.home = descriptor.getParentFile();
         List<Element> clientList = root.elements("client");

@@ -267,9 +267,9 @@ public final class WAR {
 
         String packageName;
         if (service.service.name.equals("")) {
-            packageName = service.service.parent.shortName;
+            packageName = service.service.parent.name;
         } else {
-            packageName = service.service.parent.shortName + "." + service.service.name;
+            packageName = service.service.parent.name + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
             service.service.wsdl.getCanonicalPath());

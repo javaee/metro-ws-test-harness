@@ -58,7 +58,7 @@ public class DeploymentExecutor extends Executor {
         //options.add(genClientCustomizationFile(context).getAbsolutePath());
 
         // set package name. use 'client' to avoid collision between server artifacts
-        options.add("-p").add(context.parent.descriptor.shortName+".client");
+        options.add("-p").add(context.parent.descriptor.name +".client");
         
         //Add user's additional customization files
         TestClient tc = context.parent.descriptor.clients.get(0);

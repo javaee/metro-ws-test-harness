@@ -86,9 +86,9 @@ public class TestService {
      */
     public String getGlobalUniqueName() {
         if(name.length()==0)
-            return parent.shortName;
+            return parent.name;
         else
-            return parent.shortName+'.'+name;
+            return parent.name +'.'+name;
     }
 
     /**
