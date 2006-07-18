@@ -162,11 +162,12 @@
 		</l:section>
 		<l:section title="Tomcat">
 			<p>
-				The following command causes tests to run by using Tomcat that's launched outside the test harness. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
+				The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
 			</p>
 			<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 ...</l:harness-cmd>
 			<p>
-				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file and deploy/undeploy it for the user.
+				It is your responsibility to launch Tomcat. In this mode, the harness will only deploy and undeploy services from this running instance.
+				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file, and this is the only way to make sure that you are testing the bits that you are supposed to be testing.
 			</p>
 			<l:tip>
 				To find out the admin username and password, look at <tt>$TOMCAT_HOME/conf/tomcat-users.xml</tt> and find the entry that has "manager" as one of the roles. If none is found, simply add the following two lines to the file:
