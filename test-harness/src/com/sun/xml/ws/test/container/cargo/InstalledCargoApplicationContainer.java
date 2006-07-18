@@ -5,6 +5,7 @@ import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
@@ -23,6 +24,7 @@ import org.codehaus.cargo.generic.deployer.DefaultDeployerFactory;
 
 import java.io.File;
 import java.util.Random;
+import java.net.URL;
 
 /**
  * {@link ApplicationContainer} that launches a container from within the harness.
@@ -39,6 +41,8 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
     private final String containerId;
 
     private InstalledLocalContainer container;
+
+    private final int httpPort;
 
     /**
      *
@@ -60,7 +64,8 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
                 containerId, ConfigurationType.STANDALONE);
 
         // set TCP port to somewhere between 20000-30000
-        configuration.setProperty(ServletPropertySet.PORT, Integer.toString(new Random().nextInt(10000)+20000));
+        httpPort = new Random().nextInt(10000) + 20000;
+        configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         // TODO: we should provide a mode to launch the container with debugger
 
 
@@ -81,15 +86,20 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
 
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
-        System.out.println("Deploying a service");
+        WAR assembly = assembleWar(service);
         Deployable war = new DefaultDeployableFactory().createDeployable(
-            containerId, assembleWar(service).root, DeployableType.WAR);
+            containerId, assembly.root, DeployableType.WAR);
 
         Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.LOCAL);
 
+        System.out.println("Deploying a service");
         deployer.deploy(war);
 
-        return new CargoApplication(deployer,war);
+        return new CargoApplication(
+            deployer,
+            war,
+            new URL("http","localhost",httpPort,"/"+service.service.name+"/"),
+            service);
     }
 
     public String toString() {
