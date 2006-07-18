@@ -104,14 +104,14 @@ public class Main {
     @Option(name="-tomcat",usage="Test with embedded Tomcat",metaVar="TOMCAT_HOME")
     File tomcat = null;
 
-    @Option(name="-remote-tomcat",metaVar="[USER:PASS@]HOST[:PORT]",
+    @Option(name="-tomcat-remote",metaVar="[USER:PASS@]HOST[:PORT]",
         usage="Test with remote Tomcat\nNeeds login info for admin. Defaults: USER=admin, PASS=admin, PORT=8080")
     String remoteTomcat = null;
 
     @Option(name="-glassfish",usage="Test with Glassfish",metaVar="GLASSFISH_HOME")
     File glassfish = null;
 
-    @Option(name="-remote-glassfish",usage="Test with remote Glassfish",metaVar="HOST:PORT")
+    @Option(name="-glassfish-remote",usage="Test with remote Glassfish",metaVar="HOST:PORT")
     String remoteGlassfish = null;
 
 

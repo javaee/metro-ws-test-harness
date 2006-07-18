@@ -162,9 +162,9 @@
 		</l:section>
 		<l:section title="Tomcat">
 			<p>
-				The following command causes tests to run by using Tomcat that's launched outside the test harness. The parameter to the -remote-tomcat option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
+				The following command causes tests to run by using Tomcat that's launched outside the test harness. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
 			</p>
-			<l:harness-cmd>-remote-tomcat admin:admin@localhost:8080 ...</l:harness-cmd>
+			<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 ...</l:harness-cmd>
 			<p>
 				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file and deploy/undeploy it for the user.
 			</p>
