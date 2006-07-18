@@ -28,7 +28,7 @@
   <d:taglib uri="layout">
   	<!-- command example -->
 	  <d:tag name="harness-cmd">
-	  	<pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
+	  	<pre class="cmd">$$ java${jvmargs} -jar -cp:{wsit,wsit-image,jaxws,jaxws-image} class-directory path/to/harness.jar <d:invokeBody /></pre>
 	  </d:tag>
   	<!-- "not yet" icon -->
 	  <d:tag name="not-yet">
@@ -164,7 +164,7 @@
 			<p>
 				The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
 			</p>
-			<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 ...</l:harness-cmd>
+			<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 test-dir1 test-dir2 ...</l:harness-cmd>
 			<p>
 				It is your responsibility to launch Tomcat. In this mode, the harness will only deploy and undeploy services from this running instance.
 				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file, and this is the only way to make sure that you are testing the bits that you are supposed to be testing.
@@ -187,7 +187,7 @@
 			<p>
 				<l:not-yet /> Run the following command to use Tomcat in the embedded mode. In this mode, the haress runs both Tomcat and clients in the same VM, allowing a single debugger to monitor both sides. You need to specify the location of Tomcat, so that the harness can find Tomcat jar files.
 			</p>
-			<l:harness-cmd>-tomcat path/to/tomcat ...</l:harness-cmd>
+			<l:harness-cmd>-tomcat path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
 		</l:section>
 		<l:section title="Glassfish">
 			<p>
@@ -204,7 +204,7 @@
 			<p>
 				The following option tells the harness to pick up the classes from the JAX-WS workspace. Specifically, with this option, the harness will look into various <tt>build/classes</tt> and library jars.
 			</p>
-			<l:harness-cmd>-cp:jaxws path/to/jaxws-ri ...</l:harness-cmd>
+			<l:harness-cmd>-cp:jaxws path/to/jaxws-ri test-dir1 test-dir2 ...</l:harness-cmd>
 		</l:section>
 	</l:section>
 </l:section>
