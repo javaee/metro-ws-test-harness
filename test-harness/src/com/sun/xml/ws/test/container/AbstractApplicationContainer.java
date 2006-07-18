@@ -2,6 +2,10 @@ package com.sun.xml.ws.test.container;
 
 import com.sun.xml.ws.test.tool.WsTool;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
 /**
  * Base implementation of {@link ApplicationContainer}.
  *
@@ -42,6 +46,10 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         war.generateSunJaxWsXml();
         war.generateWebXml();
+
+        PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
+        w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
+        w.close();
 
         return war;
     }

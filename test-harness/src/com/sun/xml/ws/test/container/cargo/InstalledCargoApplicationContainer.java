@@ -11,7 +11,6 @@ import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
-import org.codehaus.cargo.container.deployable.Deployable;
 import org.codehaus.cargo.container.deployable.DeployableType;
 import org.codehaus.cargo.container.deployer.Deployer;
 import org.codehaus.cargo.container.deployer.DeployerType;
@@ -21,10 +20,11 @@ import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.codehaus.cargo.generic.deployable.DefaultDeployableFactory;
 import org.codehaus.cargo.generic.deployer.DefaultDeployerFactory;
+import org.codehaus.cargo.util.log.SimpleLogger;
 
 import java.io.File;
-import java.util.Random;
 import java.net.URL;
+import java.util.Random;
 
 /**
  * {@link ApplicationContainer} that launches a container from within the harness.
@@ -59,13 +59,17 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
 
         ConfigurationFactory configurationFactory =
             new DefaultConfigurationFactory();
+        //File containerWorkDir = new File("c:\\sandbox\\tomcat");
+        //containerWorkDir.mkdirs();
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
-                containerId, ConfigurationType.STANDALONE);
+                containerId, ConfigurationType.STANDALONE );
+                //containerWorkDir);
 
         // set TCP port to somewhere between 20000-30000
         httpPort = new Random().nextInt(10000) + 20000;
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
+        configuration.setLogger(new SimpleLogger());
         // TODO: we should provide a mode to launch the container with debugger
 
 
@@ -87,18 +91,22 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         WAR assembly = assembleWar(service);
-        Deployable war = new DefaultDeployableFactory().createDeployable(
-            containerId, assembly.root, DeployableType.WAR);
+        org.codehaus.cargo.container.deployable.WAR war = (org.codehaus.cargo.container.deployable.WAR)
+            new DefaultDeployableFactory().createDeployable(containerId, assembly.root, DeployableType.WAR);
+        String contextPath = service.service.getGlobalUniqueName();
+        war.setContext(contextPath);
 
         Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.LOCAL);
 
-        System.out.println("Deploying a service");
+        URL serviceUrl = new URL("http", "localhost", httpPort, "/" + contextPath + "/");
+
+        System.out.println("Deploying a service to "+serviceUrl);
         deployer.deploy(war);
 
         return new CargoApplication(
             deployer,
             war,
-            new URL("http","localhost",httpPort,"/"+service.service.name+"/"),
+            serviceUrl,
             service);
     }
 

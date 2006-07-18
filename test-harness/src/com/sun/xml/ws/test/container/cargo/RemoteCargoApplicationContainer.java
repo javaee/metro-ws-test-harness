@@ -1,9 +1,7 @@
 package com.sun.xml.ws.test.container.cargo;
 
-import com.sun.istack.NotNull;
-import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.RemoteContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
@@ -14,7 +12,6 @@ import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -28,10 +25,9 @@ import java.net.URL;
  *
  * @author Kohsuke Kawaguchi
  */
-public class RemoteCargoApplicationContainer implements ApplicationContainer {
-    private final String containerId;
+public class RemoteCargoApplicationContainer extends AbstractCargoContainer<RemoteContainer> {
 
-    private RemoteContainer container;
+    private final URL serverUrl;
 
     /**
      *
@@ -44,9 +40,13 @@ public class RemoteCargoApplicationContainer implements ApplicationContainer {
      * @param server
      *      The URL of the server.
      */
-    public RemoteCargoApplicationContainer(String containerId, URL server, String userName, String password) throws MalformedURLException {
-        this.containerId = containerId;
+    public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug, String containerId, URL server, String userName, String password) throws Exception {
+        super(createContainer(containerId, userName, password, server), wsimport,wsgen,debug);
 
+        this.serverUrl = server;
+    }
+
+    private static RemoteContainer createContainer(String containerId, String userName, String password, URL server) throws Exception {
         ConfigurationFactory configurationFactory =
             new DefaultConfigurationFactory();
         RuntimeConfiguration configuration =
@@ -59,11 +59,14 @@ public class RemoteCargoApplicationContainer implements ApplicationContainer {
             configuration.setProperty(TomcatPropertySet.MANAGER_URL,
                 new URL(server,"/manager").toExternalForm());
 
-
         // TODO: we should provide a mode to launch the container with debugger
 
-        container = (RemoteContainer) new DefaultContainerFactory().createContainer(
+        return (RemoteContainer) new DefaultContainerFactory().createContainer(
             containerId, ContainerType.REMOTE, configuration);
+    }
+
+    protected URL getServiceUrl(String contextPath) throws Exception {
+        return new URL(serverUrl,"/"+contextPath+"/");
     }
 
     public void start() throws Exception {
@@ -72,15 +75,10 @@ public class RemoteCargoApplicationContainer implements ApplicationContainer {
     }
 
     public void shutdown() throws Exception {
-    }
-
-    @NotNull
-    public Application deploy(DeployedService service) throws Exception {
-        // TODO: refactor with LocalApplicationContainer
-        throw new UnsupportedOperationException();
+        // noop.
     }
 
     public String toString() {
-        return "CargoContainer:"+containerId;
+        return "CargoRemoteContainer:"+container.getId();
     }
 }

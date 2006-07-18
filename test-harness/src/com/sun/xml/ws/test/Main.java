@@ -279,12 +279,14 @@ public class Main {
 
         if(remoteTomcat!=null) {
             System.err.println("Using remote Tomcat at "+remoteTomcat);
-            //  group capture number  :        12    3      4   5 6
-            Matcher matcher = Pattern.compile("((.+):(.*)@)?(.+)(:([0-9]+))?").matcher(remoteTomcat);
+            //  group capture number  :        12    3      4      5 6
+            Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:]+)(:([0-9]+))?").matcher(remoteTomcat);
             if(!matcher.matches())
                 throw new CmdLineException("Unable to parse "+remoteTomcat);
 
-            return new RemoteCargoApplicationContainer("tomcat5x",
+            return new RemoteCargoApplicationContainer(
+                wsimport, wsgen, debug,
+                "tomcat5x",
                 new URL("http",matcher.group(4),
                     Integer.parseInt(defaultsTo(matcher.group(6),"8080")),
                     "/"),

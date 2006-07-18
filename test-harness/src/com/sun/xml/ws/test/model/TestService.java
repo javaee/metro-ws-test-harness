@@ -81,6 +81,17 @@ public class TestService {
     }
 
     /**
+     * Returns the name combined with the test case name to make a globaly unique name
+     * for this service.
+     */
+    public String getGlobalUniqueName() {
+        if(name.length()==0)
+            return parent.shortName;
+        else
+            return parent.shortName+'.'+name;
+    }
+
+    /**
      * Scans the Java source code in the server directory and
      * find all classes with @WebService. Those are turned into
      * {@link TestEndpoint}. 
