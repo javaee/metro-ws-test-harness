@@ -70,15 +70,18 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
     }
 
     public void start() throws Exception {
+        System.out.println("Starting "+containerId);
         container.start();
     }
 
     public void shutdown() throws Exception {
+        System.out.println("Stopping "+containerId);
         container.stop();
     }
 
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
+        System.out.println("Deploying a service");
         Deployable war = new DefaultDeployableFactory().createDeployable(
             containerId, assembleWar(service).root, DeployableType.WAR);
 

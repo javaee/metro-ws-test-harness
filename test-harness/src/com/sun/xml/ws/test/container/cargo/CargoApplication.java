@@ -24,6 +24,7 @@ final class CargoApplication implements Application {
     }
 
     public void undeploy() throws Exception {
+        System.out.println("Undeploying a service");
         deployer.undeploy(war);
     }
 
@@ -33,9 +34,12 @@ final class CargoApplication implements Application {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * When deployed to HTTP service, WSDL URL can be obtained by "?wsdl".
+     */
     @NotNull
     public URL getWSDL() throws Exception {
-        // TODO
-        throw new UnsupportedOperationException();
+        // TODO: there's wrong "one-service/one-endpoint" assumption here
+        return new URL(getEndpointAddress(null/*TODO*/).toURL(),"?wsdl");
     }
 }

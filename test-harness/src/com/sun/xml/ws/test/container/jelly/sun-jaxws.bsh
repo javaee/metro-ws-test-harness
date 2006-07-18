@@ -58,7 +58,6 @@ if (!fromWsdl) {
 
 
     // create endpoint info beans
-    int urlPatternNum = 0;
     tns = wsca.targetNamespace();
 
     // hacky
@@ -79,8 +78,7 @@ if (!fromWsdl) {
             new QName(tns, wsca.name()),
             new QName(tns, portName),
             "binding",
-            "/pattern" + urlPatternNum);
-        urlPatternNum++;
+            "/" + portName);
         beans.add(bean);
     }
 }
