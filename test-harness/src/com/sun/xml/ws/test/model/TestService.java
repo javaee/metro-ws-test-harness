@@ -126,10 +126,14 @@ public class TestService {
                 String className = src.getName();
                 className = className.substring(0,className.length()-5); // trim off ".java"
 
-                if(pkg!=null)
-                    className = pkg+'.'+className;
+                String fullName;
 
-                endpoints.add(new TestEndpoint(src.getName(),className));
+                if(pkg!=null)
+                    fullName = pkg+'.'+className;
+                else
+                    fullName = className;
+
+                endpoints.add(new TestEndpoint(className,fullName));
             }
         }
     }
