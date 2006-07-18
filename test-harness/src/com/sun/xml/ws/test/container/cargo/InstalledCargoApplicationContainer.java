@@ -1,17 +1,25 @@
 package com.sun.xml.ws.test.container.cargo;
 
+import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
-import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
-import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
+import org.codehaus.cargo.container.deployable.Deployable;
+import org.codehaus.cargo.container.deployable.DeployableType;
+import org.codehaus.cargo.container.deployer.Deployer;
+import org.codehaus.cargo.container.deployer.DeployerType;
+import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
+import org.codehaus.cargo.generic.deployable.DefaultDeployableFactory;
+import org.codehaus.cargo.generic.deployer.DefaultDeployerFactory;
 
 import java.io.File;
 import java.util.Random;
@@ -27,7 +35,7 @@ import java.util.Random;
  *
  * @author Kohsuke Kawaguchi
  */
-public class InstalledCargoApplicationContainer implements ApplicationContainer {
+public class InstalledCargoApplicationContainer extends AbstractApplicationContainer {
     private final String containerId;
 
     private InstalledLocalContainer container;
@@ -40,7 +48,9 @@ public class InstalledCargoApplicationContainer implements ApplicationContainer 
      *      The installation of the container. For Tomcat, this is
      *      <tt>$TOMCAT_HOME</tt>.
      */
-    public InstalledCargoApplicationContainer(String containerId, File homeDir) {
+    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug, String containerId, File homeDir) {
+        super(wsimport,wsgen,debug);
+
         this.containerId = containerId;
 
         ConfigurationFactory configurationFactory =
@@ -69,8 +79,14 @@ public class InstalledCargoApplicationContainer implements ApplicationContainer 
 
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
-        // TODO: refactor with LocalApplicationContainer
-        throw new UnsupportedOperationException();
+        Deployable war = new DefaultDeployableFactory().createDeployable(
+            containerId, assembleWar(service).root, DeployableType.WAR);
+
+        Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.LOCAL);
+
+        deployer.deploy(war);
+
+        return new CargoApplication(deployer,war);
     }
 
     public String toString() {

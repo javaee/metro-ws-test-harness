@@ -273,7 +273,8 @@ public class Main {
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
-            return new InstalledCargoApplicationContainer("tomcat5x",tomcat);
+            return new InstalledCargoApplicationContainer(
+                wsimport, wsgen, debug, "tomcat5x",tomcat);
         }
 
         if(remoteTomcat!=null) {

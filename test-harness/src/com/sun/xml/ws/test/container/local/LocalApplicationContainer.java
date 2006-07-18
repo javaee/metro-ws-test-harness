@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class LocalApplicationContainer extends AbstractApplicationContainer {
 
-    public LocalApplicationContainer(WsTool wscompile, WsTool wsgen, boolean debug) {
-        super(wscompile,wsgen,debug);
+    public LocalApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug) {
+        super(wsimport,wsgen,debug);
     }
 
     public void start() {

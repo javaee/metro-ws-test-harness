@@ -20,8 +20,8 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
      */
     private final boolean debug;
 
-    protected AbstractApplicationContainer(WsTool wscompile, WsTool wsgen, boolean debug) {
-        this.wsimport = wscompile;
+    protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug) {
+        this.wsimport = wsimport;
         this.wsgen = wsgen;
         this.debug = debug;
     }
