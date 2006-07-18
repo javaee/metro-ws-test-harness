@@ -28,7 +28,7 @@
   <d:taglib uri="layout">
   	<!-- command example -->
 	  <d:tag name="harness-cmd">
-	  	<pre class="cmd">$$ java ${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
+	  	<pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
 	  </d:tag>
   	<!-- "not yet" icon -->
 	  <d:tag name="not-yet">
@@ -136,7 +136,7 @@
 		<p>
 			The following command executes a test with debugger support enabled. Run this command from a console, then set up a remote debugging with your IDE to port 8000. This allows you to set breakpoints anywhere both on the client and the server.
 		</p>
-		<l:harness-cmd jvmargs="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000">testdata/abc/def</l:harness-cmd>
+		<l:harness-cmd jvmargs=" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000">testdata/abc/def</l:harness-cmd>
 		<l:tip>
 			You'll use this command very often, so consider defining an alias to <tt>java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000 -jar path/to/harness.jar</tt>
 		</l:tip>
@@ -147,7 +147,7 @@
 			Do not run any targets that generate jar files, as those unnecessary work will slow you down.
 		</l:tip>
 		<p>
-			If your change to the code is to the runtime and does not affect the code generation, then use the <tt>-skip</tt> option to skip the code generation. This allows you to quickly rerun the actual tests.
+			If your change to the code is to the runtime and does not affect the code generation, then use the <tt>-skip</tt> option to skip the code generation. This allows you to quickly rerun the runtime portion of the tests without wasting time running all the tools just to produce the same results.
 		<l:harness-cmd>-skip testdata/abc/def</l:harness-cmd>
 	</l:section>
 	
@@ -157,7 +157,7 @@
 		</p>
 		<l:section title="local">
 			<p>
-				By default, the test harness uses the local transport, which is the preferred mode of testing because of its quick turn-around time.
+				By default, the test harness uses the local transport. There's no additional option required for this mode.  This is the preferred mode of testing because of its quick turn-around time. This mode also allows you to use a single debug session to debug both the client and the server side.
 			</p>
 		</l:section>
 		<l:section title="Tomcat">
