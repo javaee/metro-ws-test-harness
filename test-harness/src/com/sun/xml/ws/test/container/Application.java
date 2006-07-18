@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URL;
+import java.net.URI;
 
 /**
  * Represents an application deployed inside a {@link ApplicationContainer}.
@@ -18,7 +19,7 @@ public interface Application {
      * Returns the actual endpoint address to which the given {@link TestEndpoint}
      * is deployed.
      */
-    @NotNull String getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception;
+    @NotNull URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception;
 
     /**
      * Gets the WSDL of this service.

@@ -1,4 +1,4 @@
-package com.sun.xml.ws.test.container.local.jelly;
+package com.sun.xml.ws.test.container.jelly;
 
 import javax.xml.namespace.QName;
 
@@ -6,7 +6,7 @@ import javax.xml.namespace.QName;
  * This bean wraps the endpoint information. It is passed to
  * the Jelly script to create a sun-jaxws.xml file.
  *
- * @see com.sun.xml.ws.test.container.local.jelly.SunJaxwsInfoBean
+ * @see com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean
  */
 public class EndpointInfoBean {
 

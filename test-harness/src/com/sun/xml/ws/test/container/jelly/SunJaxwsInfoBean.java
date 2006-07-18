@@ -1,8 +1,8 @@
-package com.sun.xml.ws.test.container.local.jelly;
+package com.sun.xml.ws.test.container.jelly;
 
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InterpreterEx;
-import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.util.FileUtil;
 
 import java.io.InputStreamReader;
@@ -17,7 +17,7 @@ import java.util.List;
  * this bean just wraps one or more EndpointInfoBean
  * ojects since sun-jaxws.xml may have multiple endpoints.
  *
- * @see com.sun.xml.ws.test.container.local.jelly.EndpointInfoBean
+ * @see com.sun.xml.ws.test.container.jelly.EndpointInfoBean
  */
 public class SunJaxwsInfoBean {
 
@@ -26,18 +26,17 @@ public class SunJaxwsInfoBean {
     /**
      * The constructor creates the fields queried by the Jelly script.
      */
-    public SunJaxwsInfoBean(DeployedService service)
+    public SunJaxwsInfoBean(WAR war)
         throws Exception {
 
         ClassLoader loader = new URLClassLoader(
-            new URL[]{service.buildClassesDir.toURL()},
+            new URL[]{war.classDir.toURL()},
             World.runtime.getClassLoader());
-        String [] classNames =
-            FileUtil.getClassFileNames(service.buildClassesDir);
+        String[] classNames = FileUtil.getClassFileNames(war.classDir);
 
         InterpreterEx i = new InterpreterEx(loader);
         i.getNameSpace().importStatic(EndpointInfoBean.class);
-        i.set("fromWsdl", service.service.wsdl != null);
+        i.set("fromWsdl", war.service.service.wsdl != null);
         i.set("classNames", classNames);
         i.set("loader", loader);
         i.set("beans", endpointInfoBeans);

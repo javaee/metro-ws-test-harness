@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.util;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Delete;
+import org.apache.tools.ant.taskdefs.Copy;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,5 +78,18 @@ public class FileUtil {
         d.setProject(p);
         d.setDir(dir);
         d.execute();
+    }
+
+    /**
+     * Copies a single file.
+     */
+    public static void copyFile(File src, File dest) {
+        Project p = new Project();
+        p.init();
+        Copy cp = new Copy();
+        cp.setProject(p);
+        cp.setFile(src);
+        cp.setTofile(dest);
+        cp.execute();
     }
 }

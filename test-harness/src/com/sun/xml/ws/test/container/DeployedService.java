@@ -40,6 +40,11 @@ public final class DeployedService {
     public final @NotNull File workDir;
 
     /**
+     * Directory to store a war file image.
+     */
+    public final @NotNull File warDir;
+
+    /**
      * Classpaths to load client artifacts for this service.
      */
     public final List<URL> clientClasspaths = new ArrayList<URL>();
@@ -52,18 +57,6 @@ public final class DeployedService {
      */
     public Class serviceClass;
 
-    /**
-     * "build/classes" directory under the work directory. It is used
-     * often enough that it is created here to avoid typo errors.
-     */
-    public final File buildClassesDir;
-
-    /**
-     * "WEB-INF" directory under the work directory. It is used
-     * often enough that it is created here to avoid typo errors.
-     */
-    public final File webInfDir;
-
     /*package*/ DeployedService(DeploymentContext parent, TestService service) {
         this.parent = parent;
         this.service = service;
@@ -74,16 +67,13 @@ public final class DeployedService {
             rel += '/' + service.name;
         this.workDir = new File(parent.workDir,rel);
 
-        buildClassesDir = new File(workDir, "build/classes");
-
-        webInfDir = new File(workDir, "WEB-INF");
+        this.warDir = new File(workDir,"war");
     }
 
     /**
      * Creates working directory
      */
     /*package*/ void prepare() {
-        buildClassesDir.mkdirs();
-        webInfDir.mkdirs();
+        warDir.mkdirs();
     }
 }

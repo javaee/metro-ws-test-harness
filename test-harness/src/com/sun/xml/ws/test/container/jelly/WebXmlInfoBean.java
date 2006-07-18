@@ -1,4 +1,4 @@
-package com.sun.xml.ws.test.container.local.jelly;
+package com.sun.xml.ws.test.container.jelly;
 
 import com.sun.xml.ws.test.container.DeploymentContext;
 
@@ -31,7 +31,6 @@ public class WebXmlInfoBean {
         servletName = context.descriptor.shortName;
         urlPatterns = new String[1];
         urlPatterns[0] = "/pattern0";
-        int dummyBreakpoint = 0;
     }
     
     public String getDisplayName() {

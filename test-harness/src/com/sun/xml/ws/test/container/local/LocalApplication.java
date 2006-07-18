@@ -12,9 +12,11 @@ package com.sun.xml.ws.test.container.local;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 
@@ -25,28 +27,23 @@ import java.io.IOException;
  */
 final class LocalApplication implements Application {
 
-    /**
-     * Generated or provided WSDL.
-     */
-    private final File wsdl;
+    private final @NotNull WAR war;
+
+    private final @NotNull URI endpointAddress;
 
     /** Creates a new instance of LocalApplication */
-    LocalApplication(@NotNull DeployedService service, @NotNull File wsdl) throws IOException {
-        this.service = service;
-        // make canonical so that when reference to WSDL is baked into
-        // the generated customization file, it works.
-        this.wsdl = wsdl.getCanonicalFile();
+    LocalApplication(@NotNull WAR war, URI endpointAddress) {
+        this.war = war;
+        this.endpointAddress = endpointAddress;
     }
-
-    private final DeployedService service;
 
     /**
      * Returns the actual endpoint address to which the given {@link TestEndpoint}
      * is deployed.
      */
     @NotNull
-    public String getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
-        return endpoint.name;
+    public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
+        return endpointAddress;
     }
 
     /**
@@ -57,7 +54,7 @@ final class LocalApplication implements Application {
      */
     @NotNull
     public URL getWSDL() throws Exception {
-        return wsdl.toURL();
+        return war.getWSDL().toURL();
     }
 
     /**
