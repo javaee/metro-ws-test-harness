@@ -59,6 +59,8 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
 
         URL serviceUrl = getServiceUrl(contextPath);
 
+        System.out.println("Verifying that "+serviceUrl+" is already removed");
+        deployer.undeploy(war);
         System.out.println("Deploying a service to "+serviceUrl);
         deployer.deploy(war,new URLDeployableMonitor(serviceUrl));
 
