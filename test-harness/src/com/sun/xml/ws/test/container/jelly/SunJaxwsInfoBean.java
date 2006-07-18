@@ -39,6 +39,7 @@ public class SunJaxwsInfoBean {
         i.set("fromWsdl", war.service.service.wsdl != null);
         i.set("classNames", classNames);
         i.set("loader", loader);
+        i.set("endpoints",war.service.service.endpoints);
         i.set("beans", endpointInfoBeans);
         i.eval(new InputStreamReader(getClass().getResourceAsStream("sun-jaxws.bsh")));
 

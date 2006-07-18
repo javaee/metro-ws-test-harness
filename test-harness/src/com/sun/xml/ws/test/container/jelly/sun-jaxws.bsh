@@ -3,28 +3,16 @@ import javax.jws.*;
 import javax.xml.namespace.*;
 
 if (!fromWsdl) {
-    for( className : classNames ) {
-        clazz = loader.loadClass(className);
-        a = clazz.getAnnotation(WebService.class);
-        if(a!=null) {
-            if (!clazz.isInterface()) {
-                implClass = clazz.getName();
-            }
-            name = a.name();
-            if (name.equals("")) {
-                throw new IllegalArgumentException(className+" doesn't have @WebService.name set");
-            }
-
-            bean = create(
-                name,
-                implClass,
-                null,
-                null,
-                null,
-                null,
-                "/pattern");
-            beans.add(bean);
-        }
+    for( endpoint : endpoints ) {
+          bean = create(
+              endpoint.name,
+              endpoint.className,
+              null,
+              null,
+              null,
+              null,
+              "/"+endpoint.name);
+          beans.add(bean);
     }
 } else {
     portNames = new ArrayList();
