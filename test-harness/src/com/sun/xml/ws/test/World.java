@@ -4,6 +4,8 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.NoSuchRealmException;
+import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.Project;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,16 +33,17 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public final class World {
+    private static final Project project = new Project();   // Path needs a Project.
     public static final ClassWorld world = initWorld();
 
     public static final ClassRealm harness = initRealm(null,"harness");
-    public static String harnessClasspath = null;
+    public static Path harnessClasspath = new Path(project);
 
     public static final ClassRealm runtime = initRealm(null,"runtime");
-    public static String runtimeClasspath = null;
+    public static Path runtimeClasspath = new Path(project);
 
     public static final ClassRealm tool = initRealm(runtime,"tool");
-    public static String toolClasspath = null;
+    public static Path toolClasspath = new Path(project);
 
     /**
      * Gets the {@link ClassWorld} that governs this VM.

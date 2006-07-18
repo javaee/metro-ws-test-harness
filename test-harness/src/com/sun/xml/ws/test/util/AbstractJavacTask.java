@@ -20,9 +20,7 @@ public abstract class AbstractJavacTask extends Javac {
 
         setCompiler(adapterClass.getName());
 
-        Path classPath = new Path(getProject());
-        classPath.setPath(World.runtimeClasspath);
-        setClasspath(classPath);
+        setClasspath(World.runtimeClasspath);
     }
 
     /**

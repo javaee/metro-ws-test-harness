@@ -1,6 +1,7 @@
 package com.sun.xml.ws.test;
 
 import org.codehaus.classworlds.ClassRealm;
+import org.apache.tools.ant.types.Path;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,15 +12,16 @@ import java.util.Arrays;
 import com.sun.xml.ws.test.World;
 
 /**
- * Adds jar files to {@link ClassRealm}.
+ * Adds jar files to {@link ClassRealm} and also builds up {@link Path}
+ * to remember what those jars are.
  *
  * @author Kohsuke Kawaguchi
  */
 public final class RealmBuilder {
     private final ClassRealm realm;
-    private String classPath;
+    private Path classPath;
 
-    public RealmBuilder(ClassRealm realm, String classPath) {
+    public RealmBuilder(ClassRealm realm, Path classPath) {
         this.realm = realm;
         this.classPath = classPath;
     }
@@ -32,17 +34,9 @@ public final class RealmBuilder {
             throw new IOException("No such file: "+jar);
         realm.addConstituent(jar.toURL());
 
-        if (classPath != null) {
-            classPath += File.pathSeparatorChar + jar.toString();
-        } else {
-            classPath = jar.toString();
-        }
+        classPath.createPathElement().setLocation(jar);
     }
    
-    public String getClasspath() {
-        return classPath;
-    }
-    
     /**
      * Adds a single class folder.
      */
@@ -78,7 +72,7 @@ public final class RealmBuilder {
     }
 
     public void dump(PrintStream out) {
-        for( String item : classPath.split(File.pathSeparator)) {
+        for( String item : classPath.toString().split(File.pathSeparator)) {
             out.println("  "+item);
         }
     }

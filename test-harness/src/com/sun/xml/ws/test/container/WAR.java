@@ -16,6 +16,9 @@ import java.io.File;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+import org.apache.tools.ant.taskdefs.Zip;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.Path;
 
 /**
  * Represents an exploded WAR file on a file system.
@@ -68,6 +71,17 @@ public final class WAR {
         classDir.mkdirs();
         srcDir = new File(root,"gen-src");
         srcDir.mkdirs();
+    }
+
+    /**
+     * Creates a war archive.
+     */
+    public void zipTo(File archive) throws Exception {
+        Zip zip = new Zip();
+        zip.setProject(new Project());
+        zip.setDestFile(archive);
+        zip.setBasedir(root);
+        zip.execute();
     }
 
     /**
@@ -180,10 +194,13 @@ public final class WAR {
             if(debug)
                 options.add("-verbose");
             options.add("-r").add(wsdlDir);
-            String path = classDir.getAbsolutePath() + File.pathSeparatorChar + World.toolClasspath + File.pathSeparatorChar + World.runtimeClasspath;
+            Path cp = new Path(new Project());
+            cp.createPathElement().setLocation(classDir);
+            cp.add(World.toolClasspath);
+            cp.add(World.runtimeClasspath);
             if(debug)
-                System.out.println("wsgen classpath arg = " + path);
-            options.add("-cp").add(path);
+                System.out.println("wsgen classpath arg = " + cp);
+            options.add("-cp").add(cp);
             options.add("-s").add(classDir);
             options.add("-d").add(classDir);
 

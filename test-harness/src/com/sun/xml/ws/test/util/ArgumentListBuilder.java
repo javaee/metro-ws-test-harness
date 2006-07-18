@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.io.File;
 import java.net.URL;
 
+import org.apache.tools.ant.types.Path;
+
 /**
  * Provide convenient methods for building up command-line arguments.
  *
@@ -39,5 +41,9 @@ public final class ArgumentListBuilder {
      */
     public void invoke(WsTool tool) throws Exception {
         tool.invoke(args.toArray(new String[args.size()]));
+    }
+
+    public ArgumentListBuilder add(Path cp) {
+        return add(cp.toString());
     }
 }

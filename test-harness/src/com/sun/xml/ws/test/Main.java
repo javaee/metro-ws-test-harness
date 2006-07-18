@@ -243,9 +243,6 @@ public class Main {
         File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
         tool.addJar(toolsJar);
         
-        World.runtimeClasspath = runtime.getClasspath();
-        World.toolClasspath = tool.getClasspath();
-
         if(debug) {
             System.err.println("runtime realm");
             runtime.dump(System.err);
