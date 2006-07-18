@@ -162,13 +162,31 @@
 		</l:section>
 		<l:section title="Tomcat">
 			<p>
-				Run the following command to use Tomcat in the embedded mode. In this mode, the haress runs both Tomcat and clients in the same VM, allowing a single debugger to monitor both sides. You need to specify the location of Tomcat, so that the harness can find Tomcat jar files.
+				The following command causes tests to run by using Tomcat that's launched outside the test harness. The parameter to the -remote-tomcat option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
+			</p>
+			<l:harness-cmd>-remote-tomcat admin:admin@localhost:8080 ...</l:harness-cmd>
+			<p>
+				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file and deploy/undeploy it for the user.
+			</p>
+			<l:tip>
+				To find out the admin username and password, look at <tt>$TOMCAT_HOME/conf/tomcat-users.xml</tt> and find the entry that has "manager" as one of the roles. If none is found, simply add the following two lines to the file:
+<pre><xmp>
+<role rolename="manager"/>
+<user username="admin" password="admin" roles="manager"/>
+</xmp></pre>
+			</l:tip>
+			<l:tip>
+				To debug the server side in this set up, you need to launch Tomcat with the debugger support enabled. Run <tt>catalina.sh jpda run</tt> to do this, and you can attach your debugger to Tomcat remotely.
+			</l:tip>
+			<l:tip>
+				By default, Tomcat is configured to output logs to multiple places, including files in the <tt>logs</tt> directory and stdout/stderr. This is often inconvenient for debugging, as you are not sure which file you should monitor. You can modify <tt>$TOMCAT_HOME/conf/server.xml</tt> to avoid this problem, by sending all the outputs to stdout. To do so, find all "&lt;Logger>" elements in server.xml and replace them with <tt>SystemOutLogger</tt>, like this:
+				<pre>&lt;Logger className="org.apache.catalina.logger.SystemOutLogger" /></pre>
+			</l:tip>
+			
+			<p>
+				<l:not-yet /> Run the following command to use Tomcat in the embedded mode. In this mode, the haress runs both Tomcat and clients in the same VM, allowing a single debugger to monitor both sides. You need to specify the location of Tomcat, so that the harness can find Tomcat jar files.
 			</p>
 			<l:harness-cmd>-tomcat path/to/tomcat ...</l:harness-cmd>
-			<p>
-				<l:not-yet />The following command causes tests to run by using Tomcat that's already running.
-			</p>
-			<l:harness-cmd>-remote-tomcat localhost:8080 ...</l:harness-cmd>
 		</l:section>
 		<l:section title="Glassfish">
 			<p>
