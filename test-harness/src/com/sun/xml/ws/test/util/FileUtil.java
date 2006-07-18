@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import com.sun.xml.ws.test.World;
+
 /**
  * Class for utility methods for finding files and
  * information about them.
@@ -26,14 +28,14 @@ public class FileUtil {
         addClassNames(dir, pathStack, names);
         return names.toArray(new String [names.size()]);
     }
- 
+
     /**
      * Recursive method for adding class names under
      * a given top directory.
      */
     private static void addClassNames(File current, Stack<String> stack,
-        List<String> names) {
-        
+                                      List<String> names) {
+
         File[] children = current.listFiles();
         if (children == null) {
             return;
@@ -50,10 +52,10 @@ public class FileUtil {
             }
         }
     }
-    
+
     /*
-     * Create a fully-qualified path name.
-     */
+    * Create a fully-qualified path name.
+    */
     private static String createFullName(Stack<String> dirs, File classFile) {
         String className = classFile.getName().substring(
             0, classFile.getName().indexOf(".class"));
@@ -74,7 +76,7 @@ public class FileUtil {
      */
     public static void deleteRecursive(File dir) {
         Delete d = new Delete();
-        d.setProject(PROJECT);
+        d.setProject(World.project);
         d.setDir(dir);
         d.execute();
     }
@@ -84,7 +86,7 @@ public class FileUtil {
      */
     public static void copyFile(File src, File dest) {
         Copy cp = new Copy();
-        cp.setProject(PROJECT);
+        cp.setProject(World.project);
         cp.setFile(src);
         cp.setTofile(dest);
         cp.execute();
@@ -95,17 +97,11 @@ public class FileUtil {
      */
     public static void copyDir(File src, File dest) {
         Copy cp = new Copy();
-        cp.setProject(PROJECT);
+        cp.setProject(World.project);
         cp.setTodir(dest);
         FileSet fs = new FileSet();
         fs.setDir(src);
         cp.addFileset(fs);
         cp.execute();
     }
-
-    private static final Project PROJECT = new Project();
-    static {
-        PROJECT.init();
-    }
-
 }

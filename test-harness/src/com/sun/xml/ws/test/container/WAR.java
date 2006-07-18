@@ -1,24 +1,23 @@
 package com.sun.xml.ws.test.container;
 
 import com.sun.istack.NotNull;
-import com.sun.xml.ws.test.util.Jelly;
-import com.sun.xml.ws.test.util.ArgumentListBuilder;
-import com.sun.xml.ws.test.util.JavacTask;
-import com.sun.xml.ws.test.util.FileUtil;
-import com.sun.xml.ws.test.util.CustomizationBean;
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
-import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.tool.WsTool;
-
-import java.io.File;
-
+import com.sun.xml.ws.test.util.ArgumentListBuilder;
+import com.sun.xml.ws.test.util.CustomizationBean;
+import com.sun.xml.ws.test.util.FileUtil;
+import com.sun.xml.ws.test.util.JavacTask;
+import com.sun.xml.ws.test.util.Jelly;
+import org.apache.tools.ant.taskdefs.Jar;
+import org.apache.tools.ant.taskdefs.Zip;
+import org.apache.tools.ant.types.Path;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
-import org.apache.tools.ant.taskdefs.Zip;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.Path;
+
+import java.io.File;
 
 /**
  * Represents an exploded WAR file on a file system.
@@ -79,7 +78,7 @@ public final class WAR {
      */
     public void zipTo(File archive) throws Exception {
         Zip zip = new Zip();
-        zip.setProject(new Project());
+        zip.setProject(World.project);
         zip.setDestFile(archive);
         zip.setBasedir(root);
         zip.execute();
@@ -90,13 +89,23 @@ public final class WAR {
      * into <tt>WEB-INF/lib</tt> and <tt>WEB-INF/classes</tt>
      */
     public void copyClasspath(Path classpath) throws Exception {
+        int n = 0;
         for (String path : classpath.list()) {
             File p = new File(path);
             if(p.isFile())
                 // just copy one jar
                 FileUtil.copyFile(p,new File(libDir,p.getName()));
-            else
-                FileUtil.copyDir(p,classDir);
+            else {
+                // create an uncompressed jar file. This serves a few purposes.
+                //  - in general file systems are not good at dealing with many small files
+                //  - we'll do the archiving anyway when we pack this into a jar
+                Jar jar = new Jar();
+                jar.setProject(World.project);
+                jar.setDestFile(new File(libDir,"generated"+(n++)+".jar"));
+                jar.setBasedir(p);
+                jar.setCompress(false);
+                jar.execute();
+            }
         }
     }
 
@@ -210,7 +219,7 @@ public final class WAR {
             if(World.debug)
                 options.add("-verbose");
             options.add("-r").add(wsdlDir);
-            Path cp = new Path(new Project());
+            Path cp = new Path(World.project);
             cp.createPathElement().setLocation(classDir);
             cp.add(World.toolClasspath);
             cp.add(World.runtimeClasspath);

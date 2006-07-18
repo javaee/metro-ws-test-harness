@@ -233,6 +233,8 @@ public class Main {
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
+            runtime.addClassFolder( new File(jaxwsWs,"servlet/build/classes"));
+            runtime.addClassFolder( new File(jaxwsWs,"servlet/src"));
             runtime.addClassFolder( new File(jaxwsWs,"rt-fi/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"transports/local/src"));

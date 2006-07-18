@@ -11,10 +11,7 @@ import java.io.File;
 
 public abstract class AbstractJavacTask extends Javac {
     /*package*/ AbstractJavacTask(String toolName, Class<? extends CompilerAdapter> adapterClass) {
-        Project p = new Project();
-        p.init();
-        
-        setProject(p);
+        setProject(World.project);
         setTaskType(toolName);
         setTaskName(toolName);
 

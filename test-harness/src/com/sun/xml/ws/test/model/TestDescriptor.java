@@ -181,7 +181,7 @@ public class TestDescriptor {
                 FileSet fs = new FileSet();
                 fs.setDir(testDir);
                 fs.setIncludes(client.attributeValue("href"));
-                for( String relPath : fs.getDirectoryScanner(new Project()).getIncludedFiles() ) {
+                for( String relPath : fs.getDirectoryScanner(World.project).getIncludedFiles() ) {
                     TestClient testClient = new TestClient(this,versionProcessor,
                             new Script.File(new File(testDir,relPath)));
                     File customization = parseFile(testDir,"custom-client.xml");

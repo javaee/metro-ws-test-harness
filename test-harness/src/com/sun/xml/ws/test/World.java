@@ -36,7 +36,12 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public final class World {
-    private static final Project project = new Project();   // Path needs a Project.
+    /**
+     * Whenever we need a {@link Project} to use Ant tasks,
+     * we can use this shared instance.
+     */
+    public static final Project project = new Project();
+
     public static final ClassWorld world = initWorld();
 
     public static final ClassRealm harness = initRealm(null,"harness");
