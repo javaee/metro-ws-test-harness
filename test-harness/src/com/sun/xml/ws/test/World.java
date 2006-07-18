@@ -42,6 +42,10 @@ public final class World {
      */
     public static final Project project = new Project();
 
+    static {
+        project.init();
+    }
+
     public static final ClassWorld world = initWorld();
 
     public static final ClassRealm harness = initRealm(null,"harness");
