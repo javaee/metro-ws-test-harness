@@ -38,6 +38,7 @@ public class SunJaxwsInfoBean {
         i.getNameSpace().importStatic(EndpointInfoBean.class);
         i.set("fromWsdl", war.service.service.wsdl != null);
         i.set("classNames", classNames);
+        i.set("service", war.service.service);
         i.set("loader", loader);
         i.set("endpoints",war.service.service.endpoints);
         i.set("beans", endpointInfoBeans);

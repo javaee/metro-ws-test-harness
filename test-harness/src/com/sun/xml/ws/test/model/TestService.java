@@ -81,6 +81,17 @@ public class TestService {
     }
 
     /**
+     * Gets the {@link TestEndpoint} that has the specified implementation class.
+     */
+    public TestEndpoint getEndpointByImpl(String implClassFullName) {
+        for (TestEndpoint ep : endpoints) {
+            if(ep.className.equals(implClassFullName))
+                return ep;
+        }
+        throw new Error("No TestEndpoint object recorded for "+implClassFullName);
+    }
+
+    /**
      * Returns the name combined with the test case name to make a globaly unique name
      * for this service.
      */

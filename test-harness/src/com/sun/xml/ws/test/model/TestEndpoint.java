@@ -20,6 +20,9 @@ public class TestEndpoint {
      * <p>
      * This value is used to infer the port QName, the proxy object variable
      * name to be injected, etc.
+     *
+     * <p>
+     * The endpoint will be deployed to "/[name]" URL.
      */
     @NotNull
     public final String name;
@@ -29,6 +32,12 @@ public class TestEndpoint {
      */
     @NotNull
     public final String className;
+
+    /**
+     * URL pattern like "/foo" where this service is bound.
+     */
+    @NotNull
+    public String urlPattern;
 
     public TestEndpoint(String name, String className) {
         this.name = name;
