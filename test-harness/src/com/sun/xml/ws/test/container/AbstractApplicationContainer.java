@@ -19,22 +19,16 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
     private final WsTool wsimport;
     private final WsTool wsgen;
 
-    /**
-     * Produce output for debugging the harness.
-     */
-    private final boolean debug;
-
-    protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug) {
+    protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen) {
         this.wsimport = wsimport;
         this.wsgen = wsgen;
-        this.debug = debug;
     }
 
     /**
      * Prepares an exploded war file image for this service.
      */
     protected final WAR assembleWar(DeployedService service) throws Exception {
-        WAR war = new WAR(service,debug);
+        WAR war = new WAR(service);
 
         boolean fromJava = (service.service.wsdl==null);
 

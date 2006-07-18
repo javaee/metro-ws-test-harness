@@ -50,10 +50,9 @@ public class InstalledCargoApplicationContainer extends AbstractApplicationConta
      *      The ID that represents the container. "tomcat5x" for Tomcat.
      * @param homeDir
      *      The installation of the container. For Tomcat, this is
-     *      <tt>$TOMCAT_HOME</tt>.
      */
-    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug, String containerId, File homeDir) {
-        super(wsimport,wsgen,debug);
+    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir) {
+        super(wsimport,wsgen);
 
         this.containerId = containerId;
 

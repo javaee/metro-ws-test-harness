@@ -33,15 +33,14 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
      *
      * @param containerId
      *      The ID that represents the container. "tomcat5x" for Tomcat.
+     * @param server
      * @param userName
      *      The user name of the admin. Necessary to deploy a war remotely
      * @param password
      *      The password of the admin. Necessary to deploy a war remotely
-     * @param server
-     *      The URL of the server.
      */
-    public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, boolean debug, String containerId, URL server, String userName, String password) throws Exception {
-        super(createContainer(containerId, userName, password, server), wsimport,wsgen,debug);
+    public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, URL server, String userName, String password) throws Exception {
+        super(createContainer(containerId, userName, password, server), wsimport,wsgen);
 
         this.serverUrl = server;
     }

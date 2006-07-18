@@ -45,6 +45,11 @@ public final class WAR {
     public final File webInfDir;
 
     /**
+     * "WEB-INF/lib" directory.
+     */
+    public final File libDir;
+
+    /**
      * Directory to put additional generated source files.
      */
     public final File srcDir;
@@ -56,25 +61,21 @@ public final class WAR {
      */
     public final DeployedService service;
 
-    /**
-     * Produce output for debugging the harness.
-     */
-    private final boolean debug;
 
-
-    public WAR(DeployedService service, boolean debug) {
+    public WAR(DeployedService service) {
         this.service = service;
-        this.debug = debug;
         root = service.warDir;
         webInfDir = new File(root,"WEB-INF");
         classDir = new File(webInfDir,"classes");
         classDir.mkdirs();
+        libDir = new File(webInfDir,"lib");
+        libDir.mkdir();
         srcDir = new File(root,"gen-src");
-        srcDir.mkdirs();
+        srcDir.mkdir();
     }
 
     /**
-     * Creates a war archive.
+     * Creates a war archive from the exploded image at {@link #root}.
      */
     public void zipTo(File archive) throws Exception {
         Zip zip = new Zip();
@@ -82,6 +83,21 @@ public final class WAR {
         zip.setDestFile(archive);
         zip.setBasedir(root);
         zip.execute();
+    }
+
+    /**
+     * Copies the classpath specified by the given {@link Path}
+     * into <tt>WEB-INF/lib</tt> and <tt>WEB-INF/classes</tt>
+     */
+    public void copyClasspath(Path classpath) throws Exception {
+        for (String path : classpath.list()) {
+            File p = new File(path);
+            if(p.isFile())
+                // just copy one jar
+                FileUtil.copyFile(p,new File(libDir,p.getName()));
+            else
+                FileUtil.copyDir(p,classDir);
+        }
     }
 
     /**
@@ -144,7 +160,7 @@ public final class WAR {
         }
 
         //Other options
-        if(debug)
+        if(World.debug)
             options.add("-verbose");
         options.add("-s").add(srcDir);
         options.add("-Xnocompile");
@@ -191,14 +207,14 @@ public final class WAR {
         for (TestEndpoint endpt : service.service.endpoints) {
             ArgumentListBuilder options = new ArgumentListBuilder();
             options.add("-wsdl");
-            if(debug)
+            if(World.debug)
                 options.add("-verbose");
             options.add("-r").add(wsdlDir);
             Path cp = new Path(new Project());
             cp.createPathElement().setLocation(classDir);
             cp.add(World.toolClasspath);
             cp.add(World.runtimeClasspath);
-            if(debug)
+            if(World.debug)
                 System.out.println("wsgen classpath arg = " + cp);
             options.add("-cp").add(cp);
             options.add("-s").add(classDir);

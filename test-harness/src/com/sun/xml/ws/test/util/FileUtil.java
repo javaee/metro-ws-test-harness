@@ -1,6 +1,7 @@
 package com.sun.xml.ws.test.util;
 
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.taskdefs.Copy;
 
@@ -72,10 +73,8 @@ public class FileUtil {
      * Recursively delete a directory and all its descendants.
      */
     public static void deleteRecursive(File dir) {
-        Project p = new Project();
-        p.init();
         Delete d = new Delete();
-        d.setProject(p);
+        d.setProject(PROJECT);
         d.setDir(dir);
         d.execute();
     }
@@ -84,12 +83,29 @@ public class FileUtil {
      * Copies a single file.
      */
     public static void copyFile(File src, File dest) {
-        Project p = new Project();
-        p.init();
         Copy cp = new Copy();
-        cp.setProject(p);
+        cp.setProject(PROJECT);
         cp.setFile(src);
         cp.setTofile(dest);
         cp.execute();
     }
+
+    /**
+     * Copies a whole directory recursively.
+     */
+    public static void copyDir(File src, File dest) {
+        Copy cp = new Copy();
+        cp.setProject(PROJECT);
+        cp.setTodir(dest);
+        FileSet fs = new FileSet();
+        fs.setDir(src);
+        cp.addFileset(fs);
+        cp.execute();
+    }
+
+    private static final Project PROJECT = new Project();
+    static {
+        PROJECT.init();
+    }
+
 }

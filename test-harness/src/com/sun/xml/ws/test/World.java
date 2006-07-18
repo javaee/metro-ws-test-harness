@@ -13,7 +13,10 @@ import java.io.FilenameFilter;
 import java.util.logging.Logger;
 
 /**
- * Pointers to various {@link ClassRealm}s that represent compartments inside the VM.
+ * "Global variables" for the test harness. Use with caution.
+ *
+ * This class includes pointers to
+ * various {@link ClassRealm}s that represent compartments inside the VM.
  *
  * <p>
  * The followings are the key realms:
@@ -44,6 +47,11 @@ public final class World {
 
     public static final ClassRealm tool = initRealm(runtime,"tool");
     public static Path toolClasspath = new Path(project);
+
+    /**
+     * @see Main#debug
+     */
+    public static boolean debug = false;
 
     /**
      * Gets the {@link ClassWorld} that governs this VM.

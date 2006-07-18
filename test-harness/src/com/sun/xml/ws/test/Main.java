@@ -85,6 +85,9 @@ public class Main {
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
+    /**
+     * This is copied to {@link World#debug}.
+     */
     @Option(name="-debug",usage="Generate output for debugging harness")
     boolean debug;
 
@@ -204,6 +207,8 @@ public class Main {
      * Fills the world with classes.
      */
     private void fillWorld() throws IOException {
+        World.debug = this.debug;
+
         RealmBuilder runtime = new RealmBuilder(World.runtime,World.runtimeClasspath);
         RealmBuilder tool = new RealmBuilder(World.tool,World.toolClasspath);
 
@@ -271,7 +276,7 @@ public class Main {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
             return new InstalledCargoApplicationContainer(
-                wsimport, wsgen, debug, "tomcat5x",tomcat);
+                wsimport, wsgen, "tomcat5x",tomcat);
         }
 
         if(remoteTomcat!=null) {
@@ -282,7 +287,7 @@ public class Main {
                 throw new CmdLineException("Unable to parse "+remoteTomcat);
 
             return new RemoteCargoApplicationContainer(
-                wsimport, wsgen, debug,
+                wsimport, wsgen,
                 "tomcat5x",
                 new URL("http",matcher.group(4),
                     Integer.parseInt(defaultsTo(matcher.group(6),"8080")),
@@ -302,7 +307,7 @@ public class Main {
 
 
         System.err.println("Testing with the local transport");
-        return new LocalApplicationContainer(wsimport,wsgen,debug);
+        return new LocalApplicationContainer(wsimport,wsgen);
     }
 
     private static String defaultsTo( String value, String defaultValue ) {
