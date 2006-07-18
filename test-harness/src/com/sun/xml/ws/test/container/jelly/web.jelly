@@ -23,10 +23,10 @@
     </servlet>
     
     <!-- mappings -->
-<j:forEach items="${data.urlPatterns}" var="pattern">
+<j:forEach items="${data.endpoints}" var="endpoint">
     <servlet-mapping>
         <servlet-name>${data.servletName}</servlet-name>
-        <url-pattern>${pattern}</url-pattern>
+        <url-pattern>${endpoint.urlPattern}</url-pattern>
     </servlet-mapping>
 </j:forEach>
     <session-config>

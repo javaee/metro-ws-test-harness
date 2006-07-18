@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
+import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
@@ -18,6 +19,7 @@ import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Represents an exploded WAR file on a file system.
@@ -128,13 +130,18 @@ public final class WAR {
      * in the SunJaxwsInfoBean object which supplies information
      * to the Jelly processor through accessor methods.
      *
-     * @see com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean
+     * @see SunJaxwsInfoBean
+     *
+     * @return
+     *      list of endpoints that were discovered.
      */
-    final void generateSunJaxWsXml() throws Exception {
+    final List<EndpointInfoBean> generateSunJaxWsXml() throws Exception {
         Jelly jelly = new Jelly(getClass(),"jelly/sun-jaxws.jelly");
         SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(this);
         jelly.set("data", infoBean);
         jelly.run(new File(webInfDir, "sun-jaxws.xml"));
+
+        return infoBean.getEndpointInfoBeans();
     }
 
     /**
@@ -143,11 +150,11 @@ public final class WAR {
      * in the WebXmlInfoBean object which supplies information
      * to the Jelly processor through accessor methods.
      *
-     * @see com.sun.xml.ws.test.container.jelly.WebXmlInfoBean
+     * @see WebXmlInfoBean
      */
-    final void generateWebXml() throws Exception {
+    final void generateWebXml(List<EndpointInfoBean> endpoints) throws Exception {
         Jelly jelly = new Jelly(getClass(),"jelly/web.jelly");
-        WebXmlInfoBean infoBean = new WebXmlInfoBean(service.parent);
+        WebXmlInfoBean infoBean = new WebXmlInfoBean(service.parent,endpoints);
         jelly.set("data", infoBean);
         jelly.run(new File(webInfDir, "web.xml"));
     }

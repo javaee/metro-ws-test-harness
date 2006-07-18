@@ -52,6 +52,7 @@ final class CargoApplication implements Application {
         // this is guaranteed for fromwsdl. For fromjava, this is also
         // guaranteed by the fact that we only support one endpoint per service.
         TestEndpoint endpoint = service.service.endpoints.iterator().next();
-        return new URL(getEndpointAddress(endpoint).toURL(),"?wsdl");
+        // somehow relative path computation doesn't work, so I rely on String concatanation. Ouch!
+        return new URL(getEndpointAddress(endpoint).toString()+"?wsdl");
     }
 }

@@ -1,10 +1,12 @@
 package com.sun.xml.ws.test.container;
 
 import com.sun.xml.ws.test.tool.WsTool;
+import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
@@ -38,8 +40,8 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         if(fromJava)
             war.generateWSDL(wsgen);
 
-        war.generateSunJaxWsXml();
-        war.generateWebXml();
+        List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
+        war.generateWebXml(endpoints);
 
         PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
         w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");

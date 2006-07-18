@@ -17,7 +17,7 @@ import java.util.List;
  * this bean just wraps one or more EndpointInfoBean
  * ojects since sun-jaxws.xml may have multiple endpoints.
  *
- * @see com.sun.xml.ws.test.container.jelly.EndpointInfoBean
+ * @see EndpointInfoBean
  */
 public class SunJaxwsInfoBean {
 
