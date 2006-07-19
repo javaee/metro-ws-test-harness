@@ -162,32 +162,58 @@
 		</l:section>
 		<l:section title="Tomcat">
 			<p>
-				The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
+				This test harness supports Tomcat 5.0.x or 5.5.x. There are a few different ways of using Tomcat.
 			</p>
-			<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 test-dir1 test-dir2 ...</l:harness-cmd>
-			<p>
-				It is your responsibility to launch Tomcat. In this mode, the harness will only deploy and undeploy services from this running instance.
-				The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file, and this is the only way to make sure that you are testing the bits that you are supposed to be testing.
-			</p>
-			<l:tip>
-				To find out the admin username and password, look at <tt>$TOMCAT_HOME/conf/tomcat-users.xml</tt> and find the entry that has "manager" as one of the roles. If none is found, simply add the following two lines to the file:
+			<l:section title="Embedded Tomcat">
+				<p>
+					The following command causes the harness to run Tomcat within the same VM. This mode is bit like the local transport, in the sense that both the server and the client runs inside the same VM, but this mode run tests by using HTTP and full servlet container.
+				</p>
+				<l:harness-cmd>-tomcat-embedded path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
+				<p>
+					<tt>path/to/tomcat</tt> should point to the directory where you have Tomcat installed. The harness will load Tomcat jar files from there.
+				<p>
+					This mode is preferrable mode of testing for Tomcat, as this provides the quickest turn-around time, and worry-free. This mode is the only mode in Tomcat where you can use a single debug session to debug both the client and the server.
+				</p>
+			</l:section>
+			<l:section title="Remote Tomcat">
+				<p>
+					The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
+				</p>
+				<l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 test-dir1 test-dir2 ...</l:harness-cmd>
+				<p>
+					It is your responsibility to launch Tomcat. In this mode, the harness will only deploy and undeploy services from this running instance.
+					The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file, and this is the only way to make sure that you are testing the bits that you are supposed to be testing.
+				</p>
+				<l:tip>
+					To find out the admin username and password, look at <tt>$TOMCAT_HOME/conf/tomcat-users.xml</tt> and find the entry that has "manager" as one of the roles. If none is found, simply add the following two lines to the file:
 <pre><xmp>
 <role rolename="manager"/>
 <user username="admin" password="admin" roles="manager"/>
 </xmp></pre>
-			</l:tip>
-			<l:tip>
-				To debug the server side in this set up, you need to launch Tomcat with the debugger support enabled. Run <tt>catalina.sh jpda run</tt> to do this, and you can attach your debugger to Tomcat remotely.
-			</l:tip>
-			<l:tip>
-				By default, Tomcat is configured to output logs to multiple places, including files in the <tt>logs</tt> directory and stdout/stderr. This is often inconvenient for debugging, as you are not sure which file you should monitor. You can modify <tt>$TOMCAT_HOME/conf/server.xml</tt> to avoid this problem, by sending all the outputs to stdout. To do so, find all "&lt;Logger>" elements in server.xml and replace them with <tt>SystemOutLogger</tt>, like this:
-				<pre>&lt;Logger className="org.apache.catalina.logger.SystemOutLogger" /></pre>
-			</l:tip>
-			
-			<p>
-				<l:not-yet /> Run the following command to use Tomcat in the embedded mode. In this mode, the haress runs both Tomcat and clients in the same VM, allowing a single debugger to monitor both sides. You need to specify the location of Tomcat, so that the harness can find Tomcat jar files.
-			</p>
-			<l:harness-cmd>-tomcat path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
+				</l:tip>
+				<l:tip>
+					To debug the server side in this set up, you need to launch Tomcat with the debugger support enabled. Run <tt>catalina.sh jpda run</tt> to do this, and you can attach your debugger to Tomcat remotely.
+				</l:tip>
+				<l:tip>
+					(Tomcat 5.0.x only) By default, Tomcat is configured to output logs to multiple places, including files in the <tt>logs</tt> directory and stdout/stderr. This is often inconvenient for debugging, as you are not sure which file you should monitor. You can modify <tt>$TOMCAT_HOME/conf/server.xml</tt> to avoid this problem, by sending all the outputs to stdout. To do so, find all "&lt;Logger>" elements in server.xml and replace them with <tt>SystemOutLogger</tt>, like this:
+					<pre>&lt;Logger className="org.apache.catalina.logger.SystemOutLogger" /></pre>
+				</l:tip>
+				<l:tip>
+					When tests are aborted via Ctrl+C, web applications may be left running on this remote machine. When the test is run next time, they will be removed (or you can remove them manually.)
+				</l:tip>
+			</l:section>
+			<l:section title="Local Tomcat">
+				<p>
+					Run the following command to use Tomcat in the local mode. In this mode, the haress launches Tomcat as a child process, run tests, and terminates Tomcat when everything is done.
+				</p>
+				<l:harness-cmd>-tomcat-local path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
+				<p>
+					See the tips for the remote tomcat support for how to configure Tomcat to report logs to one place.
+				</p>
+				<l:tip>
+					On Windows systems, aborting the harness via Ctrl+C will leave the child Tomcat process running (does anyone know how to fix that?) Those orphan processes can be killed from task manager (be careful not to kill other Java processes), or better yet, <a href="http://www.sysinternals.com/Utilities/ProcessExplorer.html">process explorer</a>.
+				</l:tip>
+			</l:section>
 		</l:section>
 		<l:section title="Glassfish">
 			<p>
