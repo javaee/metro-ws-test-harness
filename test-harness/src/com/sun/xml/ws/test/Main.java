@@ -102,7 +102,7 @@ public class Main {
 
       If none is given we test in the local mode.
     */
-    @Option(name="-tomcat",usage="Launch Tomcat from the harness and test with it",metaVar="TOMCAT_HOME")
+    @Option(name="-tomcat-local",usage="Launch Tomcat from the harness and test with it",metaVar="TOMCAT_HOME")
     File tomcat = null;
 
     @Option(name="-tomcat-remote",metaVar="[USER:PASS@]HOST[:PORT]",
