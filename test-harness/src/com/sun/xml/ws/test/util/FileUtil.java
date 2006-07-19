@@ -1,16 +1,14 @@
 package com.sun.xml.ws.test.util;
 
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.taskdefs.Delete;
+import com.sun.xml.ws.test.World;
 import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.tools.ant.taskdefs.Delete;
+import org.apache.tools.ant.types.FileSet;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-import com.sun.xml.ws.test.World;
 
 /**
  * Class for utility methods for finding files and

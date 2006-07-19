@@ -1,15 +1,12 @@
 package com.sun.xml.ws.test;
 
-import org.codehaus.classworlds.ClassRealm;
 import org.apache.tools.ant.types.Path;
+import org.codehaus.classworlds.ClassRealm;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-
-import com.sun.xml.ws.test.World;
 
 /**
  * Adds jar files to {@link ClassRealm} and also builds up {@link Path}

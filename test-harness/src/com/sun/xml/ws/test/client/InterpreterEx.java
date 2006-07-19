@@ -1,11 +1,11 @@
 package com.sun.xml.ws.test.client;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
-import bsh.EvalError;
 
-import java.io.Reader;
 import java.io.PrintStream;
+import java.io.Reader;
 
 /**
  * {@link Interpreter} that redirects stderr to stdout.

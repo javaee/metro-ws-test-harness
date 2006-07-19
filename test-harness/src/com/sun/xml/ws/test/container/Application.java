@@ -3,8 +3,8 @@ package com.sun.xml.ws.test.container;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
-import java.net.URL;
 import java.net.URI;
+import java.net.URL;
 
 /**
  * Represents an application deployed inside a {@link ApplicationContainer}.

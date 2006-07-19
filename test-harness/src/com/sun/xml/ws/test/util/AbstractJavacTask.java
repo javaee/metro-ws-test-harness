@@ -1,7 +1,6 @@
 package com.sun.xml.ws.test.util;
 
 import com.sun.xml.ws.test.World;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Javac;
 import org.apache.tools.ant.taskdefs.compilers.CompilerAdapter;
 import org.apache.tools.ant.types.Path;
@@ -17,7 +16,7 @@ public abstract class AbstractJavacTask extends Javac {
 
         setCompiler(adapterClass.getName());
 
-        setClasspath(World.runtimeClasspath);
+        setClasspath(World.runtime.getPath());
     }
 
     /**

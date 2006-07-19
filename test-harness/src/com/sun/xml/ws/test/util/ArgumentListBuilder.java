@@ -1,13 +1,12 @@
 package com.sun.xml.ws.test.util;
 
 import com.sun.xml.ws.test.tool.WsTool;
+import org.apache.tools.ant.types.Path;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.File;
 import java.net.URL;
-
-import org.apache.tools.ant.types.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provide convenient methods for building up command-line arguments.

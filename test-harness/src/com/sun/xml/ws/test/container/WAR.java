@@ -1,10 +1,11 @@
 package com.sun.xml.ws.test.container;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.Realm;
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
-import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
@@ -90,13 +91,12 @@ public final class WAR {
      * Copies the classpath specified by the given {@link Path}
      * into <tt>WEB-INF/lib</tt> and <tt>WEB-INF/classes</tt>
      */
-    public void copyClasspath(Path classpath) throws Exception {
+    public void copyClasspath(Realm classpath) throws Exception {
         int n = 0;
-        for (String path : classpath.list()) {
-            File p = new File(path);
-            if(p.isFile())
+        for (File path : classpath.list()) {
+            if(path.isFile())
                 // just copy one jar
-                FileUtil.copyFile(p,new File(libDir,p.getName()));
+                FileUtil.copyFile(path,new File(libDir,path.getName()));
             else {
                 // create an uncompressed jar file. This serves a few purposes.
                 //  - in general file systems are not good at dealing with many small files
@@ -104,7 +104,7 @@ public final class WAR {
                 Jar jar = new Jar();
                 jar.setProject(World.project);
                 jar.setDestFile(new File(libDir,"generated"+(n++)+".jar"));
-                jar.setBasedir(p);
+                jar.setBasedir(path);
                 jar.setCompress(false);
                 jar.execute();
             }
@@ -232,8 +232,8 @@ public final class WAR {
             options.add("-r").add(wsdlDir);
             Path cp = new Path(World.project);
             cp.createPathElement().setLocation(classDir);
-            cp.add(World.toolClasspath);
-            cp.add(World.runtimeClasspath);
+            cp.add(World.tool.getPath());
+            cp.add(World.runtime.getPath());
             if(World.debug)
                 System.out.println("wsgen classpath arg = " + cp);
             options.add("-cp").add(cp);

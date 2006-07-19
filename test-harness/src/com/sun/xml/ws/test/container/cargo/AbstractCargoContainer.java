@@ -1,12 +1,12 @@
 package com.sun.xml.ws.test.container.cargo;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.tool.WsTool;
-import com.sun.xml.ws.test.World;
 import org.codehaus.cargo.container.Container;
 import org.codehaus.cargo.container.deployable.DeployableType;
 import org.codehaus.cargo.container.deployer.Deployer;
@@ -15,8 +15,8 @@ import org.codehaus.cargo.container.deployer.URLDeployableMonitor;
 import org.codehaus.cargo.generic.deployable.DefaultDeployableFactory;
 import org.codehaus.cargo.generic.deployer.DefaultDeployerFactory;
 
-import java.net.URL;
 import java.io.File;
+import java.net.URL;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -42,7 +42,7 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
         // copy runtime classes into the classpath. this is slow.
         // isn't there a better way to do this?
         System.out.println("Copying runtime libraries");
-        assembly.copyClasspath(World.runtimeClasspath);
+        assembly.copyClasspath(World.runtime);
 
         // TODO: fix Cargo so that it can work with exploded image, which is more efficient
         System.out.println("Assembling a war file");
@@ -55,12 +55,16 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
 
         war.setContext(contextPath);
 
-        Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.REMOTE);
+        Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.toType(container.getType()));
 
         URL serviceUrl = getServiceUrl(contextPath);
 
         System.out.println("Verifying that "+serviceUrl+" is already removed");
-        deployer.undeploy(war);
+        try {
+            deployer.undeploy(war);
+        } catch (Exception e) {
+            // swallow any failure to undeploy
+        }
         System.out.println("Deploying a service to "+serviceUrl);
         deployer.deploy(war,new URLDeployableMonitor(serviceUrl));
 

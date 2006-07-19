@@ -1,6 +1,5 @@
 package com.sun.xml.ws.test.container;
 
-import com.sun.xml.ws.test.model.TestService;
 import com.sun.istack.NotNull;
 
 /**

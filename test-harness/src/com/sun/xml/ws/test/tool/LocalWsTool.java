@@ -1,7 +1,7 @@
 package com.sun.xml.ws.test.tool;
 
-import com.sun.xml.ws.test.World;
 import com.sun.istack.test.Which;
+import com.sun.xml.ws.test.World;
 
 import java.lang.reflect.Method;
 

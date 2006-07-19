@@ -1,13 +1,12 @@
 package com.sun.xml.ws.test.client;
 
-import com.sun.xml.ws.test.model.TestDescriptor;
-import com.sun.xml.ws.test.model.TestClient;
-import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.container.DeploymentContext;
+import com.sun.xml.ws.test.model.TestClient;
+import com.sun.xml.ws.test.model.TestDescriptor;
+import junit.framework.Assert;
 
 import java.io.File;
-
-import junit.framework.Assert;
 
 /**
  * Client test script will be executed as if it's a method

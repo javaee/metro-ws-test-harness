@@ -4,8 +4,8 @@ import com.sun.istack.NotNull;
 import com.sun.istack.test.VersionProcessor;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A test script that plays the role of the client.

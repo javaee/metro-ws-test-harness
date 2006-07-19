@@ -1,17 +1,16 @@
 package com.sun.xml.ws.test.util;
 
-import org.apache.tools.ant.taskdefs.compilers.DefaultCompilerAdapter;
-import org.apache.tools.ant.taskdefs.compilers.CompilerAdapter;
+import com.sun.istack.test.Which;
+import com.sun.xml.ws.test.World;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.compilers.CompilerAdapter;
+import org.apache.tools.ant.taskdefs.compilers.DefaultCompilerAdapter;
 import org.apache.tools.ant.types.Commandline;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Collections;
-
-import com.sun.xml.ws.test.World;
-import com.sun.istack.test.Which;
 
 /**
  * {@link CompilerAdapter} that loads tools from the tools realm.

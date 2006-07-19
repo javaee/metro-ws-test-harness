@@ -11,14 +11,11 @@ package com.sun.xml.ws.test.container.local;
 
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.container.Application;
-import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
-import java.net.URL;
 import java.net.URI;
-import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 
 /**
  * {@link Application} implementation for {@link LocalApplicationContainer}.

@@ -4,16 +4,17 @@ import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
+import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
+import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter;
 import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.NoSuchRealmException;
+import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.dom4j.DocumentException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -26,11 +27,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.net.URL;
+import java.util.regex.Pattern;
 
 /**
  * Test harness driver.
@@ -124,6 +125,8 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
+        // enable all assertions
+        Main.class.getClassLoader().setDefaultAssertionStatus(true);
         System.exit(doMain(args));
     }
 
@@ -210,17 +213,26 @@ public class Main {
     /**
      * Fills the world with classes.
      */
-    private void fillWorld() throws IOException {
+    private void fillWorld() throws Exception {
         World.debug = this.debug;
 
-        RealmBuilder runtime = new RealmBuilder(World.runtime,World.runtimeClasspath);
-        RealmBuilder tool = new RealmBuilder(World.tool,World.toolClasspath);
+        Realm container = World.container;
+        Realm runtime = World.runtime;
+        Realm tool = World.tool;
 
+        // fill in container realm.
+        if(embeddedTomcat!=null) {
+            container.addJarFolder(new File(embeddedTomcat,"bin"));
+            container.addJarFolder(new File(embeddedTomcat,"common/lib"));
+            container.addJarFolder(new File(embeddedTomcat,"server/lib"));
+        }
+
+        // fill in runtime and tool realms
         if(wsitImage!=null) {
             runtime.addJar(new File(wsitImage,"lib/webservices.jar"));
             runtime.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
             tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
-        }
+        } else
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
             runtime.addJarFolder(   new File(wsitWs,"lib/runtime"));
@@ -228,12 +240,12 @@ public class Main {
             runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));
             tool.addClassFolder(    new File(wsitWs,"tools/build/classes"));
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
-        }
+        } else
         if(jaxwsImage!=null) {
             tool.addJar(            new File(jaxwsWs,"lib/jaxws-tools.jar"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
-        }
+        } else
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
@@ -247,6 +259,11 @@ public class Main {
             runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
+        } else {
+            // TODO: if none is given, wouldn't it be nice if we can guess?
+            // TODO: don't we need a better way to discover local transport.
+
+            throw new CmdLineException("No -cp option is specified");
         }
 
         // put tools.jar in the tools classpath
@@ -255,23 +272,14 @@ public class Main {
         tool.addJar(toolsJar);
         
         if(debug) {
+            System.err.println("container realm");
+            container.dump(System.err);
             System.err.println("runtime realm");
             runtime.dump(System.err);
             System.err.println("tool realm");
             tool.dump(System.err);
         }
 
-        // jaxb-xjc.jar will suck in JAXB runtime and API through Class-Path manifest entries
-        // into the tool realm, so we'll end up loading two JAXB API.
-        // avoid this by importing API from runtime. This isn't the best fix, however.
-        try {
-            World.tool.importFrom("runtime","javax.xml.bind");
-        } catch (NoSuchRealmException e) {
-            throw new AssertionError(e);
-        }
-
-        // TODO: if none is given, wouldn't it be nice if we can guess?
-        // TODO: don't we need a better way to discover local transport.
     }
 
     /**
@@ -281,7 +289,7 @@ public class Main {
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
-            return new EmbeddedCargoApplicationContainer(
+            return new InstalledCargoApplicationContainer(
                 wsimport, wsgen, "tomcat5x",tomcat);
         }
 

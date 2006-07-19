@@ -8,9 +8,9 @@ import com.sun.xml.ws.test.util.FileUtil;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * State of running {@link TestDescriptor} execution.

@@ -1,7 +1,7 @@
 package com.sun.xml.ws.test.container;
 
-import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
+import com.sun.xml.ws.test.tool.WsTool;
 
 import java.io.File;
 import java.io.FileWriter;

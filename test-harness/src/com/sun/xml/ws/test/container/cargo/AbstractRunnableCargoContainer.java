@@ -1,8 +1,7 @@
 package com.sun.xml.ws.test.container.cargo;
 
-import org.codehaus.cargo.container.internal.RunnableContainer;
-import org.codehaus.cargo.container.LocalContainer;
 import com.sun.xml.ws.test.tool.WsTool;
+import org.codehaus.cargo.container.LocalContainer;
 
 import java.net.URL;
 import java.util.Random;

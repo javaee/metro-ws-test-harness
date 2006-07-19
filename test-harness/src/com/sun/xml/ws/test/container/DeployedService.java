@@ -5,8 +5,8 @@ import com.sun.xml.ws.test.model.TestService;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Information about running {@link TestService}.
