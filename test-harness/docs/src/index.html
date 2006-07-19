@@ -28,7 +28,7 @@
   <d:taglib uri="layout">
   	<!-- command example -->
 	  <d:tag name="harness-cmd">
-	  	<pre class="cmd">$$ java${jvmargs} -jar -cp:{wsit,wsit-image,jaxws,jaxws-image} class-directory path/to/harness.jar <d:invokeBody /></pre>
+	  	<pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
 	  </d:tag>
   	<!-- "not yet" icon -->
 	  <d:tag name="not-yet">
@@ -114,6 +114,50 @@
 <l:document>
 
 <l:section title="Running Tests">
+	<l:section title="Configuring the Harness Classpath for Different Delivery Vehicles">
+		<p>
+			The harness can be used to test different projects that use the JAX-WS RI.
+		</p>
+		<l:section title="JAX-WS RI Workspace">
+			<p>
+				The following option tells the harness to pick up the JAX-WS RI
+                                classes from the JAX-WS workspace. Specifically, with this option,
+                                the harness will look into various <tt>build/classes</tt> and library
+                                jars.
+			</p>
+			<l:harness-cmd>-cp:jaxws path/to/jaxws-ri-workspace test-dir1 test-dir2 ...</l:harness-cmd>
+		</l:section>
+		<l:section title="JAX-WS RI Binary Image">
+			<p>
+				The following option tells the harness to pick up the
+                                RI classes from a JAX-WS binary dist image. Using this option,
+                                the harness will only look at the RI library jars found under
+                                the <TT>lib</TT> directory of the top-level dist image directory that
+                                you specify.
+			</p>
+			<l:harness-cmd>-cp:jaxws-image path/to/jaxws-ri-image test-dir1 test-dir2 ...</l:harness-cmd>
+		</l:section>
+		<l:section title="WSIT Workspace">
+			<p>
+				The following option tells the harness to pick up the WSIT
+                                classes from a WSIT workspace. Specifically, with this option,
+                                the harness will look into various <tt>build/classes</tt> and library
+                                jars.
+			</p>
+			<l:harness-cmd><span style="color:red; font-weight:bold">-cp:wsit path/to/wsit-workspace</span> test-dir1 test-dir2 ...</l:harness-cmd>
+		</l:section>
+		<l:section title="WSIT Binary Image">
+			<p>
+				The following option tells the harness to pick up the
+                                WSIT classes from a binary dist image. Using this option,
+                                the harness will only look at the WSIT library jars (webservices.jar & 
+                                webservices-tools.jar) found under the <TT>lib</TT> directory of the
+                                dist image directory that you specify.
+			</p>
+			<l:harness-cmd>-cp:wsit-image path/to/wsit-image test-dir1 test-dir2 ...</l:harness-cmd>
+		</l:section>
+	</l:section>
+	
 	<l:section title="Running Tests Manually">
 		<p>
 			Each test is packaged in a directory. The following command runs a single test stored in <tt>testdata/abc/def</tt>:
@@ -219,18 +263,6 @@
 			<p>
 				<l:not-yet />
 			</p>
-		</l:section>
-	</l:section>
-	
-	<l:section title="Testing Different Delivery Vehicles">
-		<p>
-			The harness can be used to test different projects that use the JAX-WS RI.
-		</p>
-		<l:section title="JAX-WS RI">
-			<p>
-				The following option tells the harness to pick up the classes from the JAX-WS workspace. Specifically, with this option, the harness will look into various <tt>build/classes</tt> and library jars.
-			</p>
-			<l:harness-cmd>-cp:jaxws path/to/jaxws-ri test-dir1 test-dir2 ...</l:harness-cmd>
 		</l:section>
 	</l:section>
 </l:section>
