@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
+ * Represents a classloader.
+ *
+ * {@link Realm}s form a tree structure where children delegates
+ * to the parent for classloading.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Realm {
