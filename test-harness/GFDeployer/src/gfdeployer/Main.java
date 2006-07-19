@@ -15,21 +15,13 @@ package gfdeployer;
  */
 public class Main {
     
-    /** Creates a new instance of Main */
-    public Main() {
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String[] deployArgs = {"deploy", "deployer:Sun:AppServer::localhost:4848", "admin", "adminadmin", "true", "./test.war"};
         String[] undeployArgs = {"undeploy", "deployer:Sun:AppServer::localhost:4848", "admin", "adminadmin", "test"};
         System.setProperty("com.sun.aas.installRoot","/home/ken/work/glassfish-b08");
 
         JSR88Deployer.main(deployArgs);
-        try {
-            Thread.sleep(30000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+        Thread.sleep(30000);
         JSR88Deployer.main(undeployArgs);
     }
 }
