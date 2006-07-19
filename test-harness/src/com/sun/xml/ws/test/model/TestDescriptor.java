@@ -28,11 +28,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Root object of the test model. Describes one test.
@@ -223,12 +221,17 @@ public class TestDescriptor {
                 serviceBaseDir = testDir;
             }
 
-            File wsdl = null;
+            File wsdl ;
+            WSDL wsdlInfo = null;
             if (service.element("wsdl") != null) {
                 wsdl = parseFile(serviceBaseDir,service.element("wsdl").attributeValue("href","test.wsdl"));
+                File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
+                List<File> schemaFiles = Arrays.asList(schemas);
+                wsdlInfo = new WSDL(wsdl,schemaFiles);
+
             }
 
-            TestService testService = new TestService(this,serviceName,serviceBaseDir,wsdl);
+            TestService testService = new TestService(this,serviceName,serviceBaseDir,wsdlInfo);
             File customization = parseFile(serviceBaseDir,"custom-server.xml");
             if (customization.exists() ) {
                 testService.customizations.add(customization);
@@ -315,4 +318,11 @@ public class TestDescriptor {
         factory.setValidating(true);
         return new SAXReader(factory.newSAXParser().getXMLReader()).read(descriptor);
     }
+
+    class XSDFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            return (name.endsWith(".xsd"));
+        }
+    }
+
 }

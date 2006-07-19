@@ -174,25 +174,29 @@ public final class WAR {
         for (File custFile: service.service.customizations) {
             options.add("-b").add(custFile);
         }
+        options.add("-extension");
 
         //Other options
         if(World.debug)
             options.add("-verbose");
         options.add("-s").add(srcDir);
         options.add("-Xnocompile");
-        options.add(service.service.wsdl);
-        System.out.println("Generating server artifacts from " + service.service.wsdl);
+        options.add(service.service.wsdl.wsdlFile);
+        System.out.println("Generating server artifacts from " + service.service.wsdl.wsdlFile);
         options.invoke(wsimport);
 
         // copy WSDL into a war file
         File wsdlDir = new File(webInfDir,"wsdl");
         wsdlDir.mkdirs();
 
-        File src = service.service.wsdl;
+        File src = service.service.wsdl.wsdlFile;
         assert this.wsdl==null;
         this.wsdl = new File(wsdlDir, src.getName());
 
         FileUtil.copyFile(src,wsdl);
+        for (File schema :service.service.wsdl.schemas){
+            FileUtil.copyFile(schema,new File(wsdlDir,schema.getName()));
+        }
     }
 
     /**
@@ -279,7 +283,7 @@ public final class WAR {
             packageName = service.service.parent.name + "." + service.service.name;
         }
         CustomizationBean infoBean = new CustomizationBean(packageName,
-            service.service.wsdl.getCanonicalPath());
+            service.service.wsdl.wsdlFile.getCanonicalPath());
         jelly.set("data", infoBean);
 
         jelly.run(serverCustomizationFile);

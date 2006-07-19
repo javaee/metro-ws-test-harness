@@ -59,7 +59,8 @@ public class DeploymentExecutor extends Executor {
 
         // set package name. use 'client' to avoid collision between server artifacts
         options.add("-p").add(context.parent.descriptor.name +".client");
-        
+        options.add("-extension");
+
         //Add user's additional customization files
         TestClient tc = context.parent.descriptor.clients.get(0);
         for (File custFile : tc.customizations) {

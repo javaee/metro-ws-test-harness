@@ -49,7 +49,7 @@ public class TestService {
      * Optional WSDL file that describes this service.
      */
     @Nullable
-    public final File wsdl;
+    public final WSDL wsdl;
 
     /**
      * Possibly empty list of JAXB/JAX-WS external binding customizations.
@@ -70,7 +70,7 @@ public class TestService {
 
     public final TestDescriptor parent;
 
-    public TestService(TestDescriptor parent, String name, File baseDir, File wsdl) throws IOException {
+    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl) throws IOException {
         this.parent = parent;
         this.name = name;
         this.wsdl = wsdl;
