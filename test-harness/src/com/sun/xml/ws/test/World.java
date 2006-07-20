@@ -38,12 +38,12 @@ public final class World {
     }
 
     /**
-     * Realm optionally used to load the embedded application container.
-     * Otherwise this realm will be empty, containing no class.
+     * Loads JAX-WS runtime classes.
+     *
+     * This realm is also used to load the embedded application container,
+     * so that we don't have to package JAX-WS runtime into the war file.
      */
-    public static final Realm container = new Realm("container",null);
-
-    public static final Realm runtime = new Realm("runtime",container);
+    public static final Realm runtime = new Realm("runtime",null);
     public static final Realm tool    = new Realm("tool",   runtime);
 
     /**

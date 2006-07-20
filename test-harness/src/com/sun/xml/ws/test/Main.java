@@ -220,15 +220,14 @@ public class Main {
     private void fillWorld() throws Exception {
         World.debug = this.debug;
 
-        Realm container = World.container;
         Realm runtime = World.runtime;
         Realm tool = World.tool;
 
         // fill in container realm.
         if(embeddedTomcat!=null) {
-            container.addJarFolder(new File(embeddedTomcat,"bin"));
-            container.addJarFolder(new File(embeddedTomcat,"common/lib"));
-            container.addJarFolder(new File(embeddedTomcat,"server/lib"));
+            runtime.addJarFolder(new File(embeddedTomcat,"bin"));
+            runtime.addJarFolder(new File(embeddedTomcat,"common/lib"));
+            runtime.addJarFolder(new File(embeddedTomcat,"server/lib"));
         }
 
         // fill in runtime and tool realms
@@ -279,8 +278,6 @@ public class Main {
         runtime.addJar(toolsJar);
 
         if(debug) {
-            System.err.println("container realm");
-            container.dump(System.err);
             System.err.println("runtime realm");
             runtime.dump(System.err);
             System.err.println("tool realm");
@@ -302,7 +299,7 @@ public class Main {
 
         if(embeddedTomcat!=null) {
             return new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x", embeddedTomcat );
+                wsimport, wsgen, "tomcat5x");
         }
 
         if(remoteTomcat!=null) {

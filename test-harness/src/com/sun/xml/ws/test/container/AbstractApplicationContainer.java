@@ -59,12 +59,21 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         // copy runtime classes into the classpath. this is slow.
         // isn't there a better way to do this?
-        System.out.println("Copying runtime libraries");
-        assembly.copyClasspath(World.runtime);
+        if(copyRuntimeLibraries()) {
+            System.out.println("Copying runtime libraries");
+            assembly.copyClasspath(World.runtime);
+        }
 
         System.out.println("Assembling a war file");
         assembly.zipTo(archive);
 
         return assembly;
+    }
+
+    /**
+     * Copy JAX-WS runtime code?
+     */
+    protected boolean copyRuntimeLibraries() {
+        return true;
     }
 }

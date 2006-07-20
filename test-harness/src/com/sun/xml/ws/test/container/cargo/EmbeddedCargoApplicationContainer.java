@@ -26,14 +26,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoContainer<EmbeddedLocalContainer> {
-    /**
-     *
-     * @param containerId
-     *      The ID that represents the container. "tomcat5x" for Tomcat.
-     * @param homeDir
-     *      The installation of the container. For Tomcat, this is
-     */
-    public EmbeddedCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir) throws IOException {
+    public EmbeddedCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId) {
         super(wsimport,wsgen);
 
         ConfigurationFactory configurationFactory =
@@ -49,9 +42,14 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
 
         container = (EmbeddedLocalContainer) new DefaultContainerFactory().createContainer(
             containerId, ContainerType.EMBEDDED, configuration);
-        container.setClassLoader(World.container.getClassLoader());
+        container.setClassLoader(World.runtime.getClassLoader());
     }
 
+    @Override
+    protected boolean copyRuntimeLibraries() {
+        // runtime jars available in the container. no need to copy
+        return false;
+    }
 
     public String toString() {
         return "EmbeddedContainer:"+container.getId();
