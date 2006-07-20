@@ -29,8 +29,11 @@ import javax.xml.namespace.*;
 import javax.jws.WebService;
 import javax.jws.WebParam;
 import javax.xml.bind.JAXBElement;
+import javax.xml.ws.soap.*;
+import javax.xml.ws.*;
 
 @WebService(endpointInterface="wsrm.roundtrip.server.IPing")
+@BindingType(SOAPBinding.SOAP12HTTP_BINDING)
 public class IPingImpl {
 
     /**
