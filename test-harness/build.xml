@@ -61,7 +61,8 @@
     <copy tofile="build/dist/harness.jar" file="bootstrap/build/bootstrap.jar" />
     <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
     <copy todir="build/dist/lib">
-      <fileset dir="lib" />
+      <fileset dir="lib" includes="*" />
+      <fileset dir="lib/gf" includes="*" />
       <fileset dir="build" includes="*.jar, *.zip" excludes="test-harness.zip"/>
     </copy>
     <copy todir="build/dist">
