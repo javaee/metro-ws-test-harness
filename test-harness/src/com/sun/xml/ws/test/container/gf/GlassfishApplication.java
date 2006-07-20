@@ -28,6 +28,6 @@ final class GlassfishApplication extends AbstractHttpApplication {
     }
 
     public void undeploy() throws Exception {
-        container.undeploy(modules);
+        container.undeploy(modules,warURL);
     }
 }

@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.container;
 
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.tool.WsTool;
+import com.sun.xml.ws.test.World;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -48,5 +49,22 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         w.close();
 
         return war;
+    }
+
+    /**
+     * Prepares a fully packaged war file to the specified location.
+     */
+    protected final WAR createWARZip(DeployedService service, File archive) throws Exception {
+        WAR assembly = assembleWar(service);
+
+        // copy runtime classes into the classpath. this is slow.
+        // isn't there a better way to do this?
+        System.out.println("Copying runtime libraries");
+        assembly.copyClasspath(World.runtime);
+
+        System.out.println("Assembling a war file");
+        assembly.zipTo(archive);
+
+        return assembly;
     }
 }

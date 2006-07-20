@@ -80,28 +80,19 @@ public final class GlassfishContainer extends AbstractApplicationContainer {
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         String contextPath = service.service.getGlobalUniqueName();
-
-        WAR assembly = assembleWar(service);
-
-        // copy runtime classes into the classpath. this is slow.
-        // isn't there a better way to do this?
-        System.out.println("Copying runtime libraries");
-        assembly.copyClasspath(World.runtime);
-
-        // TODO: fix Cargo so that it can work with exploded image, which is more efficient
-        System.out.println("Assembling a war file");
         File archive = new File(service.workDir,contextPath+".war");
-        assembly.zipTo(archive);
 
-        return new GlassfishApplication(
-            new URL(httpServerUrl,"/"+contextPath+"/"),
-            service,this,deploy(archive));
+        createWARZip(service,archive);
+
+        URL warURL = new URL(httpServerUrl, "/" + contextPath + "/");
+        return new GlassfishApplication( warURL, service,this,deploy(archive,warURL));
     }
 
     /**
      * Deploys an application and returns the list of deployed module(s).
      */
-    private TargetModuleID[] deploy(File war) throws Exception {
+    private TargetModuleID[] deploy(File war, URL targetUrl) throws Exception {
+        System.out.println("Deploying a service to "+targetUrl);
 
         ProgressObject dpo = Monitor.join(
             dm.distribute(targets, war, null),"deployment failed");
@@ -113,7 +104,8 @@ public final class GlassfishContainer extends AbstractApplicationContainer {
         return modules;
     }
 
-    void undeploy(TargetModuleID[] modules) throws Exception {
+    void undeploy(TargetModuleID[] modules, URL warURL) throws Exception {
+        System.out.println("Undeploying a service from "+warURL);
         Monitor.join(dm.undeploy(modules),"undeploy operation failed");
     }
 
