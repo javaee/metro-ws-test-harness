@@ -10,7 +10,7 @@
   <property name="build.id" value="${now}(${user.name})"/>
 
   <path id="javac.classpath">
-    <fileset dir="." includes="lib/*.jar"/>
+    <fileset dir="." includes="lib/**/*.jar"/>
   </path>
   
   <path id="runtime.classpath">

@@ -223,6 +223,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/GFDeployer/GFDeployer.iml" filepath="$PROJECT_DIR$/GFDeployer/GFDeployer.iml" />
       <module fileurl="file://$PROJECT_DIR$/bootstrap/bootstrap.iml" filepath="$PROJECT_DIR$/bootstrap/bootstrap.iml" />
       <module fileurl="file://$PROJECT_DIR$/test-harness.iml" filepath="$PROJECT_DIR$/test-harness.iml" />
     </modules>
