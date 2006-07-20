@@ -18,7 +18,6 @@ import javax.enterprise.deploy.spi.status.ProgressListener;
 import javax.enterprise.deploy.spi.status.ProgressObject;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -31,17 +30,17 @@ public class JSR88Deployer implements ProgressListener {
 
     private DeploymentManager dm;
     private Target[] targets;
-    private final String J2EE_DEPLOYMENT_MANAGER =
-                        "J2EE-DeploymentFactory-Implementation-Class";
+    //private final String J2EE_DEPLOYMENT_MANAGER =
+    //                    "J2EE-DeploymentFactory-Implementation-Class";
 
     /** Record all events delivered to this deployer (which is also a progress listener. */
-    private Vector receivedEvents = new Vector();
+    private Vector<ProgressEvent> receivedEvents = new Vector<ProgressEvent>();
     
     /** Record the TargetModuleIDs that resulted from the most recent operation. */
     private TargetModuleID [] mostRecentTargetModuleIDs = null;
     
     /** Creates a new instance of JSR88Deployer */
-    public JSR88Deployer(String uri, String user, String password) throws IOException, DeploymentException {
+    public JSR88Deployer(String uri, String user, String password) throws DeploymentException {
 
         log("Connecting using uri = " + uri + "; user = " + user + "; password = " + password);
 
@@ -53,10 +52,8 @@ public class JSR88Deployer implements ProgressListener {
         }
 
         Target[] allTargets = dm.getTargets();
-        if (allTargets.length == 0) {
-            log("Can't find deployment targets...");
-            System.exit(-1);
-        }
+        if (allTargets.length == 0)
+            throw new DeploymentException("Can't find deployment targets");
 
         // If test being run on EE, exclude the DAS server instance from the deploy targets
         String targetPlatform = System.getProperty("deploymentTarget");
@@ -72,13 +69,9 @@ public class JSR88Deployer implements ProgressListener {
         } else {
             targets = allTargets;
         }
-
-        for(int i=0; i<targets.length; i++) {
-            log("DBG : Target " + i + " -> " + targets[i].getName());
-        }
     }
 
-    private int waitTillComplete(ProgressObject po) throws Exception {
+    private void waitTillComplete(ProgressObject po, String errorMessage) throws Exception {
         DeploymentStatus deploymentStatus;
         do {
             /*
@@ -90,55 +83,28 @@ public class JSR88Deployer implements ProgressListener {
             deploymentStatus = po.getDeploymentStatus();
             Thread.sleep(200);
         } while (!(deploymentStatus.isCompleted() || deploymentStatus.isFailed()));   
-        log("Deployment status is " + deploymentStatus.getState().toString());
+
         if(deploymentStatus.isFailed())
-                return(-1);
-        return(0);
+            throw new DeploymentException(errorMessage);
     }
 
     public ProgressObject deploy(File archive, File deploymentPlan,
-                                boolean startByDefault, boolean useStream,
+                                boolean startByDefault,
                                 ModuleType type) 
         throws Exception {
 
         ProgressObject dpo;
         ProgressObject po;
-        if (deploymentPlan == null || deploymentPlan.getName().equals("null")) {
+        if (deploymentPlan == null) {
             log("Warning, deploying with null deployment plan");
-            if (useStream) {
-                if (type == null) {
-                    dpo = dm.distribute(targets, 
-                                    new FileInputStream(archive.getAbsolutePath()),
-                                    null);
-                } else {
-                    dpo = dm.distribute(targets, type,
-                                    new FileInputStream(archive.getAbsolutePath()),
-                                    null);
-                }
-            } else {
-                dpo = dm.distribute(targets, archive, null);          
-            }
+            dpo = dm.distribute(targets, archive, null);
         } else {
-            if (useStream) {
-                if (type == null) {
-                    dpo = dm.distribute(targets, 
-                                    new FileInputStream(archive.getAbsolutePath()),
-                                    new FileInputStream(deploymentPlan.getAbsolutePath()));
-                } else {
-                    dpo = dm.distribute(targets, type,
-                                    new FileInputStream(archive.getAbsolutePath()),
-                                    new FileInputStream(deploymentPlan.getAbsolutePath()));
-                }
-            } else {
-                dpo = dm.distribute(targets, archive, deploymentPlan);          
-            }
-        }            
+            dpo = dm.distribute(targets, archive, deploymentPlan);
+        }
+
         if (dpo!=null) {
             dpo.addProgressListener(this);
-            if(waitTillComplete(dpo) != 0) {
-                log("DEPLOY Action Failed");
-                return(null);
-            }
+            waitTillComplete(dpo,"DEPLOY Action Failed");
 
             TargetModuleID[] targetModuleIDs = dpo.getResultTargetModuleIDs();        
             this.mostRecentTargetModuleIDs = targetModuleIDs;
@@ -149,10 +115,7 @@ public class JSR88Deployer implements ProgressListener {
                 po = dm.start(targetModuleIDs);
                 if (po!=null) {
                     po.addProgressListener(this);
-                    if(waitTillComplete(po) != 0) {
-                        log("START Action Failed");
-                        return(null);
-                    }
+                    waitTillComplete(po,"START Action Failed");
                 }
                 return po;
             }
@@ -163,7 +126,7 @@ public class JSR88Deployer implements ProgressListener {
     public ProgressObject redeploy(String moduleID, File archive,
                                 File deploymentPlan, boolean useStream) throws Exception {
 
-        TargetModuleID[] list = null;
+        TargetModuleID[] list;
         if (moduleID == null) { //redeploy all but system apps
             throw new UnsupportedOperationException("DO NOT SUPPORT REDEPLOY MULTIPLE APPS");
         } else {
@@ -172,12 +135,12 @@ public class JSR88Deployer implements ProgressListener {
 
         TargetModuleID[] modules = list;
         if (modules != null && modules.length > 0) {
-            for (int i = 0; i < modules.length; i++) {
-                log("REDEPLOYING... " + modules[i]);
+            for (TargetModuleID module : modules) {
+                log("REDEPLOYING... " + module);
             }
         }
 
-        ProgressObject dpo = null;
+        ProgressObject dpo;
         if (deploymentPlan == null || deploymentPlan.getName().equals("null")) {
             log("Warning, redeploying with null deployment plan");
             if (useStream) {            
@@ -198,20 +161,16 @@ public class JSR88Deployer implements ProgressListener {
         }            
         if (dpo!=null) {
             dpo.addProgressListener(this);
-            if(waitTillComplete(dpo) != 0) {
-                log("REDEPLOY Action Failed");
-                return(null);
-            }
+            waitTillComplete(dpo,"REDEPLOY Action Failed");
 
-            TargetModuleID[] targetModuleIDs = dpo.getResultTargetModuleIDs();        
-            this.mostRecentTargetModuleIDs = targetModuleIDs;
+            this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             dumpResultModuleIDs("Redeployed " , dpo);
         }
         return(dpo);
     }
 
     public ProgressObject stop(String moduleID) throws Exception {
-        TargetModuleID[] list = null;
+        TargetModuleID[] list;
         if (moduleID == null) { //stop all but system apps
             list = getAllApplications(Boolean.TRUE);
         } else {
@@ -221,16 +180,13 @@ public class JSR88Deployer implements ProgressListener {
         ProgressObject dpo = null;
         TargetModuleID[] modules = list;
         if (modules != null && modules.length > 0) {
-            for (int i = 0; i < modules.length; i++) {
-                log("STOPPING... " + modules[i]);
+            for (TargetModuleID module : modules) {
+                log("STOPPING... " + module);
             }
             dpo = dm.stop(modules);
             if (dpo!=null) {
                 dpo.addProgressListener(this);
-                if(waitTillComplete(dpo) != 0) {
-                    log("STOP Action Failed");
-                    return(null);
-                }
+                waitTillComplete(dpo,"STOP Action Failed");
                 this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             }
         }
@@ -243,7 +199,7 @@ public class JSR88Deployer implements ProgressListener {
      *conditions involved with managing the list of listeners and the list of delivered events.
      */
     public ProgressObject start(String moduleID, int delayBeforeRegisteringListener) throws Exception {
-        TargetModuleID[] list = null;
+        TargetModuleID[] list;
         if (moduleID == null) { //start all but system apps
             list = getAllApplications(Boolean.FALSE);
         } else {
@@ -253,14 +209,14 @@ public class JSR88Deployer implements ProgressListener {
         TargetModuleID[] modules = list;
         ProgressObject dpo = null;
         if (modules != null && modules.length > 0) {
-            for (int i = 0; i < modules.length; i++) {
-                log("STARTINNG... " + modules[i]);
+            for (TargetModuleID module : modules) {
+                log("STARTINNG... " + module);
             }
             dpo = dm.start(modules);
             if (delayBeforeRegisteringListener > 0) {
                 try {
                     log("Pausing before adding self as a progress listener");
-                    Thread.currentThread().sleep(delayBeforeRegisteringListener);
+                    Thread.sleep(delayBeforeRegisteringListener);
                 } catch (InterruptedException ie) {
                     throw new RuntimeException(this.getClass().getName() + " was interrupted sleeping before adding itself as a progresslistener", ie);
                 }
@@ -270,10 +226,7 @@ public class JSR88Deployer implements ProgressListener {
                 if (delayBeforeRegisteringListener > 0) {
                     log("Now registered as a progress listener");
                 }
-                if(waitTillComplete(dpo) != 0) {
-                    log("START Action Failed");
-                    return(null);
-                }
+                waitTillComplete(dpo,"START Action Failed");
                 this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             }
         }
@@ -285,7 +238,7 @@ public class JSR88Deployer implements ProgressListener {
     }
 
     public ProgressObject undeploy(String moduleID) throws Exception {
-        TargetModuleID[] list = null;
+        TargetModuleID[] list;
         //log ("000 trying to undeploy moduleID = " + moduleID);
         if (moduleID == null) { //undeploy all but system apps
             list = getAllApplications(null);
@@ -296,16 +249,13 @@ public class JSR88Deployer implements ProgressListener {
         ProgressObject dpo = null;
         TargetModuleID[] modules = list;
         if (modules != null && modules.length > 0) {
-            for (int i = 0; i < modules.length; i++) {
-                log("UNDEPLOYING... " + modules[i]);
+            for (TargetModuleID module : modules) {
+                log("UNDEPLOYING... " + module);
             }
             dpo = dm.undeploy(modules);
             if (dpo!=null) {
                 dpo.addProgressListener(this);
-                if(waitTillComplete(dpo) != 0) {
-                    log("UNDEPLOY Action Failed");
-                    return(null);
-                }
+                waitTillComplete(dpo,"UNDEPLOY Action Failed");
                 this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             }
         }
@@ -318,8 +268,8 @@ public class JSR88Deployer implements ProgressListener {
     }
 
     protected void dumpModulesIDs(String prefix, TargetModuleID[] targetModuleIDs) {
-        for (int i=0;i<targetModuleIDs.length;i++) {            
-            dumpModulesIDs(prefix, targetModuleIDs[i]);            
+        for (TargetModuleID targetModuleID : targetModuleIDs) {
+            dumpModulesIDs(prefix, targetModuleID);
         }
     }
     
@@ -335,10 +285,10 @@ public class JSR88Deployer implements ProgressListener {
 
     public TargetModuleID[] getApplications(ModuleType moduleType, Boolean running) 
         throws Exception {
-        TargetModuleID[] modules = null;
+        TargetModuleID[] modules;
         if (running==null) {
             modules = dm.getAvailableModules(moduleType, targets);
-        } else if (running.booleanValue()) {
+        } else if (running) {
             modules = dm.getRunningModules(moduleType, targets);
         } else {
             modules = dm.getNonRunningModules(moduleType, targets);
@@ -347,8 +297,7 @@ public class JSR88Deployer implements ProgressListener {
         return modules;
     }
 
-    public TargetModuleID[] getAllApplications(Boolean running) 
-        throws Exception {
+    public TargetModuleID[] getAllApplications(Boolean running)  throws Exception {
         //log("222. getAllApplications, running = " + running);
         TargetModuleID[] ears = getApplications(ModuleType.EAR, running);
         TargetModuleID[] wars = getApplications(ModuleType.WAR, running);
@@ -396,219 +345,33 @@ public class JSR88Deployer implements ProgressListener {
      *@return new TargetModuleID array, containing only the elements from the original array that match the module ID
      */
     protected TargetModuleID[] filterTargetModuleIDsByModule(TargetModuleID [] tmids, String moduleID) {
-        List tmidsToUse = new ArrayList();
+        List<TargetModuleID> tmidsToUse = new ArrayList<TargetModuleID>();
         /*
          *Add to the vector of TMIDs each TMID from getApplications that also matches the
          *module ID.
          */
-        for (int i = 0; i < tmids.length; i++) {
-            if (moduleID.equals(tmids[i].getModuleID())) {
-                tmidsToUse.add(tmids[i]);
+        for (TargetModuleID tmid : tmids) {
+            if (moduleID.equals(tmid.getModuleID())) {
+                tmidsToUse.add(tmid);
             }
         }
-        return (TargetModuleID [])(tmidsToUse.toArray(new TargetModuleID[tmidsToUse.size()]));
+        return tmidsToUse.toArray(new TargetModuleID[tmidsToUse.size()]);
     }
     
     public void listApplications(ModuleType moduleType, Boolean running) 
         throws Exception {
         TargetModuleID[] modules = getApplications(moduleType, running); 
         if (modules == null) {
-        } else {
-            for (int i = 0; i < modules.length; i++) {
-                if (running==null) {
-                    dumpModulesIDs("    AVAILABLE ", modules[i]);
-                } else if (running.booleanValue()) {
-                    dumpModulesIDs("    RUNNING ", modules[i]);
-                } else {
-                    dumpModulesIDs("    NOT RUNNING ", modules[i]); 
-                }
+        } else
+        for (TargetModuleID module : modules) {
+            if (running == null) {
+                dumpModulesIDs("    AVAILABLE ", module);
+            } else if (running) {
+                dumpModulesIDs("    RUNNING ", module);
+            } else {
+                dumpModulesIDs("    NOT RUNNING ", module);
             }
         }
-    }
-    
-    public static void main(String[] args) throws IOException, DeploymentException {
-
-        if (args.length == 0 || "help".equals(args[0])) {
-            usage();
-            System.exit(1);
-        }
-        if (args.length < 5) {
-            usage();
-            System.exit(1);
-        }
-
-        JSR88Deployer deployer = new JSR88Deployer(args[1], args[2], args[3]);
-        if ("deploy".equals(args[0]) || "deploy-stream".equals(args[0])) {
-            if (args.length < 6) {
-                usage();
-                System.exit(1);
-            }
-            boolean useStream = "deploy-stream".equals(args[0]);
-            boolean startByDefault = "true".equals(args[4]);
-            java.io.File inputFile = new java.io.File(args[5]);
-            if (!inputFile.exists()) {
-                error("File not found : " + inputFile.getPath());
-                System.exit(1);
-            }
-            File deploymentFile = null;
-            if (args.length > 6) {
-                deploymentFile = new File(args[6]);
-                if (!args[6].equals("null")) {
-                    if (!deploymentFile.exists()) {
-                        error("Deployment File not found : " + deploymentFile.getPath());
-                        System.exit(1);
-                    }
-                }
-            }
-            try {
-                log("Deploying " + inputFile + " plan: " + deploymentFile);
-                if(deployer.deploy(inputFile, deploymentFile,
-                                        startByDefault, useStream, null) == null)
-                    ;
-            } catch(Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } else if ("deploy-stream-withtype".equals(args[0])) {
-            if (args.length < 7) {
-                usage();
-                System.exit(1);
-            }
-            boolean useStream = true;
-            boolean startByDefault = "true".equals(args[4]);
-            java.io.File inputFile = new java.io.File(args[5]);
-            if (!inputFile.exists()) {
-                error("File not found : " + inputFile.getPath());
-                System.exit(1);
-            }
-            ModuleType t =
-                ModuleType.getModuleType((new Integer(args[6])).intValue());
-            File deploymentFile = null;
-            if (args.length > 7) {
-                deploymentFile = new File(args[7]);
-                if (!args[7].equals("null")) {
-                    if (!deploymentFile.exists()) {
-                        error("Deployment File not found : " + deploymentFile.getPath());
-                        System.exit(1);
-                    }
-                }
-            }
-            try {
-                log("Deploying " + inputFile + " plan: " + deploymentFile);
-                if(deployer.deploy(inputFile, deploymentFile,
-                                        startByDefault, useStream, t) == null)
-                    ;
-            } catch(Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } else if ("list".equals(args[0])) {
-
-            if (args.length != 5) {
-                usage();
-                System.exit(0);
-            }
-
-            try {
-                if ("all".equals(args[4])) {
-                    deployer.listApplications(ModuleType.EAR, null);
-                    deployer.listApplications(ModuleType.WAR, null);
-                    deployer.listApplications(ModuleType.EJB, null);
-                    deployer.listApplications(ModuleType.CAR, null);
-                    deployer.listApplications(ModuleType.RAR, null);
-                } else if ("running".equals(args[4])) {
-                    deployer.listApplications(ModuleType.EAR, Boolean.TRUE);
-                    deployer.listApplications(ModuleType.WAR, Boolean.TRUE);
-                    deployer.listApplications(ModuleType.EJB, Boolean.TRUE);
-                    deployer.listApplications(ModuleType.CAR, Boolean.TRUE);
-                    deployer.listApplications(ModuleType.RAR, Boolean.TRUE);
-                } else if ("nonrunning".equals(args[4])) {
-                    deployer.listApplications(ModuleType.EAR, Boolean.FALSE);
-                    deployer.listApplications(ModuleType.WAR, Boolean.FALSE);
-                    deployer.listApplications(ModuleType.EJB, Boolean.FALSE);
-                    deployer.listApplications(ModuleType.CAR, Boolean.FALSE);
-                    deployer.listApplications(ModuleType.RAR, Boolean.FALSE);
-                } else {
-                    usage();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        } else if ("redeploy".equals(args[0]) || "redeploy-stream".equals(args[0])) {
-            if (args.length < 6) {
-                usage();
-                System.exit(-1);
-            }
-
-            boolean useStream = "redeploy-stream".equals(args[0]);
-            java.io.File inputFile = new java.io.File(args[5]);
-            if (!inputFile.exists()) {
-                error("File not found : " + inputFile.getPath());
-                System.exit(1);
-            }
-            File deploymentFile = null;
-            if (args.length > 6) {
-                deploymentFile = new File(args[6]);
-                if (!args[6].equals("null")) {
-                    if (!deploymentFile.exists()) {
-                        error("Deployment File not found : " + deploymentFile.getPath());
-                        System.exit(1);
-                    }
-                }
-            }
-            try {
-                log("Redeploying " + inputFile + " plan: " + deploymentFile);
-                if ("all".equals(args[4])) {
-                    deployer.redeploy(null, inputFile, deploymentFile, useStream);
-                } else {
-                    deployer.redeploy(args[4], inputFile, deploymentFile, useStream);
-                }
-            } catch(Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } else {
-            if (args.length != 5) {
-                usage();
-                System.exit(1);
-            }
-
-            try {
-                if ("all".equals(args[4])) {
-                    if ("undeploy".equals(args[0])) {
-                        if(deployer.undeploy(null) == null)
-                            ;
-                    } else if ("start".equals(args[0])) {
-                        if(deployer.start(null) == null)
-                            ;
-                    } else if ("stop".equals(args[0])) {
-                        if(deployer.stop(null) == null)
-                            ;
-                    } else {
-                        usage();
-                    }
-                } else {
-                    if ("undeploy".equals(args[0])) {
-                        if(deployer.undeploy(args[4]) == null)
-                            ;
-                    } else if ("start".equals(args[0])) {
-                        if(deployer.start(args[4]) == null)
-                            ;
-                    } else if ("stop".equals(args[0])) {
-                        if(deployer.stop(args[4]) == null)
-                            ;
-                    } else {
-                        usage();
-                        ;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-        //return(finalExitValue);
     }
     
     /** Invoked when a deployment progress event occurs.
@@ -631,7 +394,7 @@ public class JSR88Deployer implements ProgressListener {
      */
     public ProgressEvent [] getReceivedEvents() {
         ProgressEvent [] answer = new ProgressEvent[this.receivedEvents.size()];
-        return (ProgressEvent []) this.receivedEvents.toArray(answer);
+        return this.receivedEvents.toArray(answer);
     }
     
     /**

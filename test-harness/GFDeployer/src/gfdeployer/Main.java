@@ -9,19 +9,22 @@
 
 package gfdeployer;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+
 /**
  *
  * @author ken
  */
 public class Main {
-    
-    public static void main(String[] args) throws Exception {
-        String[] deployArgs = {"deploy", "deployer:Sun:AppServer::localhost:4848", "admin", "adminadmin", "true", "./test.war"};
-        String[] undeployArgs = {"undeploy", "deployer:Sun:AppServer::localhost:4848", "admin", "adminadmin", "test"};
 
-        JSR88Deployer.main(deployArgs);
+    public static void main(String[] args) throws Exception {
+        JSR88Deployer deployer = new JSR88Deployer("deployer:Sun:AppServer::localhost:4848","admin","adminadmin");
+
+        deployer.deploy(new File("test.war"),null,true,null);
         System.out.println("deployed");
-        Thread.sleep(30000);
-        JSR88Deployer.main(undeployArgs);
+        new BufferedReader(new InputStreamReader(System.in)).readLine();
+        deployer.undeploy("test");
     }
 }
