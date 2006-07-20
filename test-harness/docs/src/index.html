@@ -272,6 +272,13 @@
 			</l:tip>
 		</l:section>
 	</l:section>
+	<l:section title="Running Batch Tests">
+		<p>
+			There are a few command-line options that often go with automated batch test for a large number of tests. First, use <tt>-p N</tt> to run tests by using N number of threads. This should be used on a multi-processor system to reduce the turn-around time of the test, and ideal for continuous testing.
+		<p>
+			The <tt>-report DIR</tt> option causes the harness to generate JUnit test report files into the specified directory. These generated XML reports can be then formatted into HTML (via &lt;junitreport> ant task) or picked up by Hudson.
+		</p>
+	</l:section>
 </l:section>
 </l:document>
 </body>
