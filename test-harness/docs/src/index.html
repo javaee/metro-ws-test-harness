@@ -261,8 +261,15 @@
 		</l:section>
 		<l:section title="Glassfish">
 			<p>
-				<l:not-yet />
+				To test with Glassfish, use the following option. This mode assumes that you have already started a domain, and the harness will simply deploy/undeploy applications to this running service:
 			</p>
+			<l:harness-cmd>-glassfish-remote localhost test-dir1 test-dir2 ...</l:harness-cmd>
+			<p>
+				The "-glassfish-remote" takes the connection string as the parameter. The full syntax of the paramter is <tt>[USER:PASS@]HOST[:PORT][-HTTPURL]</tt>. The first four parts up to '-' specifies the Glassfish admin port. USER and PASS is used for the administrator login, and PORT is the admin TCP port. The last HTTPURL specifies the URL with which client test programs talk to the service. All components but HOST are defaulted, so if your glassfish installation is out of the box, then all you need to specify is the host name where Glassfish runs.
+			</p>
+			<l:tip>
+				Glassfish has its copy of JAX-WS, so testing with Glassfish requires us to replace the runtime of Glassfish. At this point the harness is not capable of doing that.
+			</l:tip>
 		</l:section>
 	</l:section>
 </l:section>
