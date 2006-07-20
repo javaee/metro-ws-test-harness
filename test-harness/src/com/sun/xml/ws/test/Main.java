@@ -105,17 +105,20 @@ public class Main {
     @Option(name="-tomcat-local",usage="Launch Tomcat from the harness and test with it",metaVar="TOMCAT_HOME")
     File tomcat = null;
 
-    @Option(name="-tomcat-remote",metaVar="[USER:PASS@]HOST[:PORT]",
-        usage="Test with remote Tomcat\nNeeds login info for admin. Defaults: USER=admin, PASS=admin, PORT=8080")
+    @Option(name="-tomcat-remote",metaVar="CONFIG",
+        usage="Test with remote Tomcat.\n" +
+            "CONFIG=[USER:PASS@]HOST[:PORT].\n" +
+            "Defaults: USER=admin, PASS=admin, PORT=8080")
     String remoteTomcat = null;
 
     @Option(name="-tomcat-embedded",metaVar="TOMCAT_HOME",
         usage="loads Tomcat into the harness VM and test with it.")
     File embeddedTomcat = null;
 
-    @Option(name="-glassfish-remote",metaVar="[USER:PASS@]HOST[:PORT][-HTTPURL]",
+    @Option(name="-glassfish-remote",metaVar="CONFIG",
         usage=
-            "Test with remote Glassfish. Needs both JMX connection info and HTTP URL. "+
+            "Test with remote Glassfish. Needs both JMX connection info and HTTP URL.\n"+
+            "CONFIG=[USER:PASS@]HOST[:PORT][-HTTPURL]\n"+
             "e.g., admin:adminadmin@localhost:4848-http://localhost:8080/\n"+
             "Defaults: USER=admin, PASS=adminadmin, PORT=4848, HTTPURL=http://HOST/")
     String remoteGlassfish = null;
