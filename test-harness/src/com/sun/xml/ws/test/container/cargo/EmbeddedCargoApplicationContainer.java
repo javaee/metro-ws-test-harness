@@ -13,9 +13,6 @@ import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.codehaus.cargo.util.log.SimpleLogger;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * {@link ApplicationContainer} that loads the container into the harness VM.
  *
@@ -48,6 +45,12 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
     @Override
     protected boolean copyRuntimeLibraries() {
         // runtime jars available in the container. no need to copy
+        return false;
+    }
+
+    @Override
+    protected boolean needsArchive() {
+        // embedded tomcat doesn't need a war file
         return false;
     }
 

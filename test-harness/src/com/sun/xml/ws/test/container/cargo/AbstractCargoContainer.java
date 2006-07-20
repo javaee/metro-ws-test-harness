@@ -35,9 +35,14 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         String contextPath = service.service.getGlobalUniqueName();
-        File archive = new File(service.workDir,contextPath+".war");
+        File archive;
 
-        createWARZip(service,archive);
+        if(needsArchive()) {
+            archive = new File(service.workDir,contextPath+".war");
+            createWARZip(service,archive);
+        } else {
+            archive = assembleWar(service).root;
+        }
 
         WAR war = (WAR)new DefaultDeployableFactory().createDeployable(
             container.getId(), archive, DeployableType.WAR);
@@ -61,4 +66,14 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
     }
 
     protected abstract URL getServiceUrl(String contextPath) throws Exception;
+
+    /**
+     * True if the Cargo implementation only takes a .war file
+     * and not the exploded war image.
+     *
+     * Not creating a war file makes the testing faster.
+     */
+    protected boolean needsArchive() {
+        return true;
+    }
 }
