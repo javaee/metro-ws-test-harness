@@ -5,6 +5,7 @@ import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
+import com.sun.xml.ws.test.container.gf.GlassfishContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
@@ -112,10 +113,11 @@ public class Main {
         usage="loads Tomcat into the harness VM and test with it.")
     File embeddedTomcat = null;
 
-    @Option(name="-glassfish",usage="Test with Glassfish",metaVar="GLASSFISH_HOME")
-    File glassfish = null;
-
-    @Option(name="-glassfish-remote",usage="Test with remote Glassfish",metaVar="HOST:PORT")
+    @Option(name="-glassfish-remote",metaVar="[USER:PASS@]HOST[:PORT][-HTTPURL]",
+        usage=
+            "Test with remote Glassfish. Needs both JMX connection info and HTTP URL. "+
+            "e.g., admin:adminadmin@localhost:4848-http://localhost:8080/\n"+
+            "Defaults: USER=admin, PASS=adminadmin, PORT=4848, HTTPURL=http://HOST/")
     String remoteGlassfish = null;
 
 
@@ -318,13 +320,29 @@ public class Main {
                 );
         }
 
-        if(glassfish!=null)
-            // TODO: implement this later
-            throw new UnsupportedOperationException();
+        if(remoteGlassfish!=null) {
+            // [USER:PASS@]HOST[:PORT][-HTTPURL]
+            System.err.println("Using remote Glassfish at "+remoteGlassfish);
+            //  group capture number  :        12    3      4         5 6         7   8
+            Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:\\-]+)(:([0-9]+))?(\\-(.+))?").matcher(remoteGlassfish);
+            if(!matcher.matches())
+                throw new CmdLineException("Unable to parse "+remoteGlassfish);
 
-        if(remoteGlassfish!=null)
-            // TODO: implement this later
-            throw new UnsupportedOperationException();
+            String userName = defaultsTo(matcher.group(2),"admin");
+            String password = defaultsTo(matcher.group(3),"adminadmin");
+            String host = matcher.group(4);
+            String port = defaultsTo(matcher.group(6),"4848");
+            String httpUrl = matcher.group(8);
+
+            if(httpUrl==null) {
+                // defaulted
+                httpUrl = "http://"+host+":8080/";
+            }
+
+            return new GlassfishContainer(
+                wsimport, wsgen, new URL(httpUrl), host, Integer.parseInt(port), userName, password
+            );
+        }
 
 
         System.err.println("Testing with the local transport");
