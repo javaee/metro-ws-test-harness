@@ -3,8 +3,8 @@ package com.sun.xml.ws.test;
 import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
-import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
+import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 import org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter;
 import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.dom4j.DocumentException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -232,12 +231,13 @@ public class Main {
             runtime.addJar(new File(wsitImage,"lib/webservices.jar"));
             runtime.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
             tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
+            //tool.addJar(new File(wsitImage,"lib/webservices.jar"));
         } else
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
             runtime.addJarFolder(   new File(wsitWs,"lib/runtime"));
-            runtime.addClassFolder(    new File(wsitWs,"tools/build/classes"));
-            runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));
+            /*runtime.addClassFolder(    new File(wsitWs,"tools/build/classes"));
+            runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));*/
             tool.addClassFolder(    new File(wsitWs,"tools/build/classes"));
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
         } else
@@ -270,7 +270,9 @@ public class Main {
         File jreHome = new File(System.getProperty("java.home"));
         File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
         tool.addJar(toolsJar);
-        
+        //TODO remove me temporary workaround
+        runtime.addJar(toolsJar);
+
         if(debug) {
             System.err.println("container realm");
             container.dump(System.err);
