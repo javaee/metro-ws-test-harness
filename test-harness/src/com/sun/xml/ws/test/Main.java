@@ -190,6 +190,7 @@ public class Main {
                     TestResult result = super.createTestResult();
 
                     if(reportDir!=null) {
+                        reportDir.mkdirs();
                         formatter = new AntXmlFormatter(XMLJUnitResultFormatter.class, reportDir);
                         result.addListener(formatter);
                     }
