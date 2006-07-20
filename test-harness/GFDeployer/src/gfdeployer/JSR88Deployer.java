@@ -36,9 +36,6 @@ public class JSR88Deployer implements ProgressListener {
     /** Record all events delivered to this deployer (which is also a progress listener. */
     private Vector<ProgressEvent> receivedEvents = new Vector<ProgressEvent>();
     
-    /** Record the TargetModuleIDs that resulted from the most recent operation. */
-    private TargetModuleID [] mostRecentTargetModuleIDs = null;
-    
     /** Creates a new instance of JSR88Deployer */
     public JSR88Deployer(String uri, String user, String password) throws DeploymentException {
 
@@ -46,6 +43,7 @@ public class JSR88Deployer implements ProgressListener {
 
         try {
             // to be more correct, we should load this from manifest.
+            // but that requires a local glassfish installation
             dm = new SunDeploymentFactory().getDeploymentManager(uri,user,password);
         } catch (DeploymentManagerCreationException e) {
             throw new DeploymentException(e);
@@ -71,7 +69,7 @@ public class JSR88Deployer implements ProgressListener {
         }
     }
 
-    private void waitTillComplete(ProgressObject po, String errorMessage) throws Exception {
+    private void waitTillComplete(ProgressObject po, String errorMessage) throws DeploymentException, InterruptedException {
         DeploymentStatus deploymentStatus;
         do {
             /*
@@ -82,19 +80,19 @@ public class JSR88Deployer implements ProgressListener {
              */
             deploymentStatus = po.getDeploymentStatus();
             Thread.sleep(200);
-        } while (!(deploymentStatus.isCompleted() || deploymentStatus.isFailed()));   
+        } while (!(deploymentStatus.isCompleted() || deploymentStatus.isFailed()));
 
         if(deploymentStatus.isFailed())
             throw new DeploymentException(errorMessage);
     }
 
-    public ProgressObject deploy(File archive, File deploymentPlan,
-                                boolean startByDefault,
-                                ModuleType type) 
-        throws Exception {
+    /**
+     * Deploys an application and returns the list of deployed module(s).
+     */
+    public TargetModuleID[] deploy(File archive, File deploymentPlan,
+                                   ModuleType type) throws DeploymentException, InterruptedException {
 
         ProgressObject dpo;
-        ProgressObject po;
         if (deploymentPlan == null) {
             log("Warning, deploying with null deployment plan");
             dpo = dm.distribute(targets, archive, null);
@@ -102,25 +100,20 @@ public class JSR88Deployer implements ProgressListener {
             dpo = dm.distribute(targets, archive, deploymentPlan);
         }
 
-        if (dpo!=null) {
-            dpo.addProgressListener(this);
-            waitTillComplete(dpo,"DEPLOY Action Failed");
+        dpo.addProgressListener(this);
+        waitTillComplete(dpo,"DEPLOY Action Failed");
 
-            TargetModuleID[] targetModuleIDs = dpo.getResultTargetModuleIDs();        
-            this.mostRecentTargetModuleIDs = targetModuleIDs;
-            dumpResultModuleIDs("Deployed " , dpo);
+        TargetModuleID[] targetModuleIDs = dpo.getResultTargetModuleIDs();
+        dumpResultModuleIDs("Deployed " , dpo);
 
-            if (startByDefault) {
-                log("STARTINNG... " + targetModuleIDs);
-                po = dm.start(targetModuleIDs);
-                if (po!=null) {
-                    po.addProgressListener(this);
-                    waitTillComplete(po,"START Action Failed");
-                }
-                return po;
-            }
-        }
-        return(dpo);
+        return targetModuleIDs;
+    }
+
+    public void start(TargetModuleID[] modules) throws DeploymentException, InterruptedException {
+        log("STARTINNG... " + modules);
+        ProgressObject po = dm.start(modules);
+        po.addProgressListener(this);
+        waitTillComplete(po,"START Action Failed");
     }
 
     public ProgressObject redeploy(String moduleID, File archive,
@@ -163,7 +156,6 @@ public class JSR88Deployer implements ProgressListener {
             dpo.addProgressListener(this);
             waitTillComplete(dpo,"REDEPLOY Action Failed");
 
-            this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             dumpResultModuleIDs("Redeployed " , dpo);
         }
         return(dpo);
@@ -187,7 +179,6 @@ public class JSR88Deployer implements ProgressListener {
             if (dpo!=null) {
                 dpo.addProgressListener(this);
                 waitTillComplete(dpo,"STOP Action Failed");
-                this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             }
         }
         return(dpo);
@@ -227,44 +218,22 @@ public class JSR88Deployer implements ProgressListener {
                     log("Now registered as a progress listener");
                 }
                 waitTillComplete(dpo,"START Action Failed");
-                this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
             }
         }
         return(dpo);
     }
 
-    public ProgressObject start(String moduleID) throws Exception {
-        return start(moduleID, 0);
-    }
-
-    public ProgressObject undeploy(String moduleID) throws Exception {
-        TargetModuleID[] list;
-        //log ("000 trying to undeploy moduleID = " + moduleID);
-        if (moduleID == null) { //undeploy all but system apps
-            list = getAllApplications(null);
-        } else {
-            list = findApplication(moduleID, null);
+    public void undeploy(TargetModuleID[] modules) throws DeploymentException, InterruptedException {
+        ProgressObject dpo = dm.undeploy(modules);
+        if (dpo!=null) {
+            dpo.addProgressListener(this);
+            waitTillComplete(dpo,"UNDEPLOY Action Failed");
         }
-
-        ProgressObject dpo = null;
-        TargetModuleID[] modules = list;
-        if (modules != null && modules.length > 0) {
-            for (TargetModuleID module : modules) {
-                log("UNDEPLOYING... " + module);
-            }
-            dpo = dm.undeploy(modules);
-            if (dpo!=null) {
-                dpo.addProgressListener(this);
-                waitTillComplete(dpo,"UNDEPLOY Action Failed");
-                this.mostRecentTargetModuleIDs = dpo.getResultTargetModuleIDs();
-            }
-        }
-        return(dpo);
     }
 
     protected void dumpResultModuleIDs(String prefix, ProgressObject po) {
         TargetModuleID[] targetModuleIDs = po.getResultTargetModuleIDs();
-	dumpModulesIDs(prefix, targetModuleIDs);
+    dumpModulesIDs(prefix, targetModuleIDs);
     }
 
     protected void dumpModulesIDs(String prefix, TargetModuleID[] targetModuleIDs) {
@@ -402,31 +371,6 @@ public class JSR88Deployer implements ProgressListener {
      */
     public void clearReceivedEvents() {
         this.receivedEvents.clear();
-    }
-
-    public TargetModuleID [] getMostRecentTargetModuleIDs() {
-        return this.mostRecentTargetModuleIDs;
-    }
-    
-    public void clearMostRecentTargetModuleIDs() {
-        this.mostRecentTargetModuleIDs = null;
-    }
-    
-    private static void usage() {
-        System.out.println("Usage: command <JSR88.URI> <admin-user> <admin-password> [command-parameters]");
-        System.out.println("    where command is one of [deploy<-stream> | redeploy<-stream> | undeploy | start | stop | list]");
-        System.out.println("    where <JSR88.URI> is: deployer:Sun:AppServer::${admin.host}:${admin.port} for PE");
-        System.out.println("    where <JSR88.URI> is: deployer:Sun:AppServer::${admin.host}:${admin.port}:https for EE");
-        System.out.println("    where command-parameters are as follows");
-        System.out.println("      deploy: <startByDefault> <archiveFile> [<deploymentFile>]");
-        System.out.println("      deploy-stream: <startByDefault> <archiveFile> [<deploymentFile>]");
-        System.out.println("      deploy-stream-withtype: <startByDefault> <archiveFile> <moduleType> [<deploymentFile>]");
-        System.out.println("      redeploy: <moduleID> <archiveFile> [<deploymentFile>]");
-        System.out.println("      redeploy-stream: <moduleID> <archiveFile> [<deploymentFile>]");
-        System.out.println("      undeploy: [all | moduleID]");
-        System.out.println("      start: [all | moduleID]");
-        System.out.println("      stop: [all | moduleID]");
-        System.out.println("      list: [all | running | nonrunning]");
     }
 
     public static void log(String message) {

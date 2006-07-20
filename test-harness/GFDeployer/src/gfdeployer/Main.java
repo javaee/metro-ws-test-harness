@@ -9,6 +9,7 @@
 
 package gfdeployer;
 
+import javax.enterprise.deploy.spi.TargetModuleID;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -22,9 +23,13 @@ public class Main {
     public static void main(String[] args) throws Exception {
         JSR88Deployer deployer = new JSR88Deployer("deployer:Sun:AppServer::localhost:4848","admin","adminadmin");
 
-        deployer.deploy(new File("test.war"),null,true,null);
+        TargetModuleID[] modules = deployer.deploy(new File("test.war"), null, null);
         System.out.println("deployed");
+        deployer.start(modules);
+        System.out.println("started");
+
         new BufferedReader(new InputStreamReader(System.in)).readLine();
-        deployer.undeploy("test");
+
+        deployer.undeploy(modules);
     }
 }
