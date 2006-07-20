@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  *
@@ -33,9 +32,6 @@ public class JSR88Deployer implements ProgressListener {
     //private final String J2EE_DEPLOYMENT_MANAGER =
     //                    "J2EE-DeploymentFactory-Implementation-Class";
 
-    /** Record all events delivered to this deployer (which is also a progress listener. */
-    private Vector<ProgressEvent> receivedEvents = new Vector<ProgressEvent>();
-    
     /** Creates a new instance of JSR88Deployer */
     public JSR88Deployer(String uri, String user, String password) throws DeploymentException {
 
@@ -110,7 +106,6 @@ public class JSR88Deployer implements ProgressListener {
     }
 
     public void start(TargetModuleID[] modules) throws DeploymentException, InterruptedException {
-        log("STARTINNG... " + modules);
         ProgressObject po = dm.start(modules);
         po.addProgressListener(this);
         waitTillComplete(po,"START Action Failed");
@@ -350,27 +345,6 @@ public class JSR88Deployer implements ProgressListener {
     public void handleProgressEvent(ProgressEvent event) {
         DeploymentStatus ds = event.getDeploymentStatus();
         System.out.println("Received Progress Event state " + ds.getState() + " msg = " + ds.getMessage());
-        /*
-         *Add this event to the vector collecting them.
-         */
-        this.receivedEvents.add(event);
-    }
-
-    /**
-     *Report all the events received by this deployer.
-     *
-     *@return array of Objects containing the received events
-     */
-    public ProgressEvent [] getReceivedEvents() {
-        ProgressEvent [] answer = new ProgressEvent[this.receivedEvents.size()];
-        return this.receivedEvents.toArray(answer);
-    }
-    
-    /**
-     *Clear the collection of received events recorded by this deployer.
-     */
-    public void clearReceivedEvents() {
-        this.receivedEvents.clear();
     }
 
     public static void log(String message) {
