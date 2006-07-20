@@ -16,10 +16,10 @@ final class LocalWsTool extends WsTool {
 
     public LocalWsTool(String className) {
         try {
-            Class wsimport = World.runtime.loadClass(className);
+            Class wsimport = World.tool.loadClass(className);
             System.out.println("Using "+Which.which(wsimport));
             main = wsimport.getMethod("doMain",String[].class);
-            Thread.currentThread().setContextClassLoader(World.runtime.getClassLoader());
+            Thread.currentThread().setContextClassLoader(World.tool.getClassLoader());
         } catch (ClassNotFoundException e) {
             throw new Error("Unable to find tool "+className,e);
         } catch (NoSuchMethodException e) {
