@@ -52,6 +52,7 @@ public class Bootstrap {
         // call into the main method
         Class main = harness.loadClass("com.sun.xml.ws.test.Main");
         Method mainMethod = main.getMethod("main", String[].class);
+        Thread.currentThread().setContextClassLoader(harness.getClassLoader());
         mainMethod.invoke(null,new Object[]{args});
     }
 
