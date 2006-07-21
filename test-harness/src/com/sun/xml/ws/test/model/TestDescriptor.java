@@ -319,6 +319,10 @@ public class TestDescriptor {
         return new SAXReader(factory.newSAXParser().getXMLReader()).read(descriptor);
     }
 
+    public String toString() {
+        return name;
+    }
+
     class XSDFilter implements FilenameFilter {
         public boolean accept(File dir, String name) {
             return (name.endsWith(".xsd"));
