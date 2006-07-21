@@ -157,8 +157,6 @@
       <arg value="-cp:jaxws-image" />
       <arg path="build/jaxws-ri" />
 
-      <arg line="-p 2" />
-
       <arg value="-report" />
       <arg path="build/test-logs" />
 
