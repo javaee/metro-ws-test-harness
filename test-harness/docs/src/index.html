@@ -78,8 +78,10 @@
 	  <d:tag name="document">
 	  	<x:parse var="tocTree">
 	  		<j:scope>
-		  		<j:set var="mode" value="toc" />
-		  		<d:invokeBody />
+	  			<ROOT>
+			  		<j:set var="mode" value="toc" />
+			  		<d:invokeBody />
+			  	</ROOT>
 		  	</j:scope>
 	  	</x:parse>
 	  	<jsl:stylesheet var="tocStylesheet">
@@ -311,6 +313,10 @@
 			The <tt>-report DIR</tt> option causes the harness to generate JUnit test report files into the specified directory. These generated XML reports can be then formatted into HTML (via &lt;junitreport> ant task) or picked up by Hudson.
 		</p>
 	</l:section>
+</l:section>
+<l:section title="Another top-level section">
+	<p>
+		Foobar
 </l:section>
 </l:document>
 </body>
