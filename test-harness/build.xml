@@ -135,5 +135,43 @@
       <classpath refid="runtime.classpath"/>
     </java>
   </target>
-    
+
+
+  <target name="test"
+          depends="dist"
+          description="run unit tests">
+    <!--
+      This target serves two purposes:
+
+       - make sure that our harness works.
+       - test bed to see what it takes to actually automate the harness,
+         to make sure our users have a good experience.
+    -->
+
+    <!-- ws need some JAX-WS to test, so let's just use the latest JAX-WS RI -->
+    <get src="http://kohsuke.sfbay/hudson/job/jaxws-ri-rearch-2005/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/build/jaxws-ri.zip"
+         dest="build/jaxws-ri.zip" />
+    <unzip src="build/jaxws-ri.zip" dest="build" />
+
+    <java jar="build/dist/harness.jar" fork="true" failonerror="true">
+      <arg value="-cp:jaxws-image" />
+      <arg path="build/jaxws-ri" />
+
+      <arg line="-p 2" />
+
+      <arg value="-report" />
+      <arg path="build/test-logs" />
+
+      <!-- test data -->
+      <arg value="-r" />
+      <arg path="test/testcases/jaxws" />
+    </java>
+
+    <mkdir dir="build/junit-reports" />
+    <junitreport todir="build/junit-reports">
+      <fileset dir="build/test-logs" />
+      <report format="frames" todir="build/junit-reports"/>
+    </junitreport>
+  </target>
+
 </project>
