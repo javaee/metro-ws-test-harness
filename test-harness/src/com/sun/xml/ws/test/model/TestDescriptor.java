@@ -319,6 +319,10 @@ public class TestDescriptor {
         return new SAXReader(factory.newSAXParser().getXMLReader()).read(descriptor);
     }
 
+    /**
+     * Returns a human readable name that identifies the test,
+     * for better readability of the test result report.
+     */
     public String toString() {
         return name;
     }
