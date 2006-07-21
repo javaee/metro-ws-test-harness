@@ -153,7 +153,9 @@
          dest="build/jaxws-ri.zip" />
     <unzip src="build/jaxws-ri.zip" dest="build" />
 
-    <java jar="build/dist/harness.jar" fork="true" failonerror="true">
+    <delete dir="build/test-logs" />
+
+    <java jar="build/dist/harness.jar" fork="true">
       <arg value="-cp:jaxws-image" />
       <arg path="build/jaxws-ri" />
 
