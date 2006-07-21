@@ -170,7 +170,7 @@ public final class WAR {
             options.add("-b").add(custFile);
         }
         options.add("-extension");
-        options.add("-p").add(service.service.getGlobalUniqueName()+".server");
+        options.add("-p").add(service.service.getGlobalUniqueName());
 
         //Other options
         if(World.debug)
