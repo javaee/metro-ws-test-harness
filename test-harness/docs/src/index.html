@@ -114,6 +114,33 @@
 <l:document>
 
 <l:section title="Running Tests">
+    <l:section title="Writing Tests">
+        <l:section title="conventions">
+            <p>
+                - test-descriptor.xml for each test directory
+                - test clients are written in beanshell
+                reside in top-level directory of each test
+                scripts should end with suffix: .js (.bsh)
+                - optionally, client beanshell code can be written inline in the <client> of the test descriptor
+                - service code assumed to be all .java files in test's basedir
+                basedir defaults to top-level directory, basedir specified in <service> element
+                - 'resources' directory - automatically made available in beanshell
+                - custom-server.xml, custom-client.xml, custom-schema-server.xml, custom-client-schema.xml
+                'client' files in top-level
+                'server' files in basedir of service (default is top-level unless specified in test-descriptor.xml)
+                - schemas (*.xsd) automatically picked up from basedir of service
+            </p>
+        </l:section>
+        <l:section title="magic">
+            <p>
+                - picks up binding info from impl class
+                - generates deployment descriptor (sun-jaxws.xml)
+                - generates basic customization files for client and service for wsdl (not needed for for java case)
+                - injects service, port, etc objects into script namespace automatically, don't need to be declared or instantiated
+                - also, script inherits from junit Assert, get assertEquals(), etc for free
+            </p>
+        </l:section>
+    </l:section>
 	<l:section title="Configuring the Harness Classpath for Different Delivery Vehicles">
 		<p>
 			The harness can be used to test different projects that use the JAX-WS RI.
