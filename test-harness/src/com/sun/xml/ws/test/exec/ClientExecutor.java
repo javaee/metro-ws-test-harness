@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.exec;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
+import bsh.EvalError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -12,6 +13,7 @@ import java.beans.Introspector;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Executes {@link TestClient}.
@@ -96,7 +98,14 @@ public class ClientExecutor extends Executor {
                     // which would be something like "addNumbersPort"
                     String portName = Introspector.decapitalize((String)nameMethod.invoke(endpoint));
 
-                    engine.set(portName, method.invoke(serviceInstance));
+                    try {
+                        engine.set(portName, method.invoke(serviceInstance));
+                    } catch (InvocationTargetException e) {
+                        if(e.getCause() instanceof Exception)
+                            throw (Exception)e.getCause();
+                        else
+                            throw e;
+                    }
                     buf.append(' ').append(portName);
                 }
             }
