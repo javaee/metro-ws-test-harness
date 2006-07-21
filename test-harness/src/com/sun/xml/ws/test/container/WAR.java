@@ -175,6 +175,7 @@ public final class WAR {
             options.add("-b").add(custFile);
         }
         options.add("-extension");
+        options.add("-p").add(service.service.parent.name +".server");
 
         //Other options
         if(World.debug)
