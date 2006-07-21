@@ -247,8 +247,8 @@ public class Main {
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
         } else
         if(jaxwsImage!=null) {
-            tool.addJar(            new File(jaxwsWs,"lib/jaxws-tools.jar"));
-            tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
+            tool.addJar(            new File(jaxwsImage,"lib/jaxws-tools.jar"));
+            tool.addJar(            new File(jaxwsImage,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
         } else
         if(jaxwsWs!=null) {
