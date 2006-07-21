@@ -9,7 +9,6 @@ import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
-import com.sun.xml.ws.test.util.CustomizationBean;
 import com.sun.xml.ws.test.util.FileUtil;
 import com.sun.xml.ws.test.util.JavacTask;
 import com.sun.xml.ws.test.util.Jelly;
@@ -165,17 +164,13 @@ public final class WAR {
     final void compileWSDL(WsTool wsimport) throws Exception {
         assert service.service.wsdl!=null;
 
-        // Generate jaxws + jaxb binding customization file
-        File serverCustomizationFile = genServerCustomizationFile(service);
-        service.service.customizations.add(serverCustomizationFile);
-
         ArgumentListBuilder options = new ArgumentListBuilder();
         //Add customization files
         for (File custFile: service.service.customizations) {
             options.add("-b").add(custFile);
         }
         options.add("-extension");
-        options.add("-p").add(service.service.parent.name +".server");
+        options.add("-p").add(service.service.getGlobalUniqueName()+".server");
 
         //Other options
         if(World.debug)
@@ -271,24 +266,4 @@ public final class WAR {
     //        return dest;
     //    }
     //}
-
-    private File genServerCustomizationFile(DeployedService service) throws Exception {
-        File serverCustomizationFile = new File(service.workDir, "custom-server.xml");
-
-        Jelly jelly = new Jelly(getClass(),"jelly/custom-server.jelly");
-
-        String packageName;
-        if (service.service.name.equals("")) {
-            packageName = service.service.parent.name;
-        } else {
-            packageName = service.service.parent.name + "." + service.service.name;
-        }
-        CustomizationBean infoBean = new CustomizationBean(packageName,
-            service.service.wsdl.wsdlFile.getCanonicalPath());
-        jelly.set("data", infoBean);
-
-        jelly.run(serverCustomizationFile);
-
-        return serverCustomizationFile;
-    }
 }
