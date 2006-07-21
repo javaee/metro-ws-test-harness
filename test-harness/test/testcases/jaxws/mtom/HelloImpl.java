@@ -20,14 +20,14 @@
  * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
  */
 
-package jaxws.mtom.server;
+package jaxws.mtom;
 
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 import javax.activation.DataHandler;
 import java.awt.Image;
 
-@WebService (endpointInterface = "jaxws.mtom.server.Hello")
+@WebService (endpointInterface = "jaxws.mtom.Hello")
 public class HelloImpl implements Hello {
     public void detail (Holder<byte[]> photo, Holder<Image> image) {
     }
