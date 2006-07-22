@@ -15,7 +15,7 @@ abstract class Executor extends TestCase {
     public final DeploymentContext context;
 
     protected Executor(String name, DeploymentContext context) {
-        super(name+' '+context.descriptor.toString());
+        super(context.descriptor.name+"."+name);
         this.context = context;
     }
 

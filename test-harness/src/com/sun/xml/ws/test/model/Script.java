@@ -64,7 +64,7 @@ public abstract class Script {
         }
 
         public String getName() {
-            return script.getPath();
+            return script.getName();    // just use the file name portion
         }
 
         public Reader read() throws IOException {

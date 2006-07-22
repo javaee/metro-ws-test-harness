@@ -15,7 +15,7 @@ public class PrepareExecutor extends Executor {
     private final boolean clean;
 
     public PrepareExecutor(DeploymentContext context, boolean clean) {
-        super(clean?"Clean ":"Prepare ", context);
+        super(clean?"clean":"prepare", context);
         this.clean = clean;
     }
 

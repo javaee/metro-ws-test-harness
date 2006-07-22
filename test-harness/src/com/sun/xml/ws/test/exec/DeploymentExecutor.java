@@ -130,7 +130,7 @@ public class DeploymentExecutor extends Executor {
      * to undeploy the service that this test deployed.
      */
     public Executor createUndeployer() {
-        return new Executor("Undeploying "+context.service,context.parent) {
+        return new Executor("Undeploy "+context.service,context.parent) {
             public void runBare() throws Throwable {
                 if(DeploymentExecutor.this.context.app!=null)
                     DeploymentExecutor.this.context.app.undeploy();

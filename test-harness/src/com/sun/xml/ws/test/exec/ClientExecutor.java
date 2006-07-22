@@ -27,9 +27,7 @@ public class ClientExecutor extends Executor {
     private final TestClient client;
 
     public ClientExecutor(DeploymentContext context, TestClient client) {
-        //super("Client "+client.scripts.getName(), context);
-        //Todo what name should we give now?
-        super("Client ", context);
+        super("client."+client.script.getName(), context);
         this.client = client;
     }
 
