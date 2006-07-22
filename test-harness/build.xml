@@ -153,6 +153,9 @@
          dest="build/jaxws-ri.zip" />
     <unzip src="build/jaxws-ri.zip" dest="build" />
 
+    <get src="http://kohsuke.sfbay/hudson/job/jaxws-ri-rearch-2005/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/transports/local/build/jaxws-local-transport.jar"
+         dest="build/jaxws-local-transport.jar" />
+
     <delete dir="build/test-logs" />
 
     <java jar="build/dist/harness.jar" fork="true">
@@ -162,9 +165,14 @@
       <arg value="-report" />
       <arg path="build/test-logs" />
 
+      <arg value="-transport" />
+      <arg path="build/jaxws-local-transport.jar" />
+
       <!-- test data -->
       <arg value="-r" />
       <arg path="test/testcases/jaxws" />
+
+      <arg line="${test.options}"/>
     </java>
 
     <mkdir dir="build/junit-reports" />
