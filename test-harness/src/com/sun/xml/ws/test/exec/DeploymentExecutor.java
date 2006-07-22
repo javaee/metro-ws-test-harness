@@ -30,7 +30,7 @@ public class DeploymentExecutor extends Executor {
     private final DeployedService context;
 
     public DeploymentExecutor(DeployedService context) {
-        super("Deploy "+context.service,context.parent);
+        super("Deploy "+context.service.name,context.parent);
         this.context = context;
     }
 
@@ -130,7 +130,7 @@ public class DeploymentExecutor extends Executor {
      * to undeploy the service that this test deployed.
      */
     public Executor createUndeployer() {
-        return new Executor("Undeploy "+context.service,context.parent) {
+        return new Executor("Undeploy "+context.service.name,context.parent) {
             public void runBare() throws Throwable {
                 if(DeploymentExecutor.this.context.app!=null)
                     DeploymentExecutor.this.context.app.undeploy();

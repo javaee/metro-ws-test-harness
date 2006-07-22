@@ -27,7 +27,7 @@ public class ClientExecutor extends Executor {
     private final TestClient client;
 
     public ClientExecutor(DeploymentContext context, TestClient client) {
-        super("client."+client.script.getName(), context);
+        super("client "+client.script.getName().replace('.','_'), context);
         this.client = client;
     }
 
