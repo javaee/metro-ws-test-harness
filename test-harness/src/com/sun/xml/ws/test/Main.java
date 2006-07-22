@@ -86,6 +86,9 @@ public class Main {
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
+    @Option(name="-transport",usage="specify the pluggable transport jar")
+    File transportJar;
+
     /**
      * This is copied to {@link World#debug}.
      */
@@ -223,6 +226,9 @@ public class Main {
 
         Realm runtime = World.runtime;
         Realm tool = World.tool;
+
+        if(transportJar!=null)
+            runtime.addJar(transportJar);
 
         // fill in container realm.
         if(embeddedTomcat!=null) {
