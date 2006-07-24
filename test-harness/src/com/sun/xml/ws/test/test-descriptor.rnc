@@ -5,7 +5,7 @@
 #
 # <descriptor>
 #    <description>this is a very useful test that tests stuff</description>
-#    <client href="foo.js" since="2.0"/>
+#    <client href="foo.bsh" since="2.0"/>
 #    <service basedir=".">
 #        <wsdl href="test.wsdl"/>
 #    </service>
@@ -38,7 +38,7 @@ start = element descriptor {
             # 'href' is the name or name-pattern for the client beanshell
             #   scripts. if 'href' is a relative path, it will be relative
             #   to the test instance directory.
-            #   this attribute supports wildcard, such as "*.js"
+            #   this attribute supports wildcard, such as "*.bsh"
             #
             attribute href {text} |
 
