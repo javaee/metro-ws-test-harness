@@ -1,13 +1,15 @@
 package com.sun.xml.ws.test;
 
-import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.ClassRealm;
 
-import java.net.URL;
-import java.io.IOException;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -26,17 +28,14 @@ import java.util.logging.Logger;
  */
 public class Bootstrap {
     public static void main(String[] args) throws Exception {
-        ClassWorld world = new ClassWorld();
-
         File home = getHomeDirectory();
         logger.fine("test harness home is "+home);
 
         // system properties are ugly but easy way to communicate values to the harness main code
         System.getProperties().put("HARNESS_HOME",home);
-        System.getProperties().put("WORLD",world);
 
         // create the harness realm and put everything in there
-        ClassRealm harness = world.newRealm("harness");
+        List<URL> harness = new ArrayList<URL>();
         // extension hook to add more libraries
         File extLib = new File(home,"lib");
         if(!extLib.exists())
@@ -47,18 +46,19 @@ public class Bootstrap {
             }
         })) {
             logger.info("Adding "+jar+" to the harness realm");
-            harness.addConstituent(jar.toURL());
+            harness.add(jar.toURL());
         }
 
         // add harness-lib.jar. Do this at the end so that overrides can take precedence.
         File libJar = new File(home,"harness-lib.jar");
-        harness.addConstituent(libJar.toURL());
+        harness.add(libJar.toURL());
 
+        ClassLoader cl = new URLClassLoader(harness.toArray(new URL[0]), null);
 
         // call into the main method
-        Class main = harness.loadClass("com.sun.xml.ws.test.Main");
+        Class main = cl.loadClass("com.sun.xml.ws.test.Main");
         Method mainMethod = main.getMethod("main", String[].class);
-        Thread.currentThread().setContextClassLoader(harness.getClassLoader());
+        Thread.currentThread().setContextClassLoader(cl);
         mainMethod.invoke(null,new Object[]{args});
     }
 
