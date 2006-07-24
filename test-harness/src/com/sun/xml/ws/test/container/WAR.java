@@ -71,7 +71,7 @@ public final class WAR {
         classDir.mkdirs();
         libDir = new File(webInfDir,"lib");
         libDir.mkdir();
-        srcDir = new File(root,"gen-src");
+        srcDir = new File(service.workDir,"gen-src");
         srcDir.mkdir();
     }
 
