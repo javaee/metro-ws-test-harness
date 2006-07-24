@@ -37,17 +37,23 @@ public class Bootstrap {
 
         // create the harness realm and put everything in there
         ClassRealm harness = world.newRealm("harness");
-        File lib = new File(home,"lib");
-        if(!lib.exists())
-            throw new IllegalStateException("No such directory: "+lib);
-        for (File jar : lib.listFiles(new FilenameFilter() {
+        // extension hook to add more libraries
+        File extLib = new File(home,"lib");
+        if(!extLib.exists())
+            throw new IllegalStateException("No such directory: "+extLib);
+        for (File jar : extLib.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(".jar");
             }
         })) {
-            logger.fine("Adding "+jar+" to the harness realm");
+            logger.info("Adding "+jar+" to the harness realm");
             harness.addConstituent(jar.toURL());
         }
+
+        // add harness-lib.jar. Do this at the end so that overrides can take precedence.
+        File libJar = new File(home,"harness-lib.jar");
+        harness.addConstituent(libJar.toURL());
+
 
         // call into the main method
         Class main = harness.loadClass("com.sun.xml.ws.test.Main");

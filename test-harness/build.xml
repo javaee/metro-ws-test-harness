@@ -57,14 +57,19 @@
   <target name="dist" depends="jar, src-zip">
     <ant dir="bootstrap" target="dist" inheritall="false"/>
     <ant dir="docs" target="doc" inheritall="false"/>
-    <mkdir dir="build/dist/lib" />
+    <mkdir dir="build/dist" />
     <copy tofile="build/dist/harness.jar" file="bootstrap/build/bootstrap.jar" />
     <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
-    <copy todir="build/dist/lib">
-      <fileset dir="lib" includes="*" />
-      <fileset dir="lib/gf" includes="*" />
-      <fileset dir="build" includes="*.jar, *.zip" excludes="test-harness.zip"/>
-    </copy>
+    <!-- create library uberjar -->
+    <zip file="build/dist/harness-lib.jar">
+      <zipgroupfileset dir="lib" includes="**/*.jar" />
+      <zipfileset src="build/test-harness-core.jar" />
+    </zip>
+    <!-- library uber source zip -->
+    <zip file="build/dist/harness-lib.src.zip">
+      <zipgroupfileset dir="lib" includes="**/*.zip" />
+      <zipfileset src="build/test-harness-core-src.zip" />
+    </zip>
     <copy todir="build/dist">
       <fileset dir="docs/build" />
     </copy>
