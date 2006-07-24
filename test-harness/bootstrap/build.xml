@@ -22,7 +22,6 @@
     <jar jarfile="build/${name}.jar">
       <manifest>
         <attribute name="Main-Class" value="com.sun.xml.ws.test.Bootstrap" />
-        <attribute name="Class-Path" value="lib/classworlds-1.0.jar" />
         <attribute name="Build-Id" value="${build.id}"/>
       </manifest>
       <fileset dir="build/classes"/>
