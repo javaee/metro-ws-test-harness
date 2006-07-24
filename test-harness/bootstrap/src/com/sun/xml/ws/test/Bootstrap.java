@@ -1,7 +1,5 @@
 package com.sun.xml.ws.test;
 
-import org.codehaus.classworlds.ClassRealm;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,7 +20,7 @@ import java.util.logging.Logger;
  *
  * <p>
  * It's only job is to find all the jars that consistute the harness,
- * and create a {@link ClassRealm}, then call into it.
+ * and create a {@link URLClassLoader}, then call into it.
  *
  * @author Kohsuke Kawaguchi
  */
