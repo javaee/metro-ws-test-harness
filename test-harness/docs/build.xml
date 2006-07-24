@@ -33,6 +33,7 @@
     </htmlmacro>
     <copy todir="build">
       <fileset dir="src" includes="*.png" />
+      <fileset dir="../src/com/sun/xml/ws/test" includes="*.rnc" />
     </copy>
   </target>
 
