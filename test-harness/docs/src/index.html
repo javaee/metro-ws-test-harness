@@ -284,37 +284,75 @@
 </l:section>
 <l:section title="Writing Tests">
     <l:section title="Conventions">
-        <p>
-            - test-descriptor.xml for each test directory
-        </p>
-        <p>
-            - test clients are written in beanshell
-            reside in top-level directory of each test
-            scripts should end with suffix: .bsh
-        </p>
-        <p>
-            - optionally, client beanshell code can be written inline in the <client> of the test descriptor
-        </p>
-        <p>
-            - service code assumed to be all .java files in test's basedir
-            basedir defaults to top-level directory, basedir specified in <service> element
-        </p>
-        <p>
-            - 'resources' directory - automatically made available in beanshell
-        </p>
-        <p>
-            - custom-server.xml, custom-client.xml, custom-schema-server.xml, custom-client-schema.xml
-            'client' files in top-level
-            'server' files in basedir of service (default is top-level unless specified in test-descriptor.xml)
-        </p>
-        <p>
-            - schemas (*.xsd) automatically picked up from basedir of service
-        </p>
+        <l:section title="Example Directory Layout">
+            ./test-descriptor.xml<br>
+            ./test1.bsh<br>
+            ./test2.bsh<br>
+            ./resources/mascot.jpeg<br>
+            ./server/AddNumbers.wsdl<br>
+            ./server/AddNumbersImpl.java<br>
+            ./server/myschema.xsd<br>
+	</l:section>
+        <l:section title="Test Descriptor">
+            The file <TT>test-descriptor.xml</TT> contains the required configuration information for each test directory.<br>
+            Sample test descriptor file:<br>
+            <br>
+            &lt;descriptor since="1.0"&gt; <br>
+               &lt;description&gt;this is a very useful test that tests stuff&lt;/description&gt; <br>
+               &lt;client href="test1.bsh" since="2.0"/&gt;<br>
+               &lt;client href="test2.bsh" since="2.0"/&gt;<br>
+               &lt;client href="*.bsh"/&gt;<br>
+               &lt;service basedir="./server"&gt;<br>
+                   &lt;wsdl href="AddNumbers.wsdl"/&gt;<br>
+               &lt;/service&gt;<br>
+            &lt;/despcriptor&gt;<br>
+	</l:section>
+        <l:section title="Client Test Scripts">
+            <p>
+                Test client scripts are written in the <a href="http://www.beanshell.org">Beanshell</a> scripting language.
+                Test scripts reside at the top-level directory of each test.
+                In <TT>test-descriptor.xml</TT>, the script names are either explicitly specified or matched with wildcard patterns.
+                Scriptnames recommended to end with suffix: <TT>.bsh</TT>
+            </p>
+            <p>
+                Optionally, client beanshell code can be written inline in the &lt;client&gt;  of the test descriptor.
+            </p>
+	</l:section>
+        <l:section title="Test Service Code">
+            Service code assumed to be all <TT>.java</TT> files in the directory specified by the service's <TT>basedir</TT> value.
+            The value for <TT>basedir</TT> defaults to top-level directory.
+            <TT>basedir</TT> specified as an attribute of the &lt;service&gt; element.
+            If you are converting existing test services to this harness, most likely the only thing that needs to
+            change is the declared package name.
+            <l:section title="WSDL">
+                For scenarios which requiring building the service from a WSDL, there is a sub-element of
+                service named <TT>wsdl</TT> with has an element named <TT>href</TT>. <TT>href</TT> should
+                name the WSDL file, relative to the service's <TT>basedir</TT>.
+            </l:section>
+	</l:section>
+        <l:section title="Resources">
+            Resources should be put in <TT>resources</TT> directory at test's top-level.
+            The resources are automatically made available to the beanshell client.
+	</l:section>
+        <l:section title="User-Defined Customization Files and Schemas">
+            <p>
+                The basic package naming often handled by boiler-plate customization
+                files is taken care of automatically by the test harness.  Only customizations
+                beyond package naming need to be specified by the user.
+            </p>
+            <p>
+                Optional user-defined customization files should have the following names: 
+                'custom-server.xml', 'custom-client.xml', 'custom-schema-server.xml', 'custom-client-schema.xml'
+                The client files must sit at the top-level of the test directory.
+                The server files in basedir of service (default is top-level unless specified in test-descriptor.xml)
+            </p>
+            <p>
+                User-defined schemas should have the suffix <TT>.xsd</TT>.
+                The <TT>.xsd</TT> files are automatically picked up from the service's <TT>basedir</TT>.
+            </p>
+	</l:section>
     </l:section>
     <l:section title="Magic">
-        <p>
-            - picks up binding info from impl class
-        </p>
         <p>
             - generates deployment descriptor (sun-jaxws.xml)
         </p>
@@ -328,11 +366,18 @@
             - also, script inherits from junit Assert, get assertEquals(), etc for free
         </p>
     </l:section>
-    <l:section title="Tips &amp; Gotchas">
-        <p>beanshell script code should use the injected port & service objects rather than explicitly 
-        creating them</p>
-        <p>beanshell can't handle Java generic's syntax with &lt; type &gt; syntax.  Simply omit the... </p>
-    </l:section>
+    <l:section title="Tips, Gotchas &amp; known Limitations">
+        <p>
+            Test scripts should use the injected port & service objects rather than explicitly 
+            creating them
+        </p>
+        <p>
+            Picks up binding info from impl class. Currently can not set it on the generated binding descriptor.
+        </p>
+        <p>
+            Beanshell can't handle Java generic's syntax with &lt; type &gt; syntax.  Simply omit the...
+        </p>
+        </l:section>
 </l:section>
 </l:document>
 </body>
