@@ -36,15 +36,15 @@ public class Bootstrap {
         List<URL> harness = new ArrayList<URL>();
         // extension hook to add more libraries
         File extLib = new File(home,"lib");
-        if(!extLib.exists())
-            throw new IllegalStateException("No such directory: "+extLib);
-        for (File jar : extLib.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".jar");
+        if(extLib.exists()) {
+            for (File jar : extLib.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".jar");
+                }
+            })) {
+                logger.info("Adding "+jar+" to the harness realm");
+                harness.add(jar.toURL());
             }
-        })) {
-            logger.info("Adding "+jar+" to the harness realm");
-            harness.add(jar.toURL());
         }
 
         // add harness-lib.jar. Do this at the end so that overrides can take precedence.
