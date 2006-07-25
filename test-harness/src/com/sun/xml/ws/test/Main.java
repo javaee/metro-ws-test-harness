@@ -240,9 +240,8 @@ public class Main {
         // fill in runtime and tool realms
         if(wsitImage!=null) {
             runtime.addJar(new File(wsitImage,"lib/webservices.jar"));
-            runtime.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
             tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
-            //tool.addJar(new File(wsitImage,"lib/webservices.jar"));
+
         } else
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
@@ -281,8 +280,7 @@ public class Main {
         File jreHome = new File(System.getProperty("java.home"));
         File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
         tool.addJar(toolsJar);
-        //TODO remove me temporary workaround
-        runtime.addJar(toolsJar);
+
 
         if(debug) {
             System.err.println("runtime realm");
