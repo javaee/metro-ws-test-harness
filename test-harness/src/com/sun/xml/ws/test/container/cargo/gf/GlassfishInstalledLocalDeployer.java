@@ -1,21 +1,21 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
-import org.codehaus.cargo.container.LocalContainer;
+import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
-import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.deployable.Deployable;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.deployer.DeployerType;
+import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.spi.deployer.AbstractLocalDeployer;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kohsuke Kawaguchi
  */
 public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
-    public GlassfishInstalledLocalDeployer(LocalContainer localContainer) {
+    public GlassfishInstalledLocalDeployer(InstalledLocalContainer localContainer) {
         super(localContainer);
     }
 
@@ -84,8 +84,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
     }
 
     private void addConnectOptions(List<String> args) {
-        args.add("--interactive");
-        args.add("false");
+        args.add("--interactive=false");
         args.add("--port");
         args.add(getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT));
         args.add("--user");

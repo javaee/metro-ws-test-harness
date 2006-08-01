@@ -5,6 +5,8 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.codehaus.cargo.container.ContainerCapability;
+import org.codehaus.cargo.container.deployable.Deployable;
+import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
 import org.codehaus.cargo.container.spi.AbstractInstalledLocalContainer;
 import org.codehaus.cargo.util.CargoException;
@@ -85,6 +87,16 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
             getConfiguration().getHome().getAbsolutePath(),
             "cargo-domain"
             );
+
+        // to workaround GF bug, the above needs to be async,
+        // so give it some time to make the admin port available
+        Thread.sleep(20*1000);
+        
+        // deploy scheduled deployables
+        GlassfishInstalledLocalDeployer deployer = new GlassfishInstalledLocalDeployer(this);
+        for (Deployable deployable : (List<Deployable>)getConfiguration().getDeployables()) {
+            deployer.deploy(deployable);
+        }
     }
 
     protected void doStop(Java java) throws Exception {

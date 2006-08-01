@@ -22,8 +22,8 @@ abstract class AbstractRunnableCargoContainer<C extends LocalContainer> extends 
     protected AbstractRunnableCargoContainer(WsTool wsimport, WsTool wsgen) {
         super(wsimport, wsgen);
 
-        // set TCP port to somewhere between 20000-30000
-        httpPort = new Random().nextInt(10000) + 20000;
+        // set TCP port to somewhere between 20000-60000
+        httpPort = new Random().nextInt(40000) + 20000;
     }
 
     public void start() throws Exception {

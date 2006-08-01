@@ -3,6 +3,7 @@ package com.sun.xml.ws.test.container.cargo.gf;
 import org.codehaus.cargo.container.spi.configuration.AbstractStandaloneLocalConfiguration;
 import org.codehaus.cargo.container.configuration.ConfigurationCapability;
 import org.codehaus.cargo.container.LocalContainer;
+import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.property.GeneralPropertySet;
 import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.property.ServletPropertySet;
@@ -69,19 +70,26 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             password,
             "--instanceport",
             getPropertyValue(ServletPropertySet.PORT),
-            "--domainproperties "
-                +getPropertyValueString(GlassfishPropertySet.JMS_PORT)+':'
-                +getPropertyValueString(GlassfishPropertySet.IIOP_PORT)+':'
-                +getPropertyValueString(GlassfishPropertySet.IIOPS_PORT)+':'
-                +getPropertyValueString(GlassfishPropertySet.HTTPS_PORT)+':'
-                +getPropertyValueString(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT)+':'
-                +getPropertyValueString(GlassfishPropertySet.JMX_ADMIN_PORT)
-            ,
+            "--domainproperties",
+
+            getPropertyValueString(GlassfishPropertySet.JMS_PORT)+':'+
+            getPropertyValueString(GlassfishPropertySet.IIOP_PORT)+':'+
+            getPropertyValueString(GlassfishPropertySet.IIOPS_PORT)+':'+
+            getPropertyValueString(GlassfishPropertySet.HTTPS_PORT)+':'+
+            getPropertyValueString(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT)+':'+
+            getPropertyValueString(GlassfishPropertySet.JMX_ADMIN_PORT),
+
             "--domaindir",
             getHome().getAbsolutePath(),
 
             // it looks like domain name can be anything, but check with the dev
             "cargo-domain");
+
+        // schedule cargocpc for deployment
+        File cpcWar = new File(getHome(), "cargocpc.war");
+        cpcWar.getParentFile().mkdirs();
+        getResourceUtils().copyResource(RESOURCE_PATH + "cargocpc.war",cpcWar);
+        getDeployables().add(new WAR(cpcWar));
     }
 
     private String getPropertyValueString(String key) {

@@ -186,9 +186,9 @@ public class Main {
             return -1;
         }
 
-        // run the tests
-        try {
-            container.start();
+        container.start();
+
+        try {// run the tests
 
             // custom TestRunner that can generate Ant format report
             TestRunner testRunner = new TestRunner() {

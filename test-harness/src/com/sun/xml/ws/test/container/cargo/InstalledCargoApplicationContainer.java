@@ -4,6 +4,7 @@ import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishStandaloneLocalConfiguration;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalContainer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalDeployer;
+import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
 import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
@@ -57,6 +58,16 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         configuration.setLogger(new SimpleLogger());
+
+        // In case this is Glassfish, override all the other TCP ports
+        // so that multiple test runs can co-exist on the same machine
+        configuration.setProperty(GlassfishPropertySet.JMS_PORT,                Integer.toString(httpPort+1));
+        configuration.setProperty(GlassfishPropertySet.IIOP_PORT,               Integer.toString(httpPort+2));
+        configuration.setProperty(GlassfishPropertySet.HTTPS_PORT,              Integer.toString(httpPort+3));
+        configuration.setProperty(GlassfishPropertySet.IIOPS_PORT,              Integer.toString(httpPort+4));
+        configuration.setProperty(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT,   Integer.toString(httpPort+5));
+        configuration.setProperty(GlassfishPropertySet.JMX_ADMIN_PORT,          Integer.toString(httpPort+6));
+
         // TODO: we should provide a mode to launch the container with debugger
 
 
