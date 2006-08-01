@@ -34,7 +34,7 @@ public final class World {
     public static final Project project = new Project();
 
     static {
-        project.init();
+        // project.init();
     }
 
     /**
