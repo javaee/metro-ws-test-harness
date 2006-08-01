@@ -78,10 +78,9 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     protected void doStart(Java java) throws Exception {
         getConfiguration().configure(this);
 
-        getLogger().info("Starting domain on HTTP port "+
+        System.out.println("Starting domain on HTTP port "+
             getConfiguration().getPropertyValue(ServletPropertySet.PORT)+" and admin port "+
-            getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT),
-            getClass().getName());
+            getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT));
 
         // see https://glassfish.dev.java.net/issues/show_bug.cgi?id=885
         // needs to spawn
