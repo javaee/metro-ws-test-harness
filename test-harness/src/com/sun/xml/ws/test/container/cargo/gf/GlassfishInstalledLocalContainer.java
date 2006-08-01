@@ -1,14 +1,14 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
+import com.sun.xml.ws.test.World;
 import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
-import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.codehaus.cargo.container.ContainerCapability;
-import org.codehaus.cargo.container.property.ServletPropertySet;
-import org.codehaus.cargo.container.deployable.Deployable;
-import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
+import org.codehaus.cargo.container.deployable.Deployable;
+import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.spi.AbstractInstalledLocalContainer;
 import org.codehaus.cargo.util.CargoException;
 
@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sun.xml.ws.test.World;
 
 /**
  * @author Kohsuke Kawaguchi
