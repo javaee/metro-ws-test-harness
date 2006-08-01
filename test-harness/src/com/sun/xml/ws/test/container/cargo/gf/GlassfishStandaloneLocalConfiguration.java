@@ -32,6 +32,12 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
         setProperty(RemotePropertySet.PASSWORD, "adminadmin");
         setProperty(GeneralPropertySet.HOSTNAME, "localhost");
         setProperty(GlassfishPropertySet.ADMIN_PORT, "4848");
+        setProperty(GlassfishPropertySet.JMS_PORT, "7676");
+        setProperty(GlassfishPropertySet.IIOP_PORT, "3700");
+        setProperty(GlassfishPropertySet.HTTPS_PORT, "8181");
+        setProperty(GlassfishPropertySet.IIOPS_PORT, "3820");
+        setProperty(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT, "3920");
+        setProperty(GlassfishPropertySet.JMX_ADMIN_PORT, "8686");
 
         // ServletPropertySet.PORT default set to 8080 by the super class
     }
@@ -53,7 +59,7 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             throw new CargoException("password needs to be 8 characters or longer");
 
         ((GlassfishInstalledLocalContainer)container).invokeAsAdmin(
-            "create-domain",
+            false, "create-domain",
             "--interactive=false",
             "--adminport",
             getPropertyValue(GlassfishPropertySet.ADMIN_PORT),
@@ -63,9 +69,24 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             password,
             "--instanceport",
             getPropertyValue(ServletPropertySet.PORT),
+            "--domainproperties "
+                +getPropertyValueString(GlassfishPropertySet.JMS_PORT)+':'
+                +getPropertyValueString(GlassfishPropertySet.IIOP_PORT)+':'
+                +getPropertyValueString(GlassfishPropertySet.IIOPS_PORT)+':'
+                +getPropertyValueString(GlassfishPropertySet.HTTPS_PORT)+':'
+                +getPropertyValueString(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT)+':'
+                +getPropertyValueString(GlassfishPropertySet.JMX_ADMIN_PORT)
+            ,
+            "--domaindir",
+            getHome().getAbsolutePath(),
 
             // it looks like domain name can be anything, but check with the dev
             "cargo-domain");
+    }
+
+    private String getPropertyValueString(String key) {
+        String value = getPropertyValue(key);
+        return key.substring("cargo.glassfish.".length())+'='+value;
     }
 
 }

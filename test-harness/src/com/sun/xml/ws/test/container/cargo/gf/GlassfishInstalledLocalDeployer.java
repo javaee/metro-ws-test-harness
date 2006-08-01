@@ -52,7 +52,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
 
         args.add(deployable.getFile().getAbsolutePath());
 
-        getLocalContainer().invokeAsAdmin(args.toArray(new String[args.size()]));
+        getLocalContainer().invokeAsAdmin(false, args.toArray(new String[args.size()]));
     }
 
     public void undeploy(Deployable deployable) {
@@ -64,7 +64,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
         // not too sure how asadmin determines 'name'
         args.add(cutExtension(deployable.getFile().getName()));
 
-        getLocalContainer().invokeAsAdmin(args.toArray(new String[args.size()]));
+        getLocalContainer().invokeAsAdmin(false, args.toArray(new String[args.size()]));
     }
 
     public void start(Deployable deployable) {

@@ -2,6 +2,8 @@ package com.sun.xml.ws.test.container.cargo.gf;
 
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.codehaus.cargo.container.ContainerCapability;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
 import org.codehaus.cargo.container.spi.AbstractInstalledLocalContainer;
@@ -11,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.xml.ws.test.World;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -23,7 +27,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     /**
      * Invokes asadmin
      */
-    /*package*/ void invokeAsAdmin(String... args) {
+    /*package*/ void invokeAsAdmin(boolean async, String... args) {
         File exec = getAsadminExecutable();
 
         List<String> cmds = new ArrayList<String>();
@@ -33,12 +37,17 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
         }
 
         try {
-            Execute exe = new Execute();
+            Execute exe = new Execute(new PumpStreamHandler(),new ExecuteWatchdog(30*1000L));
+            exe.setAntRun(World.project);
             exe.setCommandline(cmds.toArray(new String[0]));
-            int exitCode = exe.execute();
-            if(exitCode!=0)
-                // the first token is the command
-                throw new CargoException(args[0]+" failed. asadmin exited "+exitCode);
+            if(async) {
+                exe.spawn();
+            } else {
+                int exitCode = exe.execute();
+                if(exitCode!=0)
+                    // the first token is the command
+                    throw new CargoException(args[0]+" failed. asadmin exited "+exitCode);
+            }
         } catch (IOException e) {
             throw new CargoException("Failed to invoke asadmin",e);
         }
@@ -68,7 +77,9 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     protected void doStart(Java java) throws Exception {
         getConfiguration().configure(this);
 
-        invokeAsAdmin("start-domain",
+        // see https://glassfish.dev.java.net/issues/show_bug.cgi?id=885
+        // needs to spawn
+        invokeAsAdmin(true, "start-domain",
             "--interactive=false",
             "--domaindir",
             getConfiguration().getHome().getAbsolutePath(),
@@ -77,10 +88,9 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     }
 
     protected void doStop(Java java) throws Exception {
-        invokeAsAdmin("stop-domain",
-            "--interactive=false",
-            "--port",
-            getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT),
+        invokeAsAdmin(false, "stop-domain",
+            "--domaindir",
+            getConfiguration().getHome().getAbsolutePath(),
             "cargo-domain"
             );
     }
