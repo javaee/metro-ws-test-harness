@@ -57,10 +57,7 @@ public class ClientExecutor extends Executor {
             Reader r = client.script.read();
             try {
                 engine.eval(r, engine.getNameSpace(), client.script.getName() );
-            }catch (Exception e ) {
-                e.printStackTrace();
-            }
-            finally {
+            } finally {
                 r.close();
             }
         } finally {
