@@ -44,6 +44,11 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
         war.generateWebXml(endpoints);
 
+        // we only need this for Glassfish, but it's harmless to generate for other containers.
+        // TODO: figure out how not to do this for other containers
+        war.generateSunWebXml();
+
+
         PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
         w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
         w.close();

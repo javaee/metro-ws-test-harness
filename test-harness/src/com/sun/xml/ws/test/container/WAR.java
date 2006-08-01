@@ -159,6 +159,14 @@ public final class WAR {
     }
 
     /**
+     * Generates <tt>sun-web.xml</tt>
+     */
+    final void generateSunWebXml() throws Exception {
+        Jelly jelly = new Jelly(getClass(),"jelly/sun-web.jelly");
+        jelly.run(new File(webInfDir, "sun-web.xml"));
+    }
+
+    /**
      * Generate server artifacts from WSDL.
      */
     final void compileWSDL(WsTool wsimport) throws Exception {
