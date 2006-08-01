@@ -1,9 +1,13 @@
 package com.sun.xml.ws.test.container.cargo;
 
 import com.sun.xml.ws.test.container.ApplicationContainer;
+import com.sun.xml.ws.test.container.cargo.gf.GlassfishStandaloneLocalConfiguration;
+import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalContainer;
+import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalDeployer;
 import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
+import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
 import org.codehaus.cargo.container.property.ServletPropertySet;
@@ -36,8 +40,14 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
     public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir) {
         super(wsimport,wsgen);
 
-        ConfigurationFactory configurationFactory =
-            new DefaultConfigurationFactory();
+        // needed until glassfish becomes a part of Cargo
+        ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
+        configurationFactory.registerConfiguration("glassfish1x", ConfigurationType.STANDALONE, GlassfishStandaloneLocalConfiguration.class);
+        DefaultContainerFactory containerFactory = new DefaultContainerFactory();
+        containerFactory.registerContainer("glassfish1x", ContainerType.INSTALLED, GlassfishInstalledLocalContainer.class);
+        deployerFactory.registerDeployer("glassfish1x", DeployerType.LOCAL, GlassfishInstalledLocalDeployer.class);
+
+        // TODO: consider creating work directory to a visible place so that logs can be inspected.
         //File containerWorkDir = new File("c:\\sandbox\\tomcat");
         //containerWorkDir.mkdirs();
         LocalConfiguration configuration =
@@ -50,7 +60,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         // TODO: we should provide a mode to launch the container with debugger
 
 
-        container = (InstalledLocalContainer) new DefaultContainerFactory().createContainer(
+        container = (InstalledLocalContainer) containerFactory.createContainer(
             containerId, ContainerType.INSTALLED, configuration);
         container.setHome(homeDir);
     }

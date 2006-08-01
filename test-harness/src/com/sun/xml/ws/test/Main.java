@@ -126,6 +126,11 @@ public class Main {
             "Defaults: USER=admin, PASS=adminadmin, PORT=4848, HTTPURL=http://HOST/")
     String remoteGlassfish = null;
 
+    @Option(name="-glassfish-local",metaVar="GLASSFISH_HOME",
+        usage=
+            "Launch Glassfish from the harness and test with it")
+    File localGlassfish = null;
+
 
     @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
     File reportDir = null;
@@ -323,6 +328,12 @@ public class Main {
                 defaultsTo(matcher.group(2),"admin"),
                 defaultsTo(matcher.group(3),"admin")
                 );
+        }
+
+        if(localGlassfish!=null) {
+            System.err.println("Using local Glassfish from "+localGlassfish);
+            return new InstalledCargoApplicationContainer(
+                wsimport, wsgen, "glassfish1x",localGlassfish);
         }
 
         if(remoteGlassfish!=null) {

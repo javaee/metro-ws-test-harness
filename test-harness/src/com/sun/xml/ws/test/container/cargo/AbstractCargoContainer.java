@@ -28,6 +28,9 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
      */
     protected C container;
 
+    protected final DefaultDeployerFactory deployerFactory = new DefaultDeployerFactory();
+
+
     protected AbstractCargoContainer(WsTool wsimport, WsTool wsgen) {
         super(wsimport, wsgen);
     }
@@ -49,7 +52,7 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
 
         war.setContext(contextPath);
 
-        Deployer deployer = new DefaultDeployerFactory().createDeployer(container, DeployerType.toType(container.getType()));
+        Deployer deployer = deployerFactory.createDeployer(container, DeployerType.toType(container.getType()));
 
         URL serviceUrl = getServiceUrl(contextPath);
 
