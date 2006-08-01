@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,9 +87,6 @@ public class Main {
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
-    @Option(name="-leave",usage="leave the container running after all the tests are completed. Often useful for debugging problems.")
-    boolean leave = false;
-
     @Option(name="-transport",usage="specify the pluggable transport jar")
     File transportJar;
 
@@ -97,6 +95,10 @@ public class Main {
      */
     @Option(name="-debug",usage="Generate output for debugging harness")
     boolean debug;
+
+    @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
+    File reportDir = null;
+
 
     /*
       Container variables
@@ -134,9 +136,11 @@ public class Main {
             "Launch Glassfish from the harness and test with it")
     File localGlassfish = null;
 
+    @Option(name="-leave",usage="leave the container running after all the tests are completed. Often useful for debugging problems.")
+    boolean leave = false;
 
-    @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
-    File reportDir = null;
+    @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
+    int port = 18080;
 
 
     public static void main(String[] args) throws Exception {
@@ -167,6 +171,12 @@ public class Main {
      */
     public int run() throws Exception {
         fillWorld();
+
+
+        if(port==-1) {
+            // set TCP port to somewhere between 20000-60000
+            port = new Random().nextInt(40000) + 20000;
+        }
 
         // set up objects that represent test environment.
         WsTool wsimport,wsgen;
@@ -308,12 +318,12 @@ public class Main {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
             return new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x",tomcat);
+                wsimport, wsgen, "tomcat5x",tomcat,port);
         }
 
         if(embeddedTomcat!=null) {
             return new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x");
+                wsimport, wsgen, "tomcat5x",port);
         }
 
         if(remoteTomcat!=null) {
@@ -337,7 +347,7 @@ public class Main {
         if(localGlassfish!=null) {
             System.err.println("Using local Glassfish from "+localGlassfish);
             return new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "glassfish1x",localGlassfish);
+                wsimport, wsgen, "glassfish1x",localGlassfish,port);
         }
 
         if(remoteGlassfish!=null) {

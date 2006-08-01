@@ -23,8 +23,8 @@ import org.codehaus.cargo.util.log.SimpleLogger;
  * @author Kohsuke Kawaguchi
  */
 public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoContainer<EmbeddedLocalContainer> {
-    public EmbeddedCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId) {
-        super(wsimport,wsgen);
+    public EmbeddedCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, int port) {
+        super(wsimport,wsgen,port);
 
         ConfigurationFactory configurationFactory =
             new DefaultConfigurationFactory();
