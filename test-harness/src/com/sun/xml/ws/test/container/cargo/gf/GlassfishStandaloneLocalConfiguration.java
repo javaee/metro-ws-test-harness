@@ -1,16 +1,17 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
-import org.codehaus.cargo.container.spi.configuration.AbstractStandaloneLocalConfiguration;
-import org.codehaus.cargo.container.configuration.ConfigurationCapability;
 import org.codehaus.cargo.container.LocalContainer;
+import org.codehaus.cargo.container.configuration.ConfigurationCapability;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.property.GeneralPropertySet;
 import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.property.ServletPropertySet;
-import org.codehaus.cargo.util.DefaultFileHandler;
+import org.codehaus.cargo.container.spi.configuration.AbstractStandaloneLocalConfiguration;
 import org.codehaus.cargo.util.CargoException;
+import org.codehaus.cargo.util.DefaultFileHandler;
 
 import java.io.File;
+import java.io.FileWriter;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -48,6 +49,13 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
     }
 
     /**
+     * Returns the password file that contains admin's password.
+     */
+    File getPasswordFile() {
+        return new File(getHome(), "password.properties");
+    }
+
+    /**
      * Creates a new domain and set up the workspace by invoking the "asadmin" command.
      */
     protected void doConfigure(LocalContainer container) throws Exception {
@@ -59,6 +67,14 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
         if(password.length()<8)
             throw new CargoException("password needs to be 8 characters or longer");
 
+        getHome().mkdirs();
+        FileWriter w = new FileWriter(getPasswordFile());
+        // somehow glassfish uses both. Brain-dead.
+        w.write("AS_ADMIN_PASSWORD="+password+"\n");
+        w.write("AS_ADMIN_ADMINPASSWORD="+password+"\n");
+        w.close();
+
+
         ((GlassfishInstalledLocalContainer)container).invokeAsAdmin(
             false, "create-domain",
             "--interactive=false",
@@ -66,8 +82,8 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             getPropertyValue(GlassfishPropertySet.ADMIN_PORT),
             "--adminuser",
             getPropertyValue(RemotePropertySet.USERNAME),
-            "--adminpassword",
-            password,
+            "--passwordfile",
+            getPasswordFile().getAbsolutePath(),
             "--instanceport",
             getPropertyValue(ServletPropertySet.PORT),
             "--domainproperties",
@@ -87,7 +103,6 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
 
         // schedule cargocpc for deployment
         File cpcWar = new File(getHome(), "cargocpc.war");
-        cpcWar.getParentFile().mkdirs();
         getResourceUtils().copyResource(RESOURCE_PATH + "cargocpc.war",cpcWar);
         getDeployables().add(new WAR(cpcWar));
     }

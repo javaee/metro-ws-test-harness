@@ -1,7 +1,7 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
-import org.codehaus.cargo.container.internal.J2EEContainerCapability;
 import org.codehaus.cargo.container.deployable.DeployableType;
+import org.codehaus.cargo.container.internal.J2EEContainerCapability;
 
 /**
  * @author Kohsuke Kawaguchi

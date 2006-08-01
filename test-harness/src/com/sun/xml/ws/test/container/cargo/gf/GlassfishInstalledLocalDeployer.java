@@ -1,7 +1,6 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
 import org.codehaus.cargo.container.InstalledLocalContainer;
-import org.codehaus.cargo.container.configuration.LocalConfiguration;
 import org.codehaus.cargo.container.deployable.Deployable;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.deployer.DeployerType;
@@ -22,8 +21,8 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
     private GlassfishInstalledLocalContainer getLocalContainer() {
         return (GlassfishInstalledLocalContainer)super.getContainer();
     }
-    private LocalConfiguration getConfiguration() {
-        return getLocalContainer().getConfiguration();
+    private GlassfishStandaloneLocalConfiguration getConfiguration() {
+        return (GlassfishStandaloneLocalConfiguration) getLocalContainer().getConfiguration();
     }
 
     public DeployerType getType() {
@@ -89,7 +88,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
         args.add(getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT));
         args.add("--user");
         args.add(getConfiguration().getPropertyValue(RemotePropertySet.USERNAME));
-        args.add("--password");
-        args.add(getConfiguration().getPropertyValue(RemotePropertySet.PASSWORD));
+        args.add("--passwordfile");
+        args.add(getConfiguration().getPasswordFile().getAbsolutePath());
     }
 }

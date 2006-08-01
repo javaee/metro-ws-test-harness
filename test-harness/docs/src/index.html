@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.19 2006-07-24 21:24:30 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.20 2006-08-01 23:49:27 kohsuke Exp $</div>
 
 <l:document>
 
@@ -305,15 +305,31 @@ work/                    (root test directory)
     </l:section>
     <l:section title="Glassfish">
       <p>
-        To test with Glassfish, use the following option. This mode assumes that you have already started a domain, and the harness will simply deploy/undeploy applications to this running service:
+        This test harness supports Glassfish 1.0.
       </p>
-      <l:harness-cmd>-glassfish-remote localhost test-dir1 test-dir2 ...</l:harness-cmd>
-      <p>
-        The "-glassfish-remote" takes the connection string as the parameter. The full syntax of the paramter is <tt>[USER:PASS@]HOST[:PORT][-HTTPURL]</tt>. The first four parts up to '-' specifies the Glassfish admin port. USER and PASS is used for the administrator login, and PORT is the admin TCP port. The last HTTPURL specifies the URL with which client test programs talk to the service. All components but HOST are defaulted, so if your glassfish installation is out of the box, then all you need to specify is the host name where Glassfish runs.
-      </p>
-      <l:tip>
-        Glassfish has its copy of JAX-WS, so testing with Glassfish requires us to replace the runtime of Glassfish. At this point the harness is not capable of doing that.
-      </l:tip>
+      <l:section title="Remote Glassfish">
+        <p>
+          To test with existing instance of Glassfish, use the following option. This mode assumes that you have already started a domain, and the harness will simply deploy/undeploy applications to this running service:
+        </p>
+        <l:harness-cmd>-glassfish-remote localhost test-dir1 test-dir2 ...</l:harness-cmd>
+        <p>
+          The "-glassfish-remote" takes the connection string as the parameter. The full syntax of the paramter is <tt>[USER:PASS@]HOST[:PORT][-HTTPURL]</tt>. The first four parts up to '-' specifies the Glassfish admin port. USER and PASS is used for the administrator login, and PORT is the admin TCP port. The last HTTPURL specifies the URL with which client test programs talk to the service. All components but HOST are defaulted, so if your glassfish installation is out of the box, then all you need to specify is the host name where Glassfish runs.
+        </p>
+        <l:tip>
+          Glassfish has its copy of JAX-WS, so testing with Glassfish requires us to replace the runtime of Glassfish. At this point the harness is not capable of doing that.
+        </l:tip>
+      </l:section>
+      <l:section title="Local Glassfish">
+        <p>
+          The test harness is capable of starting and stopping Glassfish on its own before/after running tests. This mode assumes that you have Glassfish installed locally. Use the following command line option to run in this mode:
+        </p>
+        <l:harness-cmd>-glassfish-local path/to/glassfish test-dir1 test-dir2 ...</l:harness-cmd>
+        <p>
+          The harness will create a domain configuration in a temporary directory and run tests from there, so this running mode will not touch the files in <tt>path/to/glassfish</tt> --- it is simply used to load jar files. All the TCP ports are chosen randomly from 20000-50000 ranges, to avoid collisions with other tests that happen to be running on the same machine. See the console output for the HTTP port and admin port, in case you need to manually access them for debugging. The admin user name and password will be set to "admin" and "adminadmin" respectively.
+        </p><p>
+          This mode is convenient for fully automated Glassfish testing, because you do not need a dedicated Glassfish installation per each test set up, and the harness chooses the right TCP ports to avoid conflicts. However, starting and stopping Glassfish takes significant amount of time, so it's almost impossible to use for interactive debugging.
+        </p>
+      </l:section>
     </l:section>
   </l:section>
   <l:section title="Running Batch Tests">

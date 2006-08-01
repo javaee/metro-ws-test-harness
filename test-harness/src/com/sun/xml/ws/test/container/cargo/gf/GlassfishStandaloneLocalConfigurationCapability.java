@@ -1,9 +1,9 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
-import org.codehaus.cargo.container.spi.configuration.AbstractStandaloneLocalConfigurationCapability;
 import org.codehaus.cargo.container.property.GeneralPropertySet;
-import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.property.RemotePropertySet;
+import org.codehaus.cargo.container.property.ServletPropertySet;
+import org.codehaus.cargo.container.spi.configuration.AbstractStandaloneLocalConfigurationCapability;
 
 import java.util.HashMap;
 import java.util.Map;
