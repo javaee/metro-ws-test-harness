@@ -86,6 +86,9 @@ public class Main {
     @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
+    @Option(name="-leave",usage="leave the container running after all the tests are completed. Often useful for debugging problems.")
+    boolean leave = false;
+
     @Option(name="-transport",usage="specify the pluggable transport jar")
     File transportJar;
 
@@ -219,7 +222,8 @@ public class Main {
 
             return r.errorCount()+r.failureCount();
         } finally {
-            container.shutdown();
+            if(!leave)
+                container.shutdown();
         }
     }
 
