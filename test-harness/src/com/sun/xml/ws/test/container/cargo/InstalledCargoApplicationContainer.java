@@ -67,6 +67,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         configuration.setProperty(GlassfishPropertySet.IIOPS_PORT,              Integer.toString(httpPort+4));
         configuration.setProperty(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT,   Integer.toString(httpPort+5));
         configuration.setProperty(GlassfishPropertySet.JMX_ADMIN_PORT,          Integer.toString(httpPort+6));
+        configuration.setProperty(GlassfishPropertySet.ADMIN_PORT,              Integer.toString(httpPort+7));
 
         // TODO: we should provide a mode to launch the container with debugger
 

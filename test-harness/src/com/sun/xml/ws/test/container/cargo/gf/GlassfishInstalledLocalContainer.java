@@ -5,6 +5,7 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.codehaus.cargo.container.ContainerCapability;
+import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.deployable.Deployable;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
@@ -79,6 +80,11 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     protected void doStart(Java java) throws Exception {
         getConfiguration().configure(this);
 
+        getLogger().info("Starting domain on HTTP port "+
+            getConfiguration().getPropertyValue(ServletPropertySet.PORT)+" and admin port "+
+            getConfiguration().getPropertyValue(GlassfishPropertySet.ADMIN_PORT),
+            getClass().getName());
+
         // see https://glassfish.dev.java.net/issues/show_bug.cgi?id=885
         // needs to spawn
         invokeAsAdmin(true, "start-domain",
@@ -91,7 +97,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
         // to workaround GF bug, the above needs to be async,
         // so give it some time to make the admin port available
         Thread.sleep(20*1000);
-        
+
         // deploy scheduled deployables
         GlassfishInstalledLocalDeployer deployer = new GlassfishInstalledLocalDeployer(this);
         for (Deployable deployable : (List<Deployable>)getConfiguration().getDeployables()) {
