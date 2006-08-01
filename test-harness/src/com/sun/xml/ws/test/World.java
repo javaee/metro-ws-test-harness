@@ -33,10 +33,6 @@ public final class World {
      */
     public static final Project project = new Project();
 
-    static {
-        // project.init();
-    }
-
     /**
      * Loads JAX-WS runtime classes.
      *
