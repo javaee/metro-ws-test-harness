@@ -39,14 +39,6 @@ public final class World {
     public static final Project project = new Project();
 
     static {
-        // trying to fix NPE in Project.init()
-        Properties systemP = System.getProperties();
-        for (Iterator<Entry<Object, Object>> itr = systemP.entrySet().iterator(); itr.hasNext();) {
-            Entry<Object, Object> entry =  itr.next();
-            if(entry.getValue()==null)
-                itr.remove();
-        }
-
         project.init();
     }
 
