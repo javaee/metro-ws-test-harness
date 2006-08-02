@@ -3,6 +3,11 @@ package com.sun.xml.ws.test;
 import org.apache.tools.ant.Project;
 import org.codehaus.classworlds.ClassRealm;
 
+import java.util.Properties;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 /**
  * "Global variables" for the test harness. Use with caution.
  *
@@ -32,6 +37,18 @@ public final class World {
      * we can use this shared instance.
      */
     public static final Project project = new Project();
+
+    static {
+        // trying to fix NPE in Project.init()
+        Properties systemP = System.getProperties();
+        for (Iterator<Entry<Object, Object>> itr = systemP.entrySet().iterator(); itr.hasNext();) {
+            Entry<Object, Object> entry =  itr.next();
+            if(entry.getValue()==null)
+                itr.remove();
+        }
+
+        project.init();
+    }
 
     /**
      * Loads JAX-WS runtime classes.
