@@ -6,6 +6,7 @@ import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.types.FileSet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -101,5 +102,16 @@ public class FileUtil {
         fs.setDir(src);
         cp.addFileset(fs);
         cp.execute();
+    }
+
+    public static File createTmpDir( boolean scheduleDeleteOnVmExit ) throws IOException {
+        // create a temporary directory
+        File tmpFile = File.createTempFile("wstest","tmp",new File("."));
+        tmpFile.delete();
+        tmpFile.mkdir();
+        if(scheduleDeleteOnVmExit) {
+            tmpFile.deleteOnExit();
+        }
+        return tmpFile;
     }
 }
