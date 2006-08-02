@@ -30,7 +30,8 @@ public class Bootstrap {
         logger.fine("test harness home is "+home);
 
         // system properties are ugly but easy way to communicate values to the harness main code
-        System.getProperties().put("HARNESS_HOME",home);
+        // setting a value other than String makes Ant upset
+        System.getProperties().put("HARNESS_HOME",home.getPath());
 
         // create the harness realm and put everything in there
         List<URL> harness = new ArrayList<URL>();
