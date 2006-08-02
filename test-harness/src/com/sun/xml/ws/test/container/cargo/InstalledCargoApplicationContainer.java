@@ -6,6 +6,7 @@ import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalContainer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalDeployer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
 import com.sun.xml.ws.test.tool.WsTool;
+import com.sun.xml.ws.test.util.FileUtil;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.deployer.DeployerType;
@@ -18,6 +19,7 @@ import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.codehaus.cargo.util.log.SimpleLogger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * {@link ApplicationContainer} that launches a container from within the harness.
@@ -38,7 +40,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
      * @param homeDir
      *      The installation of the container. For Tomcat, this is
      */
-    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir, int port) {
+    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir, int port) throws IOException {
         super(wsimport,wsgen,port);
 
         // needed until glassfish becomes a part of Cargo
@@ -48,13 +50,13 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         containerFactory.registerContainer("glassfish1x", ContainerType.INSTALLED, GlassfishInstalledLocalContainer.class);
         deployerFactory.registerDeployer("glassfish1x", DeployerType.LOCAL, GlassfishInstalledLocalDeployer.class);
 
-        // TODO: consider creating work directory to a visible place so that logs can be inspected.
-        //File containerWorkDir = new File("c:\\sandbox\\tomcat");
-        //containerWorkDir.mkdirs();
+        File containerWorkDir = FileUtil.createTmpDir(true);
+        containerWorkDir.mkdirs();
+
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
-                containerId, ConfigurationType.STANDALONE );
-                //containerWorkDir);
+                containerId, ConfigurationType.STANDALONE,
+                containerWorkDir);
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         configuration.setLogger(new SimpleLogger());
