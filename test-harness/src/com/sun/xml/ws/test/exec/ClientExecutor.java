@@ -7,6 +7,7 @@ import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
+import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.beans.Introspector;
 import java.io.Reader;
@@ -97,6 +98,7 @@ public class ClientExecutor extends Executor {
 
                     try {
                         engine.set(portName, method.invoke(serviceInstance));
+                        engine.set("endpointAddress",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
                     } catch (InvocationTargetException e) {
                         if(e.getCause() instanceof Exception)
                             throw (Exception)e.getCause();

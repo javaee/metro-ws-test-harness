@@ -136,9 +136,9 @@ public class TestService {
                 if(line.startsWith("package ")) {
                     pkg = line.substring(8,line.indexOf(';'));
                 }
-                if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
+                if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
                     isWebService = true;
-                else if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
+                else if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
                     isWebService = true;
             }
 
