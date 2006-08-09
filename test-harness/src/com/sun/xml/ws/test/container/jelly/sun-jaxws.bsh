@@ -18,6 +18,7 @@ if (!fromWsdl) {
     portNames = new ArrayList();
 
     wsca = null;
+    implClass=null;
 
     for( className : classNames ) {
         clazz = loader.loadClass(className);
@@ -40,6 +41,9 @@ if (!fromWsdl) {
             sei = a.endpointInterface();
             if(!sei.equals(""))
               implClass = clazz.getName();
+        } else {
+            if (clazz.getAnnotation(WebServiceProvider.class) != null)
+                implClass = clazz.getName();
         }
     }
 

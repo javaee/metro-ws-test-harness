@@ -138,6 +138,8 @@ public class TestService {
                 }
                 if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
                     isWebService = true;
+                else if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
+                    isWebService = true;
             }
 
             r.close();
