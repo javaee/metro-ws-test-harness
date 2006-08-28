@@ -70,46 +70,46 @@ public class ClientExecutor extends Executor {
         StringBuilder buf = new StringBuilder("injected ports:");
 
         for (DeployedService svc : context.services.values()) {
+            if (! svc.service.isSTS) {
+                String packageName = svc.serviceClass.getPackage().getName();
+                //  import the artifact package
+                ns.importPackage(packageName);
+                //  use reflection to list up all methods with 'javax.xml.ws.WebEndpoint' annotations
+                //  invoke that method via reflection to obtain the Port object.
+                //  set the endpoint address to that port object
+                //  inject it to the scripting engine
+                Method[] methods = svc.serviceClass.getMethods();
 
-            String packageName = svc.serviceClass.getPackage().getName();
-            //  import the artifact package
-            ns.importPackage(packageName);
-            //  use reflection to list up all methods with 'javax.xml.ws.WebEndpoint' annotations
-            //  invoke that method via reflection to obtain the Port object.
-            //  set the endpoint address to that port object
-            //  inject it to the scripting engine
-            Method[] methods = svc.serviceClass.getMethods();
+                // annotation that serviceClass loads and annotation that this code
+                // uses might be different
+                Class<? extends Annotation> webendpointAnnotation = svc.serviceClass.getClassLoader()
+                        .loadClass("javax.xml.ws.WebEndpoint").asSubclass(Annotation.class);
+                Method nameMethod = webendpointAnnotation.getDeclaredMethod("name");
 
-            // annotation that serviceClass loads and annotation that this code
-            // uses might be different
-            Class<? extends Annotation> webendpointAnnotation = svc.serviceClass.getClassLoader()
-                .loadClass("javax.xml.ws.WebEndpoint").asSubclass(Annotation.class);
-            Method nameMethod = webendpointAnnotation.getDeclaredMethod("name");
+                Object serviceInstance = svc.serviceClass.newInstance();
 
-            Object serviceInstance = svc.serviceClass.newInstance();
+                for (Method method : methods) {
+                    Annotation endpoint = method.getAnnotation(webendpointAnnotation);
+                    if (endpoint != null) {
+                        //For multiple endpoints the convention for injecting the variables is
+                        // portName obtained from the WebEndpoint annotation,
+                        // which would be something like "addNumbersPort"
+                        String portName = Introspector.decapitalize((String)nameMethod.invoke(endpoint));
 
-            for (Method method : methods) {
-                Annotation endpoint = method.getAnnotation(webendpointAnnotation);
-                if (endpoint != null) {
-                    //For multiple endpoints the convention for injecting the variables is
-                    // portName obtained from the WebEndpoint annotation,
-                    // which would be something like "addNumbersPort"
-                    String portName = Introspector.decapitalize((String)nameMethod.invoke(endpoint));
-
-                    try {
-                        engine.set(portName, method.invoke(serviceInstance));
-                        engine.set("endpointAddress",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
-                    } catch (InvocationTargetException e) {
-                        if(e.getCause() instanceof Exception)
-                            throw (Exception)e.getCause();
-                        else
-                            throw e;
+                        try {
+                            engine.set(portName, method.invoke(serviceInstance));
+                            engine.set("endpointAddress",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
+                        } catch (InvocationTargetException e) {
+                            if(e.getCause() instanceof Exception)
+                                throw (Exception)e.getCause();
+                            else
+                                throw e;
+                        }
+                        buf.append(' ').append(portName);
                     }
-                    buf.append(' ').append(portName);
                 }
             }
         }
-
         System.out.println(buf);
     }
 }

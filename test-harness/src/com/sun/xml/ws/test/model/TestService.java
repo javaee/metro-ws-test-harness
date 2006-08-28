@@ -69,12 +69,17 @@ public class TestService {
     public final Set<TestEndpoint> endpoints = new LinkedHashSet<TestEndpoint>();
 
     public final TestDescriptor parent;
+    /**
+     * Determines if the service is an STS for WSTrust and needs special handling
+     */
+    public boolean isSTS;
 
-    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl) throws IOException {
+    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl, boolean sts) throws IOException {
         this.parent = parent;
         this.name = name;
         this.wsdl = wsdl;
         this.baseDir = baseDir;
+        this.isSTS = sts;
 
         // search for classes with @WebService
         findEndpoints(baseDir);

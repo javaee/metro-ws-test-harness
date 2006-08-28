@@ -37,8 +37,11 @@ public class DeploymentExecutor extends Executor {
     public void runBare() throws Throwable {
         // deploy the service
         context.app = context.parent.container.deploy(context);
-        // then use that WSDL to generate client
-        generateClientArtifacts();
+        //For STS we do not want to generate client artifacts
+        if (!context.service.isSTS) {
+            // then use that WSDL to generate client
+            generateClientArtifacts();
+        }
     }
 
     /**

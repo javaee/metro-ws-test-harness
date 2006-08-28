@@ -83,8 +83,29 @@ start = element descriptor {
             attribute href {text}
 
         }?
+        }+&
+    # 'sts' element holds information for a  special handling of
+    # sts services
+    # In this case the harness should recognize the STS to be a special form
+    # of service and not generate client artifacts
+    #
+    #
+    element sts {
+
+        # basedir defaults to ".", so that a single service test case can be written more quickly
+        attribute basedir {text}?,
+
+        # 'wsdl' is optional and points to the location of STS WSDL, if any.
+        #
+        element wsdl {
+
+            # 'href' points the STS WSDL document
+            #
+            attribute href {text}
+
+        }?
     
-    }+
+    }?
 }
 
 # 'versionAttributes' pattern is set of attributes that control
