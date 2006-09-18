@@ -47,7 +47,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
                 int exitCode = exe.execute();
                 if(exitCode!=0)
                     // the first token is the command
-                    throw new CargoException(args[0]+" failed. asadmin exited "+exitCode);
+                    throw new CargoException(cmds+" failed. asadmin exited "+exitCode);
             }
         } catch (IOException e) {
             throw new CargoException("Failed to invoke asadmin",e);
