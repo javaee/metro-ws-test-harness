@@ -98,7 +98,7 @@ public class ClientExecutor extends Executor {
 
                         try {
                             engine.set(portName, method.invoke(serviceInstance));
-                            engine.set("endpointAddress",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
+                            engine.set(portName+"Address",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
                         } catch (InvocationTargetException e) {
                             if(e.getCause() instanceof Exception)
                                 throw (Exception)e.getCause();
