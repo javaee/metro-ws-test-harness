@@ -41,9 +41,21 @@ public class DeploymentExecutor extends Executor {
         if (!context.service.isSTS) {
             // then use that WSDL to generate client
             generateClientArtifacts();
+        } else {
+            addSTSToClasspath();
         }
     }
 
+    public void addSTSToClasspath() throws Exception{
+        List<URL> classpath = context.clientClasspaths;
+
+        classpath.add(new File(context.warDir, "WEB-INF/classes").toURL());
+        ClassLoader cl = new URLClassLoader( classpath.toArray(new URL[0]),
+                World.runtime.getClassLoader() );
+
+        context.parent.clientClassLoader=cl;
+
+    }
     /**
      * Generate & compile source files from service WSDL.
      */
@@ -96,6 +108,18 @@ public class DeploymentExecutor extends Executor {
         if(context.service.parent.resources!=null)
             classpath.add(context.service.parent.resources.toURL());
 
+        /**
+         * If there is a service like STS it has already been added to context.parent.clientClassLoader
+         *  add that to the final classpath
+         */
+        if (context.parent.clientClassLoader instanceof URLClassLoader) {
+            URL [] urls = ((URLClassLoader)context.parent.clientClassLoader).getURLs();
+
+            for (URL classloaderURL :urls ){
+                classpath.add(classloaderURL);
+
+            }
+        }
         ClassLoader cl = new URLClassLoader( classpath.toArray(new URL[0]),
                 World.runtime.getClassLoader() );
 
