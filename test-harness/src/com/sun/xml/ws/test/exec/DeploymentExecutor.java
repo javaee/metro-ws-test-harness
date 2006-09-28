@@ -4,14 +4,22 @@ import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.model.TestClient;
+import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
 import com.sun.xml.ws.test.util.JavacTask;
 import junit.framework.TestCase;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -43,8 +51,38 @@ public class DeploymentExecutor extends Executor {
             generateClientArtifacts();
         } else {
             addSTSToClasspath();
+            updateWsitClient();
         }
     }
+
+    public void updateWsitClient()throws Exception {
+        File wsitClientFile = new File(context.service.parent.resources,"wsit-client.xml");
+        if (wsitClientFile.exists() ){
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(wsitClientFile);
+            Element root = document.getRootElement();
+            Element policy = root.element("Policy");
+            Element sts = policy.element("ExactlyOne").element("All").element("PreconfiguredSTS");
+
+            Attribute  endpoint = sts.attribute("endpoint");
+            URI uri = context.app.getEndpointAddress((TestEndpoint)context.service.endpoints.toArray()[0]);
+            endpoint.setValue(uri.toString());
+
+            Attribute wsdlLoc = sts.attribute("wsdlLocation");
+            wsdlLoc.setValue(context.service.wsdl.wsdlFile.toURI().toString());
+
+            XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
+            writer.write( document );
+            writer.close();
+
+        } else {
+            throw new RuntimeException("wsit-client.xml is absent. It is required. \n"+
+                    "Please check " + context.service.parent.resources );
+        }
+
+
+    }
+
 
     public void addSTSToClasspath() throws Exception{
         List<URL> classpath = context.clientClasspaths;
