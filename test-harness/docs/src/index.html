@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.20 2006-08-01 23:49:27 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.21 2006-10-02 17:02:43 kohsuke Exp $</div>
 
 <l:document>
 
@@ -496,6 +496,25 @@ class FooBarService {
       <p>
         To further customize the compilation process, place a JAX-WS customization file named <tt>custom-server.xml</tt> to the service top directory (to refer to WSDL file and schema files from this customization file, just use the relative path from the customization file to WSDL/schemas like <tt>"./foo.xsd"</tt>.
     </l:section>
+  </l:section>
+  <l:section title="Requiring certain modes">
+    <p>
+      A test can declare that it requires a particular kind of a transport by declaring the transport attribute. The possible values are the values you specify in the scheme portion of the endpoint address URI (The major values include "http" and "local", but open-ended as new transports are added.)
+<pre><xmp>
+<descriptor transport="http">
+  ...
+</xmp></pre>
+    <p>
+      A test can also declare that it's applicable only to a certain verion(s) of JAX-WS/WSIT, by using the version attributes <tt>@since</tt>, <tt>@until</tt>, and <tt>@excludeFrom</tt>.
+    <ol>
+      <li>The @since attribute indicates that a test will require the given version of the test subject or later. For example, <tt>since="2.0"</tt> indicates that it will run on 2.0 FCS, 2.0 EAs, etc, but not on 1.1.
+      <li>The @until attribute indicates that a test can only be run against the given version of the test subject or earlier. For example <tt>until="1.*"</tt> indicates that the test will run on all versions of 1.x but not on 2.0.
+      <li>The @excludeFrom takes a list of whitespace-separated version numbers, and it indicates that tests be excluded from these specific versions. This is used to mark known regressions and such things.
+    </ol>
+    <p>
+      Those three attributes can be combined, and they can be specified either on &lt;descript> element (in which case the entire test is subject to the constraints), or on individual &lt;client> element (in which case only that client test is subject to the constraints.)
+    <p>
+      See <a href="https://istack-commons.dev.java.net/source/browse/istack-commons/istack-commons/test/src/com/sun/istack/test/VersionNumber.java?only_with_tag=HEAD&view=markup">this document</a> for more formal definition of what can be a valid version number, and how they are ordered.
   </l:section>
   <l:section title="Resources">
     <p>
