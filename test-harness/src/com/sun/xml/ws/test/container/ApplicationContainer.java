@@ -12,6 +12,18 @@ import com.sun.istack.NotNull;
  */
 public interface ApplicationContainer {
     /**
+     * Returns the transport that this container uses for testing.
+     *
+     * @return
+     *      For example, "http", "local", "tcp", "jms", etc. It should match
+     *      the scheme portion of
+     *      the endpoint address URI. Never null. This value is compared in
+     *      the descriptor's transport declaration to decide wheter to run a
+     *      test or not.
+     */
+    String getTransport();
+
+    /**
      * Starts the container.
      *
      * This is invoked at the very beginning before

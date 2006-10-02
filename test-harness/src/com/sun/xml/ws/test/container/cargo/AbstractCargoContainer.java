@@ -35,6 +35,10 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
         super(wsimport, wsgen);
     }
 
+    public String getTransport() {
+        return "http";
+    }
+
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         String contextPath = service.service.getGlobalUniqueName();

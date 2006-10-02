@@ -22,6 +22,11 @@ start = element descriptor {
     #
     versionAttributes &
 
+    # optional transport declaration, in case a test requires a certain
+    # kind of transport. If specified, tests will only run with the declared
+    # transport and skipped otherwise.
+    attribute transport {"http"|"local"}? &
+
     # 'description' is to be used for a human-readable
     #   description of the this particular test case
     #

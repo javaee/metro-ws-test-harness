@@ -69,6 +69,10 @@ public final class GlassfishContainer extends AbstractApplicationContainer {
     }
 
 
+    public String getTransport() {
+        return "http";
+    }
+
     public void start() throws Exception {
         // noop. assumed to be running
     }

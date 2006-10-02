@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import com.sun.istack.test.VersionProcessor;
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.model.TransportSet.Singleton;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -84,6 +85,12 @@ public class TestDescriptor {
     public final String description;
 
     /**
+     * Represents a set of transport that this test supports.
+     */
+    @NotNull
+    public final TransportSet supportedTransport;
+
+    /**
      * Bugster IDs that are related to this test.
      * Can be empty set but not null.
      */
@@ -132,6 +139,7 @@ public class TestDescriptor {
         this.home = home;
         this.resources = resources;
         this.applicableVersions = applicableVersions;
+        this.supportedTransport = TransportSet.ALL;
         this.description = description;
     }
 
@@ -148,7 +156,7 @@ public class TestDescriptor {
 
         VersionProcessor versionProcessor ;
         this.description = root.elementTextTrim("description");
-        /**
+        /*
          * Check if the resources folder exists in the dir where the
          * test-descriptor.xml is present else it is null
          */
@@ -156,11 +164,17 @@ public class TestDescriptor {
         this.resources = resourceDir.exists()?resourceDir:null;
         this.applicableVersions =  new VersionProcessor(root);
 
+        String transport = root.attributeValue("transport");
+        if(transport==null)
+            this.supportedTransport = TransportSet.ALL;
+        else
+            this.supportedTransport = new Singleton(transport);
+
         String path = testDir.getCanonicalPath();
         String testCasesPattern = "testcases" + File.separatorChar;
         int testCaseIndex = path.lastIndexOf(testCasesPattern);
         testCaseIndex += testCasesPattern.length();
-        /**
+        /*
          * For something like this 'testcases.policy.parsing.someSpecificTest'
          * I think the shortName should be policy.parsing
          * not testcases.policy.parsing as the above would conform to
@@ -228,6 +242,11 @@ public class TestDescriptor {
     public TestSuite build(ApplicationContainer container, WsTool wsimport) {
 
         TestSuite suite = new TestSuite();
+
+        if(!supportedTransport.contains(container.getTransport())) {
+            System.out.println("Skipping "+name+" as it's not applicable to "+container.getTransport());
+            return suite;
+        }
 
         DeploymentContext context = new DeploymentContext(this,container,wsimport);
 

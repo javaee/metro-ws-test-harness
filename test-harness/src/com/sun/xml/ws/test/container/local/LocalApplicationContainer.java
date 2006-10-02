@@ -29,6 +29,10 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
         super(wsimport,wsgen);
     }
 
+    public String getTransport() {
+        return "local";
+    }
+
     public void start() {
         // noop
     }
