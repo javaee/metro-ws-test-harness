@@ -64,11 +64,13 @@
     <zip file="build/dist/harness-lib.jar">
       <zipgroupfileset dir="lib" includes="**/*.jar" />
       <zipfileset src="build/test-harness-core.jar" />
+      <zipfileset dir="lib/licenses" prefix="META-INF/licenses" />
     </zip>
     <!-- library uber source zip -->
     <zip file="build/dist/harness-lib.src.zip">
       <zipgroupfileset dir="lib" includes="**/*.zip" />
       <zipfileset src="build/test-harness-core-src.zip" />
+      <zipfileset dir="lib/licenses" prefix="licenses" />
     </zip>
     <copy todir="build/dist">
       <fileset dir="docs/build" />
