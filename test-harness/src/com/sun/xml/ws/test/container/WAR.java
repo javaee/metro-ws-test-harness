@@ -20,6 +20,7 @@ import org.dom4j.io.SAXReader;
 
 import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Represents an exploded WAR file on a file system.
@@ -55,7 +56,11 @@ public final class WAR {
      */
     public final File srcDir;
 
-    private File wsdl;
+    /**
+     * One web application may end up having multiple WSDLs if a fromjava service
+     * contains multiple @WebService classes.
+     */
+    private final List<File> wsdl = new ArrayList<File>();
 
     /**
      * This war file is created for this service.
@@ -114,12 +119,13 @@ public final class WAR {
      * Gets the path of the WSDL.
      *
      * This is either copied from the test data (for "fromwsdl" tests),
-     * or generated (for "fromjava' tests.)
+     * or generated (for "fromjava" tests.) For fromjava tests with
+     * multiple <tt>WebService</tt> classes, you may get more than one WSDLs.
      */
-    public @NotNull File getWSDL() {
+    public @NotNull List<File> getWSDL() {
         // by the time this method is called,
         // it should be eithre copied into a war or generated
-        assert wsdl!=null;
+        assert !wsdl.isEmpty();
         return wsdl;
     }
 
@@ -194,10 +200,11 @@ public final class WAR {
         wsdlDir.mkdirs();
 
         File src = service.service.wsdl.wsdlFile;
-        assert this.wsdl==null;
-        this.wsdl = new File(wsdlDir, src.getName());
+        assert this.wsdl.isEmpty();
+        File wsdlFile = new File(wsdlDir, src.getName());
+        this.wsdl.add(wsdlFile);
 
-        FileUtil.copyFile(src,wsdl);
+        FileUtil.copyFile(src,wsdlFile);
         for (File schema :service.service.wsdl.schemas){
             FileUtil.copyFile(schema,new File(wsdlDir,schema.getName()));
         }
@@ -223,11 +230,6 @@ public final class WAR {
         File wsdlDir = new File(webInfDir, "wsdl");
         wsdlDir.mkdirs();
 
-        // for fromjava tests, we can't really support multiple endpoints in one service
-        // because wsgen isn't capable of generating them into one WSDL.
-        assert service.service.endpoints.size()==1;
-        File generatedWsdl=null;
-
         for (TestEndpoint endpt : service.service.endpoints) {
             ArgumentListBuilder options = new ArgumentListBuilder();
             options.add("-wsdl");
@@ -251,27 +253,13 @@ public final class WAR {
             options.add(endpt.className);
 
             System.out.println("Generating WSDL");
+            if(World.debug)
+                System.out.println(options);
             options.invoke(wsgen);
 
             // parse report
             Document dom = new SAXReader().read(report);
-            generatedWsdl = new File(dom.getRootElement().elementTextTrim("wsdl"));
+            wsdl.add(new File(dom.getRootElement().elementTextTrim("wsdl")));
         }
-
-        assert wsdl==null;
-        wsdl = generatedWsdl;
     }
-    //    } else {
-    //        // patch the WSDL and copy it to WEB-INF/wsdl at the same time.
-    //        File wsdlDir = new File(service.webInfDir,"wsdl");
-    //        wsdlDir.mkdirs();
-    //
-    //        File wsdl = service.service.wsdl;
-    //        File dest = new File(wsdlDir, wsdl.getName());
-    //
-    //        patchWsdl(service, wsdl,dest);
-    //
-    //        return dest;
-    //    }
-    //}
 }

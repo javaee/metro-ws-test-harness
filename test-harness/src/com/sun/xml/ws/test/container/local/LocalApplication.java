@@ -14,8 +14,11 @@ import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link Application} implementation for {@link LocalApplicationContainer}.
@@ -26,12 +29,16 @@ final class LocalApplication implements Application {
 
     private final @NotNull WAR war;
 
-    private final @NotNull URI endpointAddress;
+    /**
+     * "local://path/to/exploded/dir" portion of the endpoint address.
+     * Adding "?portName" makes it the full endpoint address.
+     */
+    private final @NotNull URI baseEndpointAddress;
 
     /** Creates a new instance of LocalApplication */
     LocalApplication(@NotNull WAR war, URI endpointAddress) {
         this.war = war;
-        this.endpointAddress = endpointAddress;
+        this.baseEndpointAddress = endpointAddress;
     }
 
     /**
@@ -40,7 +47,8 @@ final class LocalApplication implements Application {
      */
     @NotNull
     public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
-        return endpointAddress;
+        // I'm not too confident if endpoint.name is always the port local name.
+        return baseEndpointAddress.resolve('?'+endpoint.name);
     }
 
     /**
@@ -50,8 +58,12 @@ final class LocalApplication implements Application {
      * This WSDL will be compiled to generate client artifacts during a test.
      */
     @NotNull
-    public URL getWSDL() throws Exception {
-        return war.getWSDL().toURL();
+    public List<URL> getWSDL() throws Exception {
+        List<URL> urls = new ArrayList<URL>();
+        for (File w : war.getWSDL()) {
+            urls.add(w.toURL());
+        }
+        return urls;
     }
 
     /**

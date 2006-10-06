@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * {@link TestCase} that deploys a {@link TestService} to
@@ -102,35 +103,36 @@ public class DeploymentExecutor extends Executor {
         File gensrcDir = makeWorkDir("client-source");
         File classDir = makeWorkDir("client-classes");
 
-        ArgumentListBuilder options = new ArgumentListBuilder();
-        // Generate cusomization file & add as wsimport option
+        for (URL wsdl : context.app.getWSDL()) {
+            ArgumentListBuilder options = new ArgumentListBuilder();
+            // Generate cusomization file & add as wsimport option
 
-        // we used to do this just to set the package name, but
-        // it turns out we can do it much easily with the -p option
-        //options.add("-b");
-        //options.add(genClientCustomizationFile(context).getAbsolutePath());
+            // we used to do this just to set the package name, but
+            // it turns out we can do it much easily with the -p option
+            //options.add("-b");
+            //options.add(genClientCustomizationFile(context).getAbsolutePath());
 
-        // set package name. use 'client' to avoid collision between server artifacts
-        options.add("-p").add(context.parent.descriptor.name +".client");
-        options.add("-extension");
+            // set package name. use 'client' to avoid collision between server artifacts
+            options.add("-p").add(context.parent.descriptor.name +".client");
+            options.add("-extension");
 
-        //Add user's additional customization files
-        TestClient tc = context.parent.descriptor.clients.get(0);
-        for (File custFile : tc.customizations) {
-            options.add("-b").add(custFile);
+            //Add user's additional customization files
+            TestClient tc = context.parent.descriptor.clients.get(0);
+            for (File custFile : tc.customizations) {
+                options.add("-b").add(custFile);
+            }
+
+            //Other options
+            if(World.debug)
+                options.add("-verbose");
+            options.add("-s").add(gensrcDir);
+            options.add("-Xnocompile");
+            options.add(wsdl);
+            if(World.debug)
+                System.out.println("wsdl = " + wsdl);
+            // compile WSDL to generate client-side artifact
+            options.invoke(context.parent.wsimport);
         }
-
-        //Other options
-        if(World.debug)
-            options.add("-verbose");
-        options.add("-s").add(gensrcDir);
-        options.add("-Xnocompile");
-        options.add(context.app.getWSDL());
-        if(World.debug)
-            System.out.println("wsdl = " + context.app.getWSDL());
-        // compile WSDL to generate client-side artifact
-        options.invoke(context.parent.wsimport);
-
 
         // compile the generated source files to javac
         JavacTask javac = new JavacTask();
@@ -170,18 +172,14 @@ public class DeploymentExecutor extends Executor {
         // so that we can work on top of Java AST, but this simple grep-like
         // approach would work just fine with wsimport.
 
-        // I believe there's only one such class, but will check with Jitu
-        // whether a single wsimport invocation may create multiple Service classes
-        //Class c = Class.forName(sourceFile.getAbsolutePath());
-        //context.serviceClass = c; // TODO: set the discovered service class here
-        String serviceClazzName = findServiceClass(gensrcDir);
+        List<String> serviceClazzNames = new ArrayList<String>();
+        findServiceClass(gensrcDir,serviceClazzNames);
 
-        if (serviceClazzName != null)
-            context.serviceClass = cl.loadClass(serviceClazzName);
-        else {
+        if (serviceClazzNames.isEmpty())
             throw new RuntimeException ("Cannot find the generated 'service' class that extends from javax.xml.ws.Service");
-        }
 
+        for (String name : serviceClazzNames)
+            context.serviceClass.add(cl.loadClass(name));
     }
 
     private File makeWorkDir(String dirName) {
@@ -205,17 +203,13 @@ public class DeploymentExecutor extends Executor {
 
     /**
      * Recursively scans the Java source directory and find a class
-     * that extends from "Service".
-     *
-     * @return
-     *      fully qualified class name.
+     * that extends from "Service", add them to the given list.
      */
-    private String findServiceClass(File dir) throws Exception {
+    private void findServiceClass(File dir,List<String> result) throws Exception {
+        OUTER:
         for (File child : dir.listFiles()) {
             if (child.isDirectory()) {
-                String serviceClazzName = findServiceClass(child);
-                if(serviceClazzName!=null)
-                    return serviceClazzName; // found it
+                findServiceClass(child,result);
             } else
             if (child.getName().endsWith(".java")) {
                 // check if this is the class that extends from "Service"
@@ -236,13 +230,14 @@ public class DeploymentExecutor extends Executor {
                         className = className.substring(0,className.lastIndexOf('.'));
                         //Get the package name for the file by taking a substring after
                         // client-classes and replacing '/' by '.'
-                        return pkg+'.'+ className;
+                        result.add(pkg+'.'+ className);
+
+                        continue OUTER;
                     }
                 }
                 reader.close();
             }
         }
-        return null;
     }
 
     /**

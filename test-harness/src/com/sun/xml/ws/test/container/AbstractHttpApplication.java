@@ -5,6 +5,8 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Partial {@link Application} implementation for web containers.
@@ -33,13 +35,19 @@ public abstract class AbstractHttpApplication implements Application {
      * When deployed to HTTP service, WSDL URL can be obtained by "?wsdl".
      */
     @NotNull
-    public URL getWSDL() throws Exception {
-        // assume all the endpoints have the same WSDL.
-        // this is guaranteed for fromwsdl. For fromjava, this is also
-        // guaranteed by the fact that we only support one endpoint per service.
-        TestEndpoint endpoint = service.service.endpoints.iterator().next();
-        // somehow relative path computation doesn't work, so I rely on String concatanation. Ouch!
-        return new URL(getEndpointAddress(endpoint).toString()+"?wsdl");
+    public List<URL> getWSDL() throws Exception {
+        List<URL> urls = new ArrayList<URL>();
+
+        // TODO: if those endpoints point belong to the same service,
+        // we end up returning multiple WSDLs that are really the same.
+        // this should be harmless in terms of correctness, but
+        // it's inefficient, as we'll do extra compilation.
+        // can we avoid that?
+        for (TestEndpoint ep : service.service.endpoints) {
+            // somehow relative path computation doesn't work, so I rely on String concatanation. Ouch!
+            urls.add(new URL(getEndpointAddress(ep)+"?wsdl"));
+        }
+        return urls;
     }
 
 }

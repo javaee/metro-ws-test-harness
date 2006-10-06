@@ -45,4 +45,9 @@ public final class ArgumentListBuilder {
     public ArgumentListBuilder add(Path cp) {
         return add(cp.toString());
     }
+
+
+    public String toString() {
+        return args.toString();
+    }
 }

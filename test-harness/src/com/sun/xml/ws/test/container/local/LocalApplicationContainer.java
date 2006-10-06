@@ -44,24 +44,18 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         WAR war = assembleWar(service);
-        URI endpointAddress = patchWsdl(service,war.getWSDL());
-        return new LocalApplication(war,endpointAddress);
+        for (File wsdl : war.getWSDL())
+            patchWsdl(service,wsdl);
+        return new LocalApplication(war,new URI("local://" +
+            service.warDir.getAbsolutePath().replace('\\','/')));
     }
 
     /**
      * Fix the address in the WSDL. to the local address.
-     *
-     * This doesn't take into account multiple endpoints, url patterns, etc
-     *
-     * @return
-     *      the local endpoint URI that points to this address.
      */
-    private URI patchWsdl(DeployedService service, File wsdl) throws Exception {
+    private void patchWsdl(DeployedService service, File wsdl) throws Exception {
         Document doc = new SAXReader().read(wsdl);
         List<Element> ports = doc.getRootElement().element("service").elements("port");
-
-        // TODO: this code incorrectly assumes one service = one endpoint
-        String newLocation = null;
 
         for (Element port : ports) {
             String portName = port.attributeValue("name");
@@ -69,7 +63,7 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
             Element address = (Element)port.elements().get(0);
 
             Attribute locationAttr = address.attribute("location");
-            newLocation =
+            String newLocation =
                 "local://" + service.warDir.getAbsolutePath() + "?" + portName;
             newLocation = newLocation.replace('\\', '/');
             locationAttr.setValue(newLocation);
@@ -79,8 +73,6 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
         FileOutputStream os = new FileOutputStream(wsdl);
         new XMLWriter(os).write(doc);
         os.close();
-
-        return new URI(newLocation);
     }
 
 }

@@ -115,7 +115,8 @@ public class TestService {
     private void findEndpoints(File dir) throws IOException {
         File[] dirs = dir.listFiles(new FileFilter() {
             public boolean accept(File child) {
-                return child.isDirectory();
+                // don't go in our own work directory
+                return child.isDirectory() && !child.getName().equals("work");
             }
         });
         for (File subdir : dirs) {

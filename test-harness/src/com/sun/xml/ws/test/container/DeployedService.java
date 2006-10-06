@@ -50,12 +50,15 @@ public final class DeployedService {
     public final List<URL> clientClasspaths = new ArrayList<URL>();
 
     /**
-     * The class that represents the generated <tt>Service</tt> class.
+     * The classes that represents the generated <tt>Service</tt> classes.
      *
-     * This field is set to non-null when the service is deployed
+     * This field is populated when the service is deployed
      * and client artifacts are generated.
+     *
+     * In fromjava tests with multiple <tt>@WebService</tt>, you may actually
+     * get multiple service classes for one deployed service (argh!)
      */
-    public Class serviceClass;
+    public final List<Class> serviceClass = new ArrayList<Class>();
 
     /*package*/ DeployedService(DeploymentContext parent, TestService service) {
         this.parent = parent;

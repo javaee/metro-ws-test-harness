@@ -5,6 +5,7 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Represents an application deployed inside a {@link ApplicationContainer}.
@@ -26,8 +27,10 @@ public interface Application {
      *
      * <p>
      * This WSDL will be compiled to generate client artifacts during a test.
+     * In the general case, you may get more than one WSDL from one web application.
      */
-    @NotNull URL getWSDL() throws Exception;
+    @NotNull
+    List<URL> getWSDL() throws Exception;
 
     /**
      * Removes this application from the container.
