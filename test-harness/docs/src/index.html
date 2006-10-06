@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.21 2006-10-02 17:02:43 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.22 2006-10-06 23:09:39 kohsuke Exp $</div>
 
 <l:document>
 
@@ -421,7 +421,7 @@ bi = new Holder(new BigInteger("35.12")); // create JAX-WS holder object with Bi
       <p>
         To isolate the tests from the environment, and to make tests as reusable as possible, the harness creates services and port objects on behalf of the test programs. This allows the harness to configure ports correctly, so that they can talk to the right service.
       <p>
-        For this reason, it's important for the client program now to create port objects on its own. See the following illustration:
+        For this reason, it's important for the client program not to create port objects on its own. See the following illustration:
 <l:script>
 // :-&lt; BAD EXAMPLE
 port = new HelloService().getHelloPort();
@@ -432,13 +432,13 @@ helloPort.sayHelloTo("duke");
 </l:script>
       <p>
         To find out what port variables are imported under what names, check the output from the test harness. Right before the client script executes, you should see a line like this:
+      <pre>injected services: helloService</pre>
       <pre>injected ports: addNumbersPort</pre>
       <p>
         The only exception to this "don't create your ports" rule is when you need <tt>Dispatch</tt> objects, where you'd need to use the pre-defined variable "endpointAddress" <l:not-cooked />:
 <l:script>
 // create dispatch
-svc = new HelloService();
-svc.addPort(new QName("foo","bar"), javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
+helloService.addPort(new QName("foo","bar"), javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
 </l:script>
     </l:section>
     <l:section title="More on Script Execution Environment">
