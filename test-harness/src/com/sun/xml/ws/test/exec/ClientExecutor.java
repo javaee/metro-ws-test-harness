@@ -67,7 +67,8 @@ public class ClientExecutor extends Executor {
     }
 
     private void injectResources(NameSpace ns, Interpreter engine) throws Exception {
-        StringBuilder buf = new StringBuilder("injected ports:");
+        StringBuilder serviceList = new StringBuilder("injected services:");
+        StringBuilder portList = new StringBuilder("injected ports:");
 
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
@@ -89,6 +90,12 @@ public class ClientExecutor extends Executor {
 
                     Object serviceInstance = clazz.newInstance();
 
+                    {// inject a service instance
+                        String serviceVarName = clazz.getSimpleName();
+                        engine.set(Introspector.decapitalize(serviceVarName),serviceInstance);
+                        serviceList.append(' ').append(serviceVarName);
+                    }
+
                     for (Method method : methods) {
                         Annotation endpoint = method.getAnnotation(webendpointAnnotation);
                         if (endpoint != null) {
@@ -106,12 +113,13 @@ public class ClientExecutor extends Executor {
                                 else
                                     throw e;
                             }
-                            buf.append(' ').append(portName);
+                            portList.append(' ').append(portName);
                         }
                     }
                 }
             }
         }
-        System.out.println(buf);
+        System.out.println(serviceList);
+        System.out.println(portList);
     }
 }
