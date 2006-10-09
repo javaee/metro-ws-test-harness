@@ -98,7 +98,9 @@ public class ClientExecutor extends Executor {
 
                     for (Method method : methods) {
                         Annotation endpoint = method.getAnnotation(webendpointAnnotation);
-                        if (endpoint != null) {
+						// Skip methods like getHelloPort(WebServiceFeatures) for now
+                        if (endpoint != null && method.getParameterTypes().length == 0) {
+
                             //For multiple endpoints the convention for injecting the variables is
                             // portName obtained from the WebEndpoint annotation,
                             // which would be something like "addNumbersPort"
