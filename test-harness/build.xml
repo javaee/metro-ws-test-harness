@@ -81,6 +81,13 @@
     </zip>
   </target>
 
+  <target name="integrate-bsh">
+    <get src="http://kohsuke.sfbay/hudson/job/bsh/lastSuccessfulBuild/artifact/bean-shell/dist/bsh-2.0b1.jar"
+         dest="lib/bsh.jar"/>
+    <get src="http://kohsuke.sfbay/hudson/job/bsh/lastSuccessfulBuild/artifact/bean-shell/dist/bsh-2.0b1-src.jar"
+         dest="lib/bsh-src.zip"/>
+  </target>
+
   <target name="integrate-istack-commons">
     <property name="istack.commons.runtime"
               value="http://kohsuke.sfbay/hudson/job/istack-commons/lastSuccessfulBuild/artifact/runtime/build"/>
