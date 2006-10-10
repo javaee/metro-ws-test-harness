@@ -133,7 +133,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/bsh-src.zip!/src" />
+          <root url="jar://$MODULE_DIR$/lib/bsh-src.zip!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -294,6 +294,20 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/emma.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/emma-src.zip!/emma-2.0.5312/tools/java" />
+          <root url="jar://$MODULE_DIR$/lib/emma-src.zip!/emma-2.0.5312/core/java13" />
+          <root url="jar://$MODULE_DIR$/lib/emma-src.zip!/emma-2.0.5312/core/java12" />
+          <root url="jar://$MODULE_DIR$/lib/emma-src.zip!/emma-2.0.5312/core/java14" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntryProperties />
