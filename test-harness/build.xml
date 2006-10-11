@@ -173,6 +173,8 @@
     <delete dir="build/test-logs" />
 
     <java jar="build/dist/harness.jar" fork="true">
+      <arg value="-legacy-local" />
+
       <arg value="-cp:jaxws-image" />
       <arg path="build/jaxws-ri" />
 
