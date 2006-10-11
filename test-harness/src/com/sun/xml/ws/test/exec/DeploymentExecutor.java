@@ -88,9 +88,14 @@ public class DeploymentExecutor extends Executor {
     public void addSTSToClasspath() throws Exception{
         List<URL> classpath = context.clientClasspaths;
 
+        ClassLoader baseCl = World.runtime.getClassLoader();
+        if (context.parent.clientClassLoader != null) {
+            baseCl = context.parent.clientClassLoader;
+        }
+        
         classpath.add(new File(context.warDir, "WEB-INF/classes").toURL());
-        ClassLoader cl = new URLClassLoader( classpath.toArray(new URL[0]),
-                World.runtime.getClassLoader() );
+        ClassLoader cl =
+                new URLClassLoader( classpath.toArray(new URL[0]), baseCl );
 
         context.parent.clientClassLoader=cl;
 
