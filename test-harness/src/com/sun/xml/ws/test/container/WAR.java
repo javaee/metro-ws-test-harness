@@ -217,6 +217,7 @@ public final class WAR {
         JavacTask javac = new JavacTask();
         javac.setSourceDir(service.service.baseDir, srcDir);
         javac.setDestdir(classDir);
+        javac.setDebug(true);
         javac.execute();
     }
 

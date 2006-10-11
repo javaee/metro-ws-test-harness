@@ -138,6 +138,7 @@ public class DeploymentExecutor extends Executor {
         JavacTask javac = new JavacTask();
         javac.setSourceDir(gensrcDir);
         javac.setDestdir(classDir);
+        javac.setDebug(true);
         javac.execute();
 
         // load the generated classes
