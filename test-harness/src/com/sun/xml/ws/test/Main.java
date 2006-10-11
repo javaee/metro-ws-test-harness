@@ -2,11 +2,12 @@ package com.sun.xml.ws.test;
 
 import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
+import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.gf.GlassfishContainer;
-import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
+import com.sun.xml.ws.test.container.invm.InVmContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
 import junit.framework.Test;
@@ -135,6 +136,9 @@ public class Main {
         usage=
             "Launch Glassfish from the harness and test with it")
     File localGlassfish = null;
+
+    @Option(name="-legacy-local",usage="Emergency! I need to use the legacy local transport!")
+    boolean legacyLocalTransport = false;
 
     @Option(name="-leave",usage="leave the container running after all the tests are completed. Often useful for debugging problems.")
     boolean leave = false;
@@ -374,9 +378,13 @@ public class Main {
             );
         }
 
+        if(legacyLocalTransport) {
+            System.err.println("Using the legacy local transport. This will be removed in a near future");
+            return new LocalApplicationContainer(wsimport,wsgen);
+        }
 
-        System.err.println("Testing with the local transport");
-        return new LocalApplicationContainer(wsimport,wsgen);
+        System.err.println("Testing with the in-vm transport");
+        return new InVmContainer(wsimport,wsgen);
     }
 
     private static String defaultsTo( String value, String defaultValue ) {

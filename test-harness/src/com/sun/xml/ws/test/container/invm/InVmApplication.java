@@ -1,15 +1,7 @@
-/*
- * LocalApplication.java
- *
- * Created on June 28, 2006, 10:03 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
-package com.sun.xml.ws.test.container.local;
+package com.sun.xml.ws.test.container.invm;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.model.TestEndpoint;
@@ -21,25 +13,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link Application} implementation for {@link LocalApplicationContainer}.
+ * {@link Application} implementation for {@link InVmContainer}.
  *
  * @author ken
- * @deprecated
- *      To be removed once in-vm transport becomes ready
  */
-final class LocalApplication implements Application {
+final class InVmApplication implements Application {
 
-    private final @NotNull WAR war;
+    private final @NotNull
+    WAR war;
 
     /**
      * "local://path/to/exploded/dir" portion of the endpoint address.
      * Adding "?portName" makes it the full endpoint address.
      */
-    private final @NotNull URI baseEndpointAddress;
+    private final @NotNull
+    URI baseEndpointAddress;
+
+    /**
+     * <tt>InVmServer</tt> object. This is loaded in another classloader,
+     * so we can't use a typed value.
+     */
+    private final @NotNull Object server;
 
     /** Creates a new instance of LocalApplication */
-    LocalApplication(@NotNull WAR war, URI endpointAddress) {
+    InVmApplication(@NotNull WAR war, Object server, URI endpointAddress) {
         this.war = war;
+        this.server = server;
         this.baseEndpointAddress = endpointAddress;
     }
 
@@ -72,9 +71,8 @@ final class LocalApplication implements Application {
      * Removes this application from the container.
      */
     public void undeploy() throws Exception {
-        // no-op. don't clean up artifacts since those are often necessary
-        // to diagnose problems when the user is debugging a problem.
-
-        // instead, clean up is done in LocalApplicationContainer.deploy()
+        InterpreterEx i = new InterpreterEx(server.getClass().getClassLoader());
+        i.set("server",server);
+        i.eval("server.undeploy()");
     }
 }

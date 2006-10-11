@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.22 2006-10-06 23:09:39 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.23 2006-10-11 05:34:39 kohsuke Exp $</div>
 
 <l:document>
 
@@ -239,12 +239,12 @@ work/                    (root test directory)
     <p>
       The harness can run tests by using a variety of transports and containers.
     </p>
-    <l:section title="Local (No Container)">
+    <l:section title="In-VM (No Container)">
       <p>
-        By default, the test harness uses the local transport. There's no additional option required for this mode.  This is the preferred mode of testing because of its quick turn-around time. This mode also allows you to use a single debug session to debug both the client and the server side.
+        By default, the test harness uses the in-vm transport. There's no additional option required for this mode.  This is the preferred mode of testing because of its quick turn-around time. This mode also allows you to use a single debug session to debug both the client and the server side.
       </p>
       <p>
-        Some delivery vehicles (notably the distribution images) do not have the code needed to use the local transport. To test those, find the matching <tt>jaxws-local-transport.jar</tt> and use the <tt>-transport</tt> option to specify it.
+        Some delivery vehicles (notably the distribution images) do not have the code needed to use the in-vm transport. To test those, find the matching <tt>jaxws-local-transport.jar</tt> and use the <tt>-transport</tt> option to specify it.
       </p>
       <l:harness-cmd>-cp:wsit-image path/to/wsit -transport path/to/jaxws-local-transport.jar ...</l:harness-cmd>
     </l:section>
