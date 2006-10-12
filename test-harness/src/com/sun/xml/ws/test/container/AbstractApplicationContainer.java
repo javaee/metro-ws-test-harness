@@ -37,23 +37,34 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         if(!fromJava)
             war.compileWSDL(wsimport);
-        war.compileJavac();
+        if(!isSkipMode())
+            war.compileJavac();
         if(fromJava)
             war.generateWSDL(wsgen);
 
-        List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
-        war.generateWebXml(endpoints);
+        if(!isSkipMode()) {
+            List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
+            war.generateWebXml(endpoints);
 
-        // we only need this for Glassfish, but it's harmless to generate for other containers.
-        // TODO: figure out how not to do this for other containers
-        war.generateSunWebXml();
+            // we only need this for Glassfish, but it's harmless to generate for other containers.
+            // TODO: figure out how not to do this for other containers
+            war.generateSunWebXml();
 
 
-        PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
-        w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
-        w.close();
+            PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
+            w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
+            w.close();
+        }
 
         return war;
+    }
+
+    /**
+     * Returns true if we are running with the "-skip" option,
+     * where we shouldn't generate any artifacts and just pick up the results from the last run.
+     */
+    private boolean isSkipMode() {
+        return wsgen.isNoop() && wsimport.isNoop();
     }
 
     /**
