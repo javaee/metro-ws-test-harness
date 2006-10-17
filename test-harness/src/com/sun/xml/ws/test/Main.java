@@ -2,12 +2,12 @@ package com.sun.xml.ws.test;
 
 import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.gf.GlassfishContainer;
 import com.sun.xml.ws.test.container.invm.InVmContainer;
+import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
 import junit.framework.Test;
