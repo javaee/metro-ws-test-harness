@@ -205,6 +205,9 @@ public final class WAR {
         this.wsdl.add(wsdlFile);
 
         FileUtil.copyFile(src,wsdlFile);
+        for (File importedWsdl :service.service.wsdl.importedWsdls){
+            FileUtil.copyFile(importedWsdl,new File(wsdlDir,importedWsdl.getName()));
+        }
         for (File schema :service.service.wsdl.schemas){
             FileUtil.copyFile(schema,new File(wsdlDir,schema.getName()));
         }

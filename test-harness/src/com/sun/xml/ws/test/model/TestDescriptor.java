@@ -319,6 +319,20 @@ public class TestDescriptor {
         }
     }
 
+    /**
+     * This filter gives all wsdls in the directory excluding primaryWsdl.
+     * This can be used to gather all imported wsdls.
+     */
+
+    class WSDLFilter implements FilenameFilter {
+        String primaryWsdl;
+        public WSDLFilter(String primaryWsdl){
+            this.primaryWsdl = primaryWsdl;
+        }
+        public boolean accept(File dir, String name) {
+            return (name.endsWith(".wsdl") && (!name.equals(primaryWsdl)));
+        }
+    }
 
     private void populateServices (List<Element> serviceList,File testDir,boolean isSTS) throws IOException {
 
@@ -339,10 +353,13 @@ public class TestDescriptor {
             File wsdl ;
             WSDL wsdlInfo = null;
             if (service.element("wsdl") != null) {
-                wsdl = parseFile(serviceBaseDir,service.element("wsdl").attributeValue("href","test.wsdl"));
+                String wsdlAttribute =service.element("wsdl").attributeValue("href","test.wsdl");
+                wsdl = parseFile(serviceBaseDir,wsdlAttribute);
                 File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
+                File[] wsdls = serviceBaseDir.listFiles(new WSDLFilter(wsdlAttribute));
+                List<File> importedWsdls = Arrays.asList(wsdls);
                 List<File> schemaFiles = Arrays.asList(schemas);
-                wsdlInfo = new WSDL(wsdl,schemaFiles);
+                wsdlInfo = new WSDL(wsdl,importedWsdls, schemaFiles);
 
             }
 
