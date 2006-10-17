@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A service to be deployed for a test.
@@ -44,7 +41,7 @@ public class TestService {
      */
     @NotNull
     public final File baseDir;
-    
+
     /**
      * Optional WSDL file that describes this service.
      */
@@ -137,10 +134,17 @@ public class TestService {
 
             String pkg=null;
             boolean isWebService = false;
-
+            boolean isInterface = false;
             while((line=r.readLine())!=null) {
                 if(line.startsWith("package ")) {
                     pkg = line.substring(8,line.indexOf(';'));
+                }
+                if(line.contains("interface")) {
+                    StringTokenizer stk = new StringTokenizer(line);
+                    while(stk.hasMoreTokens()) {
+                        if(stk.nextToken().equals("interface"))
+                            isInterface = true;
+                    }
                 }
                 if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
                     isWebService = true;
@@ -149,8 +153,8 @@ public class TestService {
             }
 
             r.close();
-
-            if(isWebService) {
+            // if isInterface=true && isWebService=true, means it is SEI
+            if(isWebService && !isInterface) {
                 // found it!
 
                 String className = src.getName();
