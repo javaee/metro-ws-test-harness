@@ -6,9 +6,11 @@ import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.WAR;
+import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InterpreterEx;
+import java.io.FileWriter;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -49,6 +51,10 @@ public class InVmContainer extends AbstractApplicationContainer {
     public Application deploy(DeployedService service) throws Exception {
         String id = service.service.getGlobalUniqueName();
         WAR war = assembleWar(service);
+
+        if (service.service.isSTS)
+            updateWsitClient(service,id);
+
         for (File wsdl : war.getWSDL())
             patchWsdl(service,wsdl,id);
 
@@ -61,6 +67,35 @@ public class InVmContainer extends AbstractApplicationContainer {
         Object server = i.eval("new com.sun.xml.ws.transport.local.InVmServer(id,dir)");
 
         return new InVmApplication(war,server,new URI("in-vm://"+id+"/"));
+    }
+
+    public void updateWsitClient(DeployedService deployedService, String id)throws Exception {
+        File wsitClientFile = new File(deployedService.service.parent.resources,"wsit-client.xml");
+        if (wsitClientFile.exists() ){
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(wsitClientFile);
+            Element root = document.getRootElement();
+            Element policy = root.element("Policy");
+            Element sts = policy.element("ExactlyOne").element("All").element("PreconfiguredSTS");
+
+            Attribute  endpoint = sts.attribute("endpoint");
+            TestEndpoint foo = (TestEndpoint) deployedService.service.endpoints.toArray()[0];
+            String newLocation =
+                "in-vm://" + id + "/";
+            newLocation = newLocation.replace('\\', '/');
+            endpoint.setValue(newLocation);
+
+            Attribute wsdlLoc = sts.attribute("wsdlLocation");
+            wsdlLoc.setValue(deployedService.service.wsdl.wsdlFile.toURI().toString());
+
+            XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
+            writer.write( document );
+            writer.close();
+
+        } else {
+            throw new RuntimeException("wsit-client.xml is absent. It is required. \n"+
+                    "Please check " + deployedService.service.parent.resources );
+        }
     }
 
     /**

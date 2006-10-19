@@ -52,10 +52,10 @@ public class DeploymentExecutor extends Executor {
             generateClientArtifacts();
         } else {
             addSTSToClasspath();
-            updateWsitClient();
+            // updateWsitClient();
         }
     }
-
+/*
     public void updateWsitClient()throws Exception {
         File wsitClientFile = new File(context.service.parent.resources,"wsit-client.xml");
         if (wsitClientFile.exists() ){
@@ -83,7 +83,7 @@ public class DeploymentExecutor extends Executor {
 
 
     }
-
+*/
 
     public void addSTSToClasspath() throws Exception{
         List<URL> classpath = context.clientClasspaths;

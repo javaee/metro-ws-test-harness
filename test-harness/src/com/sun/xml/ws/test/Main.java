@@ -271,7 +271,7 @@ public class Main {
 
         // fill in runtime and tool realms
         if(wsitImage!=null) {
-            runtime.addJar(new File(wsitImage,"lib/webservices.jar"));
+            runtime.addJar(new File(wsitImage,"lib/webservices-rt.jar"));
             tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
 
         } else
