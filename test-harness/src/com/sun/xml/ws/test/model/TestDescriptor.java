@@ -72,6 +72,14 @@ public class TestDescriptor {
     public final File resources;
 
     /**
+     * If non-null, this directory contains Java files shared by service and client.
+     *
+     */
+    @Nullable
+    public final File common;
+
+
+    /**
      * Versions of the program that this test applies.
      */
     @NotNull
@@ -134,10 +142,11 @@ public class TestDescriptor {
     }
 
 
-    public TestDescriptor(String shortName, File home, File resources, VersionProcessor applicableVersions, String description) {
+    public TestDescriptor(String shortName, File home, File resources, File common,VersionProcessor applicableVersions, String description) {
         this.name = shortName;
         this.home = home;
         this.resources = resources;
+        this.common = common;
         this.applicableVersions = applicableVersions;
         this.supportedTransport = TransportSet.ALL;
         this.description = description;
@@ -162,6 +171,12 @@ public class TestDescriptor {
          */
         File resourceDir = new File(testDir,"resources");
         this.resources = resourceDir.exists()?resourceDir:null;
+        /*
+         * Check if the common folder exists in the dir where the
+         * test-descriptor.xml is present else it is null
+         */
+        File commonDir = new File(testDir,"common");
+        this.common = commonDir.exists()?commonDir:null;
         this.applicableVersions =  new VersionProcessor(root);
 
         String transport = root.attributeValue("transport");

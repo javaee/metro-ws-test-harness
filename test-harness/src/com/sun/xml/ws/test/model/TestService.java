@@ -3,11 +3,7 @@ package com.sun.xml.ws.test.model;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -175,4 +171,20 @@ public class TestService {
     public String toString() {
         return name+" of "+parent.toString();
     }
+
+    /**
+     * This filter gives all handler configuration files in the directory.
+     * i.e files matching pattern *handlers.xml
+     */
+    class HandlersFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            return (name.endsWith("handlers.xml"));
+        }
+    }
+
+    public File[] getHandlerConfiguration() {
+        return baseDir.listFiles(new HandlersFilter());
+    }
+
+
 }

@@ -55,7 +55,8 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
             w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
             w.close();
         }
-
+        //Package Handler Configuration files
+        war.copyHandlerChainFiles(service.service.getHandlerConfiguration());
         return war;
     }
 

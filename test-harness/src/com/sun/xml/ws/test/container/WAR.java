@@ -116,6 +116,15 @@ public final class WAR {
     }
 
     /**
+     * Copies handler files in to WEB-INF/classes
+     */
+    public void copyHandlerChainFiles(File[] handlerConfigs) {
+        for (File config : handlerConfigs) {
+            FileUtil.copyFile(config, new File(classDir, config.getName()));
+        }
+    }
+
+    /**
      * Gets the path of the WSDL.
      *
      * This is either copied from the test data (for "fromwsdl" tests),
@@ -218,7 +227,12 @@ public final class WAR {
      */
     final void compileJavac() throws Exception {
         JavacTask javac = new JavacTask();
-        javac.setSourceDir(service.service.baseDir, srcDir);
+        if(service.parent.descriptor.common != null)
+            javac.setSourceDir(service.service.baseDir, srcDir,
+                    service.parent.descriptor.common );
+        else
+            javac.setSourceDir(service.service.baseDir, srcDir);
+
         javac.setDestdir(classDir);
         javac.setDebug(true);
         javac.execute();
