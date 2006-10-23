@@ -311,7 +311,12 @@ public class Main {
         // put tools.jar in the tools classpath
         File jreHome = new File(System.getProperty("java.home"));
         File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
-        tool.addJar(toolsJar);
+        if (toolsJar.exists())
+            tool.addJar(toolsJar);
+        // For Mac OS X
+        File classesJar = new File( jreHome.getParent(), "Classes/classes.jar" );
+        if (classesJar.exists())
+            tool.addJar(classesJar);
 
 
         if(debug) {
