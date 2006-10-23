@@ -130,6 +130,8 @@ public class TestDescriptor {
 
     public static final Schema descriptorSchema;
 
+    private boolean skip;
+
     static {
         URL url = World.class.getResource("test-descriptor.rnc");
         try {
@@ -150,6 +152,7 @@ public class TestDescriptor {
         this.applicableVersions = applicableVersions;
         this.supportedTransport = TransportSet.ALL;
         this.description = description;
+        this.skip=false;
     }
 
     /**
@@ -178,6 +181,12 @@ public class TestDescriptor {
         File commonDir = new File(testDir,"common");
         this.common = commonDir.exists()?commonDir:null;
         this.applicableVersions =  new VersionProcessor(root);
+
+        String skipAttr = root.attributeValue("skip");
+        if(skipAttr==null)
+            this.skip = false;
+        else
+            this.skip = new Boolean(skipAttr).booleanValue();
 
         String transport = root.attributeValue("transport");
         if(transport==null)
@@ -257,6 +266,11 @@ public class TestDescriptor {
     public TestSuite build(ApplicationContainer container, WsTool wsimport) {
 
         TestSuite suite = new TestSuite();
+
+        if (skip) {
+            System.out.println("Skipping "+name+"; explictly marked to skip.");
+            return suite;
+        }
 
         if(!supportedTransport.contains(container.getTransport())) {
             System.out.println("Skipping "+name+" as it's not applicable to "+container.getTransport());

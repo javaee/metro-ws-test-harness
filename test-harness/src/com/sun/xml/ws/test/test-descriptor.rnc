@@ -27,6 +27,11 @@ start = element descriptor {
     # transport and skipped otherwise.
     attribute transport {"http"|"local"}? &
 
+    # optional flag to force test to be skipped
+    # to be used only in cases such as when the harness itself
+    # is the cause of test failures and similar dilemmas
+    attribute skip {"true"|"false"}? &
+
     # 'description' is to be used for a human-readable
     #   description of the this particular test case
     #
