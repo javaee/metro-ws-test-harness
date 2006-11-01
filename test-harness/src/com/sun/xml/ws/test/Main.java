@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -331,6 +332,8 @@ public class Main {
             DefaultLogger listener = new DefaultLogger();
             World.project.addBuildListener(listener);
             listener.setMessageOutputLevel(Project.MSG_DEBUG);
+            listener.setOutputPrintStream(System.out);
+            listener.setErrorPrintStream(System.err);
         }
 
     }
