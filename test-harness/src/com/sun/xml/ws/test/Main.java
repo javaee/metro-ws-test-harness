@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -272,6 +272,9 @@ public class Main {
             runtime.addJarFolder(new File(embeddedTomcat,"server/lib"));
         }
 
+        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null)
+            guessWorkspace();
+
         // fill in runtime and tool realms
         if(wsitImage!=null) {
             runtime.addJar(new File(wsitImage,"lib/webservices-rt.jar"));
@@ -305,10 +308,7 @@ public class Main {
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
         } else {
-            // TODO: if none is given, wouldn't it be nice if we can guess?
-            // TODO: don't we need a better way to discover local transport.
-
-            throw new CmdLineException("No -cp option is specified");
+            throw new CmdLineException("No -cp option is specified, nor were we able to guess the -cp option");
         }
 
         // put tools.jar in the tools classpath
@@ -336,6 +336,59 @@ public class Main {
             listener.setErrorPrintStream(System.err);
         }
 
+    }
+
+    /**
+     * Guess which workspace we want to test against, in case no "-cp" is given.
+     */
+    private void guessWorkspace() {
+        // JAX-WS RI teams often set this variable
+        String jaxwsHome = System.getenv("JAXWS_HOME");
+        if(jaxwsHome!=null) {
+            File f = new File(jaxwsHome);
+            if(f.isDirectory()) {
+                if(f.getName().equals("build")) {
+                    // probably being set to jaxws-ri/build. Let's verify.
+                    File home = f.getParentFile();
+                    if(new File(home,".jaxws-ri").exists()) {
+                        System.out.println("Found JAX-WS RI workspace at "+home);
+                        jaxwsWs = home;
+                        return;
+                    }
+                }
+
+                // is this really JAX-WS home?
+                if(new File(f,".jaxws-ri").exists()) {
+                    System.out.println("Found JAX-WS RI workspace at "+f);
+                    jaxwsWs = f;
+                    return;
+                }
+
+                // the other possibility is it's pointing to the JAX-WS RI distribution image
+                if(new File(f,"lib/jaxws-rt.jar").exists() && new File(f,"bin/wsgen.bat").exists()) {
+                    System.out.println("Found JAX-WS RI distribution image at "+f);
+                    jaxwsImage = f;
+                    return;
+                }
+            }
+        }
+
+        // let's go up the directory hierarchy a bit to find a match
+        File harnessJar = getHarnessJarDirectory();
+        File jaxwsUnit = getParentWithName(harnessJar,"jaxws-unit");
+        if(jaxwsUnit!=null) {
+            for( File other : jaxwsUnit.getParentFile().listFiles(DIRECTORY_FILTER)) {
+                if(new File(other,".jaxws-ri").exists()) {
+                    System.out.println("Found JAX-WS RI workspace at "+other);
+                    jaxwsWs = other;
+                    return;
+                }
+            }
+        }
+
+
+
+        // couldn't make any guess
     }
 
     /**
@@ -454,4 +507,40 @@ public class Main {
                 build(subdir,container, wsimport, suite);
         }
     }
+
+    /**
+     * Determines the 'home' directory of the test harness.
+     * This is used to determine where to load other files.
+     */
+    private static File getHarnessJarDirectory() {
+        try {
+            String res = Main.class.getClassLoader().getResource("com/sun/xml/ws/test/Main.class").toExternalForm();
+            if(res.startsWith("jar:")) {
+                res = res.substring(4,res.lastIndexOf('!'));
+                return new File(new URL(res).getFile()).getParentFile();
+            }
+            return new File(".").getAbsoluteFile();
+        } catch (MalformedURLException e) {
+            throw new Error(e);
+        }
+    }
+
+    /**
+     * Find the nearest ancestor directory that has the given name and returns it.
+     * Otherwise null.
+     */
+    private File getParentWithName(File file, String name) {
+        while(file!=null) {
+            if(file.getName().equals(name))
+                return file;
+            file = file.getParentFile();
+        }
+        return null;
+    }
+
+    private static final FileFilter DIRECTORY_FILTER = new FileFilter() {
+        public boolean accept(File path) {
+            return path.isDirectory();
+        }
+    };
 }
