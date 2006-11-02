@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.23 2006-10-11 05:34:39 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.24 2006-11-02 00:25:33 kohsuke Exp $</div>
 
 <l:document>
 
@@ -140,23 +140,26 @@
   <l:section title="Configuring the Harness Classpath for Different Delivery Vehicles">
     <p>
       The harness can be used to test different projects that use the JAX-WS RI.
+      Normally, the harness will be able to automatically guess which project you are 
+      working on, and set up classpath automatically. However, you can always use one
+      of the following options to manually specify it to override this default behavior.
     </p>
     <l:section title="JAX-WS RI Workspace">
       <p>
         The following option tells the harness to pick up the JAX-WS RI
-                                classes from the JAX-WS workspace. Specifically, with this option,
-                                the harness will look into various <tt>build/classes</tt> and library
-                                jars.
+        classes from the JAX-WS workspace. Specifically, with this option,
+        the harness will look into various <tt>build/classes</tt> and library
+        jars.
       </p>
       <l:harness-cmd>-cp:jaxws path/to/jaxws-ri-workspace test-dir1 test-dir2 ...</l:harness-cmd>
     </l:section>
     <l:section title="JAX-WS RI Binary Image">
       <p>
         The following option tells the harness to pick up the
-                                RI classes from a JAX-WS binary dist image. Using this option,
-                                the harness will only look at the RI library jars found under
-                                the <TT>lib</TT> directory of the top-level dist image directory that
-                                you specify.
+        RI classes from a JAX-WS binary dist image. Using this option,
+        the harness will only look at the RI library jars found under
+        the <TT>lib</TT> directory of the top-level dist image directory that
+        you specify.
       </p>
       <l:harness-cmd>-cp:jaxws-image path/to/jaxws-ri-image test-dir1 test-dir2 ...</l:harness-cmd>
     </l:section>
