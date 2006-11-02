@@ -386,7 +386,13 @@ public class Main {
             }
         }
 
-
+        // are we in WSIT?
+        File wsitHome = getParentWithFile(harnessJar,".wsit");
+        if(wsitHome!=null) {
+            System.out.println("Found WSIT workspace at "+wsitHome);
+            this.wsitWs = wsitHome;
+            return;
+        }
 
         // couldn't make any guess
     }
@@ -532,6 +538,19 @@ public class Main {
     private File getParentWithName(File file, String name) {
         while(file!=null) {
             if(file.getName().equals(name))
+                return file;
+            file = file.getParentFile();
+        }
+        return null;
+    }
+
+    /**
+     * Find the nearest ancestor directory that has the given file and returns it.
+     * Otherwise null.
+     */
+    private File getParentWithFile(File file, String markerFile) {
+        while(file!=null) {
+            if(new File(file,markerFile).exists())
                 return file;
             file = file.getParentFile();
         }
