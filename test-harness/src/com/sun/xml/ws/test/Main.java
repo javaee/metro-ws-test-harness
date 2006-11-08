@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +94,9 @@ public class Main {
 
     @Option(name="-transport",usage="specify the pluggable transport jar")
     File transportJar;
+
+    @Option(name="-cp:override",usage="these jars and folders are placed in front of other -cp:*** options. Useful for overriding some jars")
+    String classPathOverride;
 
     /**
      * This is copied to {@link World#debug}.
@@ -261,6 +265,13 @@ public class Main {
 
         Realm runtime = World.runtime;
         Realm tool = World.tool;
+
+        if(classPathOverride!=null) {
+            StringTokenizer tokens = new StringTokenizer(classPathOverride,File.pathSeparator);
+            while(tokens.hasMoreTokens()) {
+                runtime.addJar(new File(tokens.nextToken()));
+            }
+        }
 
         if(transportJar!=null)
             runtime.addJar(transportJar);
