@@ -331,7 +331,7 @@ public class Main {
             // install listener to Ant project so that we can get logging from there
             DefaultLogger listener = new DefaultLogger();
             World.project.addBuildListener(listener);
-            listener.setMessageOutputLevel(Project.MSG_DEBUG);
+            listener.setMessageOutputLevel(Project.MSG_INFO);
             listener.setOutputPrintStream(System.out);
             listener.setErrorPrintStream(System.err);
         }
