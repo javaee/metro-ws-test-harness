@@ -91,6 +91,6 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
      * Copy JAX-WS runtime code?
      */
     protected boolean copyRuntimeLibraries() {
-        return true;
+        return false;
     }
 }

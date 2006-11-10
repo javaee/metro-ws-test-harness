@@ -85,22 +85,21 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             "--passwordfile",
             getPasswordFile().getAbsolutePath(),
             "--instanceport",
-            getPropertyValue(ServletPropertySet.PORT),
+            getPropertyValue(ServletPropertySet.PORT),              
             "--domainproperties",
-
             getPropertyValueString(GlassfishPropertySet.JMS_PORT)+':'+
             getPropertyValueString(GlassfishPropertySet.IIOP_PORT)+':'+
             getPropertyValueString(GlassfishPropertySet.IIOPS_PORT)+':'+
             getPropertyValueString(GlassfishPropertySet.HTTPS_PORT)+':'+
             getPropertyValueString(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT)+':'+
             getPropertyValueString(GlassfishPropertySet.JMX_ADMIN_PORT),
-
+            "--template","wsit-test-domain.xml.template",
             "--domaindir",
             getHome().getAbsolutePath(),
 
             // it looks like domain name can be anything, but check with the dev
-            "cargo-domain");
-
+            "cargo-domain-" + getPropertyValue(ServletPropertySet.PORT));
+        
         // schedule cargocpc for deployment
         File cpcWar = new File(getHome(), "cargocpc.war");
         getResourceUtils().copyResource(RESOURCE_PATH + "cargocpc.war",cpcWar);

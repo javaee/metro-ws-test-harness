@@ -88,7 +88,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
             "--interactive=false",
             "--domaindir",
             getConfiguration().getHome().getAbsolutePath(),
-            "cargo-domain"
+            "cargo-domain-" + getConfiguration().getPropertyValue(ServletPropertySet.PORT)
             );
 
         // to workaround GF bug, the above needs to be async,
@@ -106,7 +106,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
         invokeAsAdmin(false, "stop-domain",
             "--domaindir",
             getConfiguration().getHome().getAbsolutePath(),
-            "cargo-domain"
+            "cargo-domain-" + getConfiguration().getPropertyValue(ServletPropertySet.PORT)
             );
     }
 
