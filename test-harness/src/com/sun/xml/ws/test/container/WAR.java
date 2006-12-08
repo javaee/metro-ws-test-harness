@@ -134,7 +134,7 @@ public final class WAR {
     public @NotNull List<File> getWSDL() {
         // by the time this method is called,
         // it should be eithre copied into a war or generated
-        assert !wsdl.isEmpty();
+        assert !wsdl.isEmpty() : "Does this test has any service?";
         return wsdl;
     }
 
