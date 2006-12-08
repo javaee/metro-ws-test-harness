@@ -155,7 +155,7 @@ public class TestService {
                             break OUTER;
                         }
                         if(tk.equals("class")) {
-                            isInterface = true;
+                            isInterface = false;
                             break OUTER;
                         }
                     }
