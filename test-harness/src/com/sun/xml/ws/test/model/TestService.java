@@ -149,11 +149,12 @@ public class TestService {
                 if(line.contains("interface") || line.contains("class")) {
                     StringTokenizer stk = new StringTokenizer(line);
                     while(stk.hasMoreTokens()) {
-                        if(stk.nextToken().equals("interface")) {
+                        String tk = stk.nextToken();
+                        if(tk.equals("interface")) {
                             isInterface = true;
                             break OUTER;
                         }
-                        if(stk.nextToken().equals("class")) {
+                        if(tk.equals("class")) {
                             isInterface = true;
                             break OUTER;
                         }
