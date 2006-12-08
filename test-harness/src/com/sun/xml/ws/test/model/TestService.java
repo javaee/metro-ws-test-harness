@@ -146,7 +146,7 @@ public class TestService {
                 // @WebService* annoations and package declaration.
                 // reading it furhter is pointless and dangerous as we may hit
                 // inner interface/classes
-                if(line.contains("interface") || line.contains("class")) {
+                if(line.contains("public interface") || line.contains("public class")) {
                     StringTokenizer stk = new StringTokenizer(line);
                     while(stk.hasMoreTokens()) {
                         String tk = stk.nextToken();
