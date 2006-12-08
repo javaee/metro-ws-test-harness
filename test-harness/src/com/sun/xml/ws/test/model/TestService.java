@@ -131,21 +131,34 @@ public class TestService {
             String pkg=null;
             boolean isWebService = false;
             boolean isInterface = false;
+
+            OUTER:
             while((line=r.readLine())!=null) {
                 if(line.startsWith("package ")) {
                     pkg = line.substring(8,line.indexOf(';'));
-                }
-                if(line.contains("interface")) {
-                    StringTokenizer stk = new StringTokenizer(line);
-                    while(stk.hasMoreTokens()) {
-                        if(stk.nextToken().equals("interface"))
-                            isInterface = true;
-                    }
                 }
                 if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
                     isWebService = true;
                 else if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
                     isWebService = true;
+
+                // if we read until the first declared type, we should have found all the
+                // @WebService* annoations and package declaration.
+                // reading it furhter is pointless and dangerous as we may hit
+                // inner interface/classes
+                if(line.contains("interface") || line.contains("class")) {
+                    StringTokenizer stk = new StringTokenizer(line);
+                    while(stk.hasMoreTokens()) {
+                        if(stk.nextToken().equals("interface")) {
+                            isInterface = true;
+                            break OUTER;
+                        }
+                        if(stk.nextToken().equals("class")) {
+                            isInterface = true;
+                            break OUTER;
+                        }
+                    }
+                }
             }
 
             r.close();
