@@ -49,8 +49,7 @@ final class LocalApplication implements Application {
      */
     @NotNull
     public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
-        // I'm not too confident if endpoint.name is always the port local name.
-        return baseEndpointAddress.resolve('?'+endpoint.name);
+        return new URI(baseEndpointAddress.toString() + '?' + endpoint.name); 
     }
 
     /**
