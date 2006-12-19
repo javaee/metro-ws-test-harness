@@ -149,7 +149,9 @@ public class DeploymentExecutor extends Executor {
             javac.setSourceDir(gensrcDir);
         javac.setDestdir(classDir);
         javac.setDebug(true);
-        javac.execute();
+        if(!context.parent.wsimport.isNoop())
+            // if we are just reusing the existing artifacts, no need to recompile.
+            javac.execute();
 
         // load the generated classes
         List<URL> classpath = context.clientClasspaths;
