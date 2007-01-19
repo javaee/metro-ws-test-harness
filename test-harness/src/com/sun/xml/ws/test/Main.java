@@ -153,6 +153,7 @@ public class Main {
     @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = 18080;
 
+    public static File[] containerClasspathPrefix;
 
     public static void main(String[] args) throws Exception {
         // enable all assertions
@@ -288,9 +289,15 @@ public class Main {
 
         // fill in runtime and tool realms
         if(wsitImage!=null) {
-            runtime.addJar(new File(wsitImage,"lib/webservices-rt.jar"));
-            tool.addJar(   new File(wsitImage,"lib/webservices-tools.jar"));
-
+            File rtJar = new File(wsitImage,"lib/webservices-rt.jar");
+            runtime.addJar(rtJar);
+            
+            File toolJar = new File(wsitImage,"lib/webservices-tools.jar");
+            tool.addJar(toolJar);
+            
+            containerClasspathPrefix = new File[2];
+            containerClasspathPrefix[0] = rtJar;
+            containerClasspathPrefix[1] = toolJar;
         } else
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));

@@ -1,5 +1,6 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
+import com.sun.xml.ws.test.util.FileUtil;
 import org.codehaus.cargo.container.LocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationCapability;
 import org.codehaus.cargo.container.deployable.WAR;
@@ -100,6 +101,11 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             // it looks like domain name can be anything, but check with the dev
             "cargo-domain-" + getPropertyValue(ServletPropertySet.PORT));
         
+        for (File src : com.sun.xml.ws.test.Main.containerClasspathPrefix) {
+            File dest = new File(getHome(), "cargo-domain-" + getPropertyValue(ServletPropertySet.PORT) + "/lib/" + src.getName());
+            FileUtil.copyFile(src,dest);
+        }
+
         // schedule cargocpc for deployment
         File cpcWar = new File(getHome(), "cargocpc.war");
         getResourceUtils().copyResource(RESOURCE_PATH + "cargocpc.war",cpcWar);
