@@ -1,6 +1,7 @@
 package com.sun.xml.ws.test.container.cargo.gf;
 
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.util.FileUtil;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
 import org.apache.tools.ant.taskdefs.Java;
@@ -108,6 +109,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
             getConfiguration().getHome().getAbsolutePath(),
             "cargo-domain-" + getConfiguration().getPropertyValue(ServletPropertySet.PORT)
             );
+        FileUtil.deleteRecursive(getConfiguration().getHome());
     }
 
     public String getId() {
