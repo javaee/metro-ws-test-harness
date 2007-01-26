@@ -131,6 +131,11 @@ public class Main {
         usage="loads Tomcat into the harness VM and test with it.")
     File embeddedTomcat = null;
 
+
+    @Option(name="-jetty-embedded",metaVar="JETTY_HOME",
+        usage="loads Jetty into the harness VM and test with it.")
+    File embeddedJetty;
+
     @Option(name="-glassfish-remote",metaVar="CONFIG",
         usage=
             "Test with remote Glassfish. Needs both JMX connection info and HTTP URL.\n"+
@@ -284,6 +289,11 @@ public class Main {
             runtime.addJarFolder(new File(embeddedTomcat,"server/lib"));
         }
 
+        if(embeddedJetty!=null) {
+            runtime.addJarFolder(embeddedJetty);
+            runtime.addJarFolder(new File(embeddedJetty,"lib"));
+        }
+
         if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null)
             guessWorkspace();
 
@@ -429,6 +439,11 @@ public class Main {
         if(embeddedTomcat!=null) {
             return new EmbeddedCargoApplicationContainer(
                 wsimport, wsgen, "tomcat5x",port);
+        }
+
+        if(embeddedJetty!=null) {
+            return new EmbeddedCargoApplicationContainer(
+                wsimport, wsgen, "jetty6x",port);
         }
 
         if(remoteTomcat!=null) {
