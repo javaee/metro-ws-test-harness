@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.24 2006-11-02 00:25:33 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.25 2007-01-26 02:50:48 kohsuke Exp $</div>
 
 <l:document>
 
@@ -140,8 +140,8 @@
   <l:section title="Configuring the Harness Classpath for Different Delivery Vehicles">
     <p>
       The harness can be used to test different projects that use the JAX-WS RI.
-      Normally, the harness will be able to automatically guess which project you are 
-      working on, and set up classpath automatically. However, you can always use one
+      Normally, <b>the harness will be able to automatically guess which project you are 
+      working on, and set up classpath automatically</b>. However, you can always use one
       of the following options to manually specify it to override this default behavior.
     </p>
     <l:section title="JAX-WS RI Workspace">
@@ -166,21 +166,27 @@
     <l:section title="WSIT Workspace">
       <p>
         The following option tells the harness to pick up the WSIT
-                                classes from a WSIT workspace. Specifically, with this option,
-                                the harness will look into various <tt>build/classes</tt> and library
-                                jars.
+        classes from a WSIT workspace. Specifically, with this option,
+        the harness will look into various <tt>build/classes</tt> and library
+        jars.
       </p>
       <l:harness-cmd><span style="color:red; font-weight:bold">-cp:wsit path/to/wsit-workspace</span> test-dir1 test-dir2 ...</l:harness-cmd>
     </l:section>
     <l:section title="WSIT Binary Image">
       <p>
         The following option tells the harness to pick up the
-                                WSIT classes from a binary dist image. Using this option,
-                                the harness will only look at the WSIT library jars (webservices.jar & 
-                                webservices-tools.jar) found under the <TT>lib</TT> directory of the
-                                dist image directory that you specify.
+        WSIT classes from a binary dist image. Using this option,
+        the harness will only look at the WSIT library jars (webservices.jar & 
+        webservices-tools.jar) found under the <TT>lib</TT> directory of the
+        dist image directory that you specify.
       </p>
       <l:harness-cmd>-cp:wsit-image path/to/wsit-image test-dir1 test-dir2 ...</l:harness-cmd>
+    </l:section>
+    <l:section title="Overriding jars">
+      <p>
+        Sometimes it's convenient to be able to override some of the test subject jars
+        with an override (like applying a patch.) You can use <tt>-cp:override</tt> option
+        to do this.
     </l:section>
   </l:section>
   
@@ -304,6 +310,17 @@ work/                    (root test directory)
         <l:tip>
           On Windows systems, aborting the harness via Ctrl+C will leave the child Tomcat process running (does anyone know how to fix that?) Those orphan processes can be killed from task manager (be careful not to kill other Java processes), or better yet, <a href="http://www.sysinternals.com/Utilities/ProcessExplorer.html">process explorer</a>.
         </l:tip>
+      </l:section>
+    </l:section>
+    <l:section title="Jetty">
+      <p>
+        This test harness supports Jetty 6.x.
+      </p>
+      <l:section title="Embedded Jetty">
+        <p>
+          The following command causes the harness to run Jetty within the same VM. See the embedded tomcat description for more about what it means to embed a container.
+        </p>
+        <l:harness-cmd>-jetty-embedded path/to/jetty-6.1.0 test-dir1 test-dir2 ...</l:harness-cmd>
       </l:section>
     </l:section>
     <l:section title="Glassfish">
