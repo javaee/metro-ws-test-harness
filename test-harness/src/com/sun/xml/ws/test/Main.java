@@ -311,11 +311,15 @@ public class Main {
             File extraJar = new File(wsitImage,"lib/webservices-extra.jar");
             runtime.addJar(extraJar);
 
-            containerClasspathPrefix = new File[4];
+            File extraApiJar = new File(wsitImage,"lib/webservices-extra-api.jar");
+            runtime.addJar(extraApiJar);
+
+            containerClasspathPrefix = new File[5];
             containerClasspathPrefix[0] = rtJar;
             containerClasspathPrefix[1] = toolJar;
             containerClasspathPrefix[2] = apiJar;
-            containerClasspathPrefix[3] = extraJar;           
+            containerClasspathPrefix[3] = extraJar;
+            containerClasspathPrefix[4] = extraApiJar;
         } else
         if(wsitWs!=null) {
             runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
