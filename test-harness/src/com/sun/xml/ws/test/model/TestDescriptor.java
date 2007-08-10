@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import com.sun.istack.test.VersionProcessor;
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.Main;
 import com.sun.xml.ws.test.model.TransportSet.Singleton;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.ApplicationContainer;
@@ -12,6 +13,7 @@ import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.exec.ClientExecutor;
 import com.sun.xml.ws.test.exec.DeploymentExecutor;
 import com.sun.xml.ws.test.exec.PrepareExecutor;
+import com.sun.xml.ws.test.exec.ConcurrentClientExecutor;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
@@ -211,6 +213,8 @@ public class TestDescriptor {
         for (Element client : clientList) {
             versionProcessor = new VersionProcessor(client);
 
+            boolean sideEffectFree = client.attribute("sideEffectFree")!=null;
+
             if(client.attribute("href")!=null) {
                 // reference to script files
                 FileSet fs = new FileSet();
@@ -218,7 +222,7 @@ public class TestDescriptor {
                 fs.setIncludes(client.attributeValue("href"));
                 for( String relPath : fs.getDirectoryScanner(World.project).getIncludedFiles() ) {
                     TestClient testClient = new TestClient(this,versionProcessor,
-                            new Script.File(new File(testDir,relPath)));
+                            new Script.File(new File(testDir,relPath)),sideEffectFree);
                     File customization = parseFile(testDir,"custom-client.xml");
                     if (customization.exists() ) {
                         testClient.customizations.add(customization);
@@ -232,7 +236,7 @@ public class TestDescriptor {
             } else {
                 // literal text
                 TestClient testClient = new TestClient(this,versionProcessor,
-                        new Script.Inline(client.getText()));
+                        new Script.Inline(client.getText()),sideEffectFree);
                 File customization = parseFile(testDir,"custom-client.xml");
                 if (customization.exists() ) {
                     testClient.customizations.add(customization);
@@ -259,11 +263,12 @@ public class TestDescriptor {
      * is executed, you execute this test.
      *
      * @param container The container to host the services.
-     *
+     * @param concurrentSideEffectFree
+     *      See {@link Main#concurrentSideEffectFree}
      * @return
      *      {@link TestSuite} that contains test execution plan for this test.
      */
-    public TestSuite build(ApplicationContainer container, WsTool wsimport) {
+    public TestSuite build(ApplicationContainer container, WsTool wsimport, boolean concurrentSideEffectFree) {
 
         TestSuite suite = new TestSuite();
 
@@ -296,7 +301,11 @@ public class TestDescriptor {
 
         // run client test scripts
         for (TestClient c : clients) {
-            suite.addTest(new ClientExecutor(context, c));
+            if(concurrentSideEffectFree && c.sideEffectFree) {
+                suite.addTest(new ConcurrentClientExecutor.Fixed(context,c));
+                suite.addTest(new ConcurrentClientExecutor.Cached(context,c));
+            } else
+                suite.addTest(new ClientExecutor(context, c));
         }
 
         // undeploy all services

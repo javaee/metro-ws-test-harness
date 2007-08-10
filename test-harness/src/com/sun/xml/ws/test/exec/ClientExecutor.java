@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.exec;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
+import bsh.EvalError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -12,6 +13,7 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 import java.beans.Introspector;
 import java.io.Reader;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,16 +61,22 @@ public class ClientExecutor extends Executor {
 
         try {
             injectResources(ns, engine);
-
-            // executes the script
-            Reader r = client.script.read();
-            try {
-                engine.eval(r, engine.getNameSpace(), client.script.getName() );
-            } finally {
-                r.close();
-            }
+            invoke(engine);
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
+        }
+    }
+
+    /**
+     * Makes the test script invocation.
+     */
+    protected void invoke(Interpreter engine) throws Throwable {
+        // executes the script
+        Reader r = client.script.read();
+        try {
+            engine.eval(r, engine.getNameSpace(), client.script.getName() );
+        } finally {
+            r.close();
         }
     }
 

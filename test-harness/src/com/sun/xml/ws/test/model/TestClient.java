@@ -41,9 +41,18 @@ public class TestClient {
     @NotNull
     public final List<File> customizations = new ArrayList<File>();
 
-    public TestClient(TestDescriptor parent, VersionProcessor applicableVersions, Script script) {
+    /**
+     * If true, it indicates that this test doesn't leave any side-effect
+     * on the client or the server. With a proper option,
+     * multiple instances of the same test will run in parallel to test
+     * the behaviors in the concurrent environment.
+     */
+    public final boolean sideEffectFree;
+
+    public TestClient(TestDescriptor parent, VersionProcessor applicableVersions, Script script, boolean sideEffectFree) {
         this.parent = parent;
         this.applicableVersions = applicableVersions;
         this.script = script;
+        this.sideEffectFree = sideEffectFree;
     }
 }

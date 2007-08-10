@@ -107,6 +107,9 @@ public class Main {
     @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
     File reportDir = null;
 
+    @Option(name="-concurrent-side-effect-free",usage="Run all side-effect free tests as concurrent")
+    boolean concurrentSideEffectFree = false;
+
 
     /*
       Container variables
@@ -542,7 +545,7 @@ public class Main {
         File descriptor = new File(dir,"test-descriptor.xml");
 
         if(descriptor.exists()) {
-            suite.addTest(new TestDescriptor(descriptor).build(container,wsimport));
+            suite.addTest(new TestDescriptor(descriptor).build(container,wsimport,concurrentSideEffectFree));
             return;
         }
 
