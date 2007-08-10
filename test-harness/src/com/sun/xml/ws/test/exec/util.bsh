@@ -18,7 +18,10 @@ void clearHandlers(provider) {
     binding.setHandlerChain(new java.util.ArrayList());
 }
 
-getSOAPMessage(Source msg) {
+/**
+ * Reads Source into a SOAP Message
+ */
+SOAPMessage getSOAPMessage(Source msg) {
     factory = MessageFactory.newInstance();
     message = factory.createMessage();
     message.getSOAPPart().setContent(msg);
@@ -26,6 +29,9 @@ getSOAPMessage(Source msg) {
     return message;
 }
 
+/**
+ * Reads Source into a SOAP Message
+ */
 SOAPMessage getSOAPMessage12(Source msg) {
     factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
     message = factory.createMessage();
