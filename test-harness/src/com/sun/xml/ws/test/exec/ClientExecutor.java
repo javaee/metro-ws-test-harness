@@ -87,6 +87,7 @@ public class ClientExecutor extends Executor {
     private void injectResources(NameSpace ns, Interpreter engine) throws Exception {
         StringBuilder serviceList = new StringBuilder("injected services:");
         StringBuilder portList = new StringBuilder("injected ports:");
+        StringBuilder addressList = new StringBuilder("injected addresses:");
 
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
@@ -127,6 +128,7 @@ public class ClientExecutor extends Executor {
                             try {
                                 engine.set(portName, method.invoke(serviceInstance));
                                 engine.set(portName+"Address",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
+                                addressList.append(' ').append(portName+"Address");
                             } catch (InvocationTargetException e) {
                                 if(e.getCause() instanceof Exception)
                                     throw (Exception)e.getCause();
@@ -141,5 +143,6 @@ public class ClientExecutor extends Executor {
         }
         System.out.println(serviceList);
         System.out.println(portList);
+        System.out.println(addressList);
     }
 }
