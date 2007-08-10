@@ -13,7 +13,23 @@ addHandlerToBinding(handler,bindingProvider) {
 /**
  * Method used to clear any handlers from a stub or dispatch object.
  */
-public static void clearHandlers(provider) {
+void clearHandlers(provider) {
     binding = provider.getBinding();
     binding.setHandlerChain(new java.util.ArrayList());
+}
+
+getSOAPMessage(Source msg) {
+    factory = MessageFactory.newInstance();
+    message = factory.createMessage();
+    message.getSOAPPart().setContent(msg);
+    message.saveChanges();
+    return message;
+}
+
+SOAPMessage getSOAPMessage12(Source msg) {
+    factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+    message = factory.createMessage();
+    message.getSOAPPart().setContent(msg);
+    message.saveChanges();
+    return message;
 }
