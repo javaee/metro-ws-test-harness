@@ -2,7 +2,6 @@ package com.sun.xml.ws.test.exec;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
-import bsh.EvalError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -11,9 +10,8 @@ import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.beans.Introspector;
-import java.io.Reader;
 import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
