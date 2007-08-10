@@ -44,6 +44,9 @@ start = element descriptor {
     # There can be zero or more 'client' elements for a test.
     #
     element client {
+        # human readable description of the test case.
+        attribute description {text}?,
+        
         (
             # 'href' is the name or name-pattern for the client beanshell
             #   scripts. if 'href' is a relative path, it will be relative
