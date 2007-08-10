@@ -39,3 +39,10 @@ SOAPMessage getSOAPMessage12(Source msg) {
     message.saveChanges();
     return message;
 }
+
+/**
+ * Creates JAXBContext for the current compiled artifacts
+ */
+JAXBContext createJAXBContext() {
+  return JAXBContext.newInstance(new Class[]{ObjectFactory.class});
+}
