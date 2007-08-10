@@ -39,6 +39,8 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import bsh.Interpreter;
+
 /**
  * Test harness driver.
  *
@@ -366,6 +368,8 @@ public class Main {
 
 
         if(debug) {
+            if(debug)
+                Interpreter.DEBUG = true;
             System.err.println("runtime realm");
             runtime.dump(System.err);
             System.err.println("tool realm");
