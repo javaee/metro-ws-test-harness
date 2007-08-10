@@ -52,7 +52,10 @@ public class Bootstrap {
         File libJar = new File(home,"harness-lib.jar");
         harness.add(libJar.toURL());
 
-        ClassLoader cl = new URLClassLoader(harness.toArray(new URL[0]), null);
+        // use the system classloader as the parent, so that the harness
+        // and the test code can share the same JUnit
+        ClassLoader cl = new URLClassLoader(harness.toArray(new URL[0]),
+            ClassLoader.getSystemClassLoader());
 
         // call into the main method
         Class main = cl.loadClass("com.sun.xml.ws.test.Main");

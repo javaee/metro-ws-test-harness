@@ -25,6 +25,7 @@
         <attribute name="Build-Id" value="${build.id}"/>
       </manifest>
       <fileset dir="build/classes"/>
+      <zipgroupfileset dir="lib" includes="junit.jar" />
     </jar>
   </target>
 
