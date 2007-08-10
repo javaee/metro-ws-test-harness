@@ -9,7 +9,7 @@ if (!fromWsdl) {
               endpoint.className,
               null,
               null,
-              new QName(endpoint.name),
+              null,
               null,
               "/"+endpoint.name);
           beans.add(bean);
