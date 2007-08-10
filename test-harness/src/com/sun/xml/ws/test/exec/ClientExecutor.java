@@ -2,6 +2,7 @@ package com.sun.xml.ws.test.exec;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
+import bsh.EvalError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -56,8 +57,12 @@ public class ClientExecutor extends Executor {
         ns.importObject(new ScriptBaseClass(context, engine, client));
 
         // load additional helper methods
-        engine.eval(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
-        
+        try {
+            engine.eval(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
+        } catch (EvalError evalError) {
+            throw new Error("Failed to evaluate util.bsh",evalError);
+        }
+
         // when invoking JAX-WS, we need to set the context classloader accordingly
         // so that it can discover classes from the right places.
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
