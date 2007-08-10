@@ -45,7 +45,7 @@ start = element descriptor {
     #
     element client {
         # human readable description of the test case.
-        attribute description {text}?,
+        element description {text}?,
         
         # see http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/docs/build/index.html#Side_effect_free_tests
         attribute sideEffectFree {"true"}?,
