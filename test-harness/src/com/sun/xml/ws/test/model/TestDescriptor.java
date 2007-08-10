@@ -118,6 +118,12 @@ public class TestDescriptor {
     public final List<TestClient> clients = new ArrayList<TestClient>();
 
     /**
+     * Java client.
+     */
+    @NotNull
+    public final List<File> javaClients = new ArrayList<File>();
+
+    /**
      * Services to be deployed for this test.
      */
     @NotNull
@@ -249,11 +255,26 @@ public class TestDescriptor {
             }
         }
 
+        findAllJavaClients(home);
+
+
         List<Element> serviceList = root.elements("service");
         populateServices(serviceList,testDir,false);
         List<Element> stsList = root.elements("sts");
         populateServices(stsList,testDir,true);
        
+    }
+
+    /**
+     * Recursively scans the test directory and finds all the Java test files.
+     */
+    private void findAllJavaClients(File dir) {
+        for(File child : dir.listFiles()) {
+            if(child.isDirectory())
+                findAllJavaClients(child);
+            if(child.getName().endsWith("Test.java"))
+                javaClients.add(child);
+        }
     }
 
 
