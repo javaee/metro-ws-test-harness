@@ -43,6 +43,7 @@ public class ClientExecutor extends Executor {
         ns.importPackage("javax.xml.ws");
         ns.importPackage("javax.xml.ws.soap");
         ns.importPackage("javax.xml.bind");
+        ns.importPackage("javax.xml.soap");
         ns.importPackage("javax.xml.namespace");
         ns.importPackage("java.util");
         ns.importPackage("java.util.concurrent");
