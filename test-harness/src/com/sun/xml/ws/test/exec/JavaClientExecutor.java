@@ -68,7 +68,7 @@ public class JavaClientExecutor extends Executor {
             return;
         }
 
-        TestSuite ts=null;
+        TestSuite ts;
         try {
             Class<?> testClass = context.clientClassLoader.loadClass(testClassName);
 
