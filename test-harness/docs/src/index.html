@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.28 2007-08-10 18:28:55 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.29 2007-08-10 19:49:00 kohsuke Exp $</div>
 
 <l:document>
 
@@ -475,6 +475,7 @@ helloService.addPort(new QName("foo","bar"), javax.xml.ws.soap.SOAPBinding.SOAP1
             <li>java.util
             <li>java.util.cocurrent
             <li>javax.xml.ws
+            <li>javax.xml.ws.soap
             <li>javax.xml.bind
             <li>javax.xml.namespace
             <li>(client artifact packages)
@@ -489,6 +490,20 @@ bean.setId(53);
         <li>
           Helper methods. The harness defines a few helper methods that are avaialble to the script as if they are global functions. See <a href="http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/src/com/sun/xml/ws/test/client/ScriptBaseClass.java">this source code</a> and <a href="http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/src/com/sun/xml/ws/test/exec/util.bsh">this source code</a> for the complete list and their semantics.
       </ol>
+    </l:section>
+    <l:section title="Side-effect free tests">
+      <p>
+        Many tests are written in such a way that they do not have any side-effect on both server or client (when I say side-effect, I mean things like updating global counters or touching database or anything of that sort.) Test descriptor can mark those tests as "side-effect free" by adding the attribute as follows:
+      </p>
+<pre><xmp>
+<descriptor>
+...
+<client href="abc.bsh" sideEffectFree="true" />
+</descriptor>
+</xmp></pre>
+      <p>
+        With the '-concurrent-side-effect-free' option, tests marked in this way will be run in concurrent environment. That is to say, the same test will be run repeatedly in multiple threads. This allows the runtime to be exercised in a new way.
+      </p>
     </l:section>
   </l:section>
   <l:section title="Service">
