@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.31 2007-08-10 21:32:17 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.32 2007-08-10 21:43:44 kohsuke Exp $</div>
 
 <l:document>
 
@@ -481,6 +481,10 @@ helloService.addPort(new QName("foo","bar"), javax.xml.ws.soap.SOAPBinding.SOAP1
             <li>javax.xml.ws.soap
             <li>javax.xml.bind
             <li>javax.xml.namespace
+            <li>javax.xml.transform
+            <li>javax.xml.transform.sax
+            <li>javax.xml.transform.dom
+            <li>javax.xml.transform.stream
             <li>(client artifact packages)
           </ul>
           So you could just say <tt>JAXBContext.newInstance(...)</tt> instead of <tt>javax.xml.bind.JAXBContext.newInstance(...)</tt>. Client artifact packages are all imported, too, so for example if you need to create a bean for service invocation, you can do as follows:
