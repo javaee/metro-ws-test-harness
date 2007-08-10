@@ -3,7 +3,7 @@
 /**
  * Method used to add a Handler to a stub or dispatch object.
  */
-addHandlerToBinding(handler,bindingProvider) {
+addHandler(handler,bindingProvider) {
     binding = bindingProvider.getBinding();
     handlers = binding.getHandlerChain();
     handlers.add(handler);
