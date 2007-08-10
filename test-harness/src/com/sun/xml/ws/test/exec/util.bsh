@@ -1,0 +1,19 @@
+// utility methods to be made available to the test clients
+
+/**
+ * Method used to add a Handler to a stub or dispatch object.
+ */
+addHandlerToBinding(handler,bindingProvider) {
+    binding = bindingProvider.getBinding();
+    handlers = binding.getHandlerChain();
+    handlers.add(handler);
+    binding.setHandlerChain(handlers);
+}
+
+/**
+ * Method used to clear any handlers from a stub or dispatch object.
+ */
+public static void clearHandlers(provider) {
+    binding = provider.getBinding();
+    binding.setHandlerChain(new java.util.ArrayList());
+}

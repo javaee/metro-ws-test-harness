@@ -11,6 +11,7 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 
 import java.beans.Introspector;
 import java.io.Reader;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,10 +43,15 @@ public class ClientExecutor extends Executor {
         ns.importPackage("javax.xml.ws");
         ns.importPackage("javax.xml.bind");
         ns.importPackage("javax.xml.namespace");
+        ns.importPackage("java.util");
+        ns.importPackage("java.util.concurrent");
 
         // this will make 'thisObject' available as 'this' in script
-        ns.importObject(new ScriptBaseClass(context, client));
+        ns.importObject(new ScriptBaseClass(context, engine, client));
 
+        // load additional helper methods
+        engine.eval(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
+        
         // when invoking JAX-WS, we need to set the context classloader accordingly
         // so that it can discover classes from the right places.
         ClassLoader cl = Thread.currentThread().getContextClassLoader();

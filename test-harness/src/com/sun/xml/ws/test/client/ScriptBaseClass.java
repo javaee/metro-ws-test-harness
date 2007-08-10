@@ -1,5 +1,6 @@
 package com.sun.xml.ws.test.client;
 
+import bsh.Interpreter;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
@@ -25,16 +26,21 @@ import java.io.File;
  * to the script. This is a convenient place to define helper
  * convenience methods for scripts to use.
  *
+ * <p>
+ * Functions defined in <tt>util.bsh</tt> serves the same role.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class ScriptBaseClass extends Assert {
 
     private final DeploymentContext context;
     private final TestClient client;
+    private final Interpreter engine;
 
-    public ScriptBaseClass(DeploymentContext context, TestClient client) {
+    public ScriptBaseClass(DeploymentContext context, Interpreter engine, TestClient client) {
         this.context = context;
         this.client = client;
+        this.engine = engine;
     }
 
     /**
