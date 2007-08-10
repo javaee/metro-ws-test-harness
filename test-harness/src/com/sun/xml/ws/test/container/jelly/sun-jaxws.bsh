@@ -65,6 +65,7 @@ if (!fromWsdl) {
         wsdlLocation.lastIndexOf("/") + 1,
         wsdlLocation.length());
 
+    i=0;
     for (String portName : portNames) {
         impl = portNameToImpl.get(portName);
         if(impl==null)
@@ -73,7 +74,7 @@ if (!fromWsdl) {
         // call EndpointInfoBean.create thanks to static import.
         // this allows us to create an instance of class that's not visible to this classloader.
         bean = create(
-            wsca.name(),
+            "endpoint"+(i++),
             implClass,
             wsdlLocation,
             new QName(tns, wsca.name()),
