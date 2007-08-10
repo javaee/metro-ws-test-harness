@@ -94,6 +94,9 @@ public class ClientExecutor extends Executor {
         StringBuilder portList = new StringBuilder("injected ports:");
         StringBuilder addressList = new StringBuilder("injected addresses:");
 
+        // inject test home directory
+        engine.set("home",client.parent.home);
+
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
                 for (Class clazz : svc.serviceClass) {
