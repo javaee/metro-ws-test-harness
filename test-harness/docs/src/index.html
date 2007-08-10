@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.29 2007-08-10 19:49:00 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.30 2007-08-10 19:50:35 kohsuke Exp $</div>
 
 <l:document>
 
@@ -371,7 +371,9 @@ testdir/
  +- test-descriptor.xml     (metadata file that describes a test)
  +- custom-client.xml       (optional client customization file)
  +- *.bsh                   (client test scripts)
- +- resources/              (resource files if needed by test)
+ +- common/                 (optional common source files)
+ |   +- *.java
+ +- resources/              (optional resource files if needed by test)
  |   +- mascot.jpeg
  |
  +- AddNumbers.wsdl         (WSDL that represents service, if any)
@@ -560,6 +562,12 @@ class FooBarService {
 <l:script>
 File f = resource("foo.xml");  // load resources/foo.xml
 </l:script>
+    <p>
+      <l:not-cooked /> we are hoping to define more convenience methods and define how to access resources from server.
+  </l:section>
+  <l:section title="Common source files">
+    <p>
+      If test programs need to share some Java source files between the server and the client, those files can be put into the 'common' directory. They will be compiled and made available to both client and server.
     <p>
       <l:not-cooked /> we are hoping to define more convenience methods and define how to access resources from server.
   </l:section>
