@@ -29,7 +29,7 @@ if (!fromWsdl) {
             wsca = a;
             for ( method : clazz.getMethods()) {
                 a = method.getAnnotation(WebEndpoint.class);
-                if (a != null) {
+                if (a != null && method.getParameterTypes().length==0) {
                     String name = a.name();
                     if (!name.equals("")) {
                         portNames.add(name);
