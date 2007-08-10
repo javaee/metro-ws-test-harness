@@ -26,6 +26,8 @@ public abstract class AbstractJavacTask extends Javac {
     public void setSourceDir( File... sourceDirs ) {
         Path path = new Path(getProject());
         for (File sourceDir : sourceDirs) {
+            if(sourceDir==null) continue;
+            if(!sourceDir.exists()) continue;
             path.createPathElement().setPath(sourceDir.getAbsolutePath());
         }
         setSrcdir(path);

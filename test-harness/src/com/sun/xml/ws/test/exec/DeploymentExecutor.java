@@ -143,10 +143,11 @@ public class DeploymentExecutor extends Executor {
 
         // compile the generated source files to javac
         JavacTask javac = new JavacTask();
-        if(context.parent.descriptor.common != null)
-            javac.setSourceDir(gensrcDir,context.parent.descriptor.common);
-        else
-            javac.setSourceDir(gensrcDir);
+        javac.setSourceDir(
+            gensrcDir,
+            context.parent.descriptor.common,
+            new File(context.parent.descriptor.home,"client")
+        );
         javac.setDestdir(classDir);
         javac.setDebug(true);
         if(!context.parent.wsimport.isNoop())
