@@ -14,6 +14,7 @@ import com.sun.xml.ws.test.exec.ClientExecutor;
 import com.sun.xml.ws.test.exec.DeploymentExecutor;
 import com.sun.xml.ws.test.exec.PrepareExecutor;
 import com.sun.xml.ws.test.exec.ConcurrentClientExecutor;
+import com.sun.xml.ws.test.exec.JavaClientExecutor;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
@@ -289,7 +290,7 @@ public class TestDescriptor {
      * @return
      *      {@link TestSuite} that contains test execution plan for this test.
      */
-    public TestSuite build(ApplicationContainer container, WsTool wsimport, boolean concurrentSideEffectFree) {
+    public TestSuite build(ApplicationContainer container, WsTool wsimport, boolean concurrentSideEffectFree) throws IOException {
 
         TestSuite suite = new TestSuite();
 
@@ -328,6 +329,10 @@ public class TestDescriptor {
             } else
                 suite.addTest(new ClientExecutor(context, c));
         }
+
+        // run client Java tests
+        for (File f : javaClients)
+            suite.addTest(new JavaClientExecutor(context,f));
 
         // undeploy all services
         for (DeploymentExecutor dt : deployTests) {
