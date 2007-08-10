@@ -39,8 +39,14 @@ public class TestEndpoint {
     @NotNull
     public String urlPattern;
 
-    public TestEndpoint(String name, String className) {
+    /**
+     * If this class is WebServiceProvider and not WebService.
+     */
+    public final boolean isProvider;
+
+    public TestEndpoint(String name, String className, boolean isProvider) {
         this.name = name;
         this.className = className;
+        this.isProvider = isProvider;
     }
 }

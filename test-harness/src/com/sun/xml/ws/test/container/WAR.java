@@ -249,6 +249,7 @@ public final class WAR {
         wsdlDir.mkdirs();
 
         for (TestEndpoint endpt : service.service.endpoints) {
+            if(endpt.isProvider)    continue;
             ArgumentListBuilder options = new ArgumentListBuilder();
             options.add("-wsdl");
             if(World.debug)

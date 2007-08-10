@@ -130,6 +130,7 @@ public class TestService {
 
             String pkg=null;
             boolean isWebService = false;
+            boolean isProvider = false;
             boolean isInterface = false;
 
             OUTER:
@@ -138,7 +139,7 @@ public class TestService {
                     pkg = line.substring(8,line.indexOf(';'));
                 }
                 if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
-                    isWebService = true;
+                    isWebService = isProvider = true;
                 else if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
                     isWebService = true;
 
@@ -177,7 +178,7 @@ public class TestService {
                 else
                     fullName = className;
 
-                endpoints.add(new TestEndpoint(className,fullName));
+                endpoints.add(new TestEndpoint(className,fullName,isProvider));
             }
         }
     }
