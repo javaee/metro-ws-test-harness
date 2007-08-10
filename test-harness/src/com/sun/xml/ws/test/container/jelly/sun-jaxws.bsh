@@ -16,6 +16,8 @@ if (!fromWsdl) {
     }
 } else {
     portNames = new ArrayList();
+    // if we find multiple implClass, use the port local name to match them
+    portNameToImpl = new HashMap();
 
     wsca = null;
     implClass=null;
@@ -42,9 +44,12 @@ if (!fromWsdl) {
             if(!sei.equals(""))
               implClass = clazz.getName();
         } else {
-            if (clazz.getAnnotation(WebServiceProvider.class) != null)
+            a = clazz.getAnnotation(WebServiceProvider.class);
+            if (a!=null)
                 implClass = clazz.getName();
         }
+        if(a!=null)
+          portNameToImpl.put(a.portName(),implClass);
     }
 
 
@@ -61,6 +66,10 @@ if (!fromWsdl) {
         wsdlLocation.length());
 
     for (String portName : portNames) {
+        impl = portNameToImpl.get(portName);
+        if(impl==null)
+          impl = implClass; // default
+
         // call EndpointInfoBean.create thanks to static import.
         // this allows us to create an instance of class that's not visible to this classloader.
         bean = create(
