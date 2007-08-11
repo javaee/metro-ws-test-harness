@@ -44,6 +44,8 @@ public class ClientExecutor extends Executor {
         // import namespaces. what are the other namespaces to be imported?
         ns.importPackage("javax.xml.ws");
         ns.importPackage("javax.xml.ws.soap");
+        ns.importPackage("javax.xml.ws.handler");
+        ns.importPackage("javax.xml.ws.handler.soap");
         ns.importPackage("javax.xml.bind");
         ns.importPackage("javax.xml.soap");
         ns.importPackage("javax.xml.namespace");
