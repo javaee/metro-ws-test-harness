@@ -133,6 +133,7 @@ public class DeploymentExecutor extends Executor {
             if(World.debug)
                 options.add("-verbose");
             options.add("-s").add(gensrcDir);
+            options.add("-d").add(classDir);
             options.add("-Xnocompile");
             options.add(wsdl);
             if(World.debug)
