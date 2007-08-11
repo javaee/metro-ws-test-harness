@@ -53,6 +53,8 @@ public class ClientExecutor extends Executor {
         ns.importPackage("javax.xml.transform.stream");
         ns.importPackage("java.util");
         ns.importPackage("java.util.concurrent");
+        // if there's any client package, put them there
+        ns.importPackage(context.descriptor.name+".client");
 
         // this will make 'thisObject' available as 'this' in script
         ns.importObject(new ScriptBaseClass(context, engine, client));

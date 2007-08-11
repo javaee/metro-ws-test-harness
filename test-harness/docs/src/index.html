@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.33 2007-08-11 00:14:00 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.34 2007-08-11 00:17:52 kohsuke Exp $</div>
 
 <l:document>
 
@@ -518,7 +518,7 @@ bean.setId(53);
     <p>
       If your client test scripts need some Java helper code (such as handlers), or if you have some JUnit test classes written as Java classes, you can put them under the <tt>testdir/client</tt> directory. All classes that ends with "Test" will be considered JUnit tests and executed like client test scripts.
     <p>
-      Also, all the Java source files are compiled and made available to client test scripts (for example so that you can access those classes.)
+      Also, all the Java source files are compiled and made available to client test scripts (for example so that you can access those classes.) The "client" package itself will be also imported into the client test scripts, so classes in the "client" package can be accessed by their short name.
   </l:section>
   <l:section title="Service">
     <p>
