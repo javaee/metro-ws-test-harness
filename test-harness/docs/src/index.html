@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.34 2007-08-11 00:17:52 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.35 2007-08-11 01:37:45 kohsuke Exp $</div>
 
 <l:document>
 
@@ -498,6 +498,10 @@ bean.setId(53);
         <li>
           Helper methods. The harness defines a few helper methods that are avaialble to the script as if they are global functions. See <a href="http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/src/com/sun/xml/ws/test/client/ScriptBaseClass.java">this source code</a> and <a href="http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/src/com/sun/xml/ws/test/exec/util.bsh">this source code</a> for the complete list and their semantics.
       </ol>
+    </l:section>
+    <l:section title="Common utility">
+      <p>
+        Often it's useful to factor out the common variable/function/etc for multiple &lt;client> scripts in a single test suite. This can be done by defining &lt;pre-client> element in the test descriptor. If specified, the pre-script will be executed before each client test script is executed.
     </l:section>
     <l:section title="Side-effect free tests">
       <p>
