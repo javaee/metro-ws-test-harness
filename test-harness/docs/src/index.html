@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.32 2007-08-10 21:43:44 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.33 2007-08-11 00:14:00 kohsuke Exp $</div>
 
 <l:document>
 
@@ -373,10 +373,11 @@ testdir/
  +- *.bsh                   (client test scripts)
  +- common/                 (optional common source files)
  |   +- *.java
+ +- client/                 (optional client source files)
+ |   +- *.java
  +- resources/              (optional resource files if needed by test)
  |   +- mascot.jpeg
- |
- +- AddNumbers.wsdl         (WSDL that represents service, if any)
+ +- AddNumbers.wsdl         (optional WSDL that represents service)
  +- **/*.java               (Java code that implements service)
 </pre>
   </l:section>
@@ -513,6 +514,12 @@ bean.setId(53);
       </p>
     </l:section>
   </l:section>
+  <l:section title="Java Client">
+    <p>
+      If your client test scripts need some Java helper code (such as handlers), or if you have some JUnit test classes written as Java classes, you can put them under the <tt>testdir/client</tt> directory. All classes that ends with "Test" will be considered JUnit tests and executed like client test scripts.
+    <p>
+      Also, all the Java source files are compiled and made available to client test scripts (for example so that you can access those classes.)
+  </l:section>
   <l:section title="Service">
     <p>
       Code that constitutes a service needs to be written by using Java. By default, those files should be placed into the same test directory. If you are converting existing test services to this harness, most likely the only thing that needs to change is the declared package name.
@@ -524,7 +531,7 @@ bean.setId(53);
 <pre>
 @WebService
 @BindingType(SOAPBinding.SOAP11HTTP_BINDING)
-class FooBarService {
+class FooBarSgervice {
   ...
 }
 </pre>
