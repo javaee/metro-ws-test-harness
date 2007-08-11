@@ -43,7 +43,7 @@ public abstract class Script {
         public String getName() {
             String text = script.replace('\n',' ');
             if(text.length()>60)
-                return text.substring(60)+" ...";
+                return text.substring(0,60)+" ...";
             else
                 return text;
         }
