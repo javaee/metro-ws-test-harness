@@ -32,6 +32,7 @@
   <target name="src-zip">
     <jar jarfile="build/${name}-src.zip">
       <fileset dir="src"/>
+      <zipgroupfileset dir="../lib" includes="junit-src.zip" />
     </jar>
   </target>
 
