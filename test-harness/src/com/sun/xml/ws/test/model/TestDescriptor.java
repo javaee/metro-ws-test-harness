@@ -243,7 +243,8 @@ public class TestDescriptor {
             } else {
                 // literal text
                 TestClient testClient = new TestClient(this,versionProcessor,
-                        new Script.Inline(client.getText()),sideEffectFree);
+                    new Script.Inline(client.getText(),client.elementText("description")),
+                    sideEffectFree);
                 File customization = parseFile(testDir,"custom-client.xml");
                 if (customization.exists() ) {
                     testClient.customizations.add(customization);

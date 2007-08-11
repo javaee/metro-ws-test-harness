@@ -32,15 +32,18 @@ public abstract class Script {
      */
     public static final class Inline extends Script {
         private final String script;
+        private final String description;
 
-        public Inline(String script) {
+        public Inline(String script, String description) {
             this.script = script;
+            this.description = description;
         }
 
         /**
          * Use a portion of the script as the name.
          */
         public String getName() {
+            if(description!=null)   return description;
             String text = script.replace('\n',' ');
             if(text.length()>60)
                 return text.substring(0,60)+" ...";
