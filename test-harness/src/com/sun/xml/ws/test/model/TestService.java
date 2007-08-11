@@ -62,6 +62,7 @@ public class TestService {
     public final Set<TestEndpoint> endpoints = new LinkedHashSet<TestEndpoint>();
 
     public final TestDescriptor parent;
+
     /**
      * Determines if the service is an STS for WSTrust and needs special handling
      */
