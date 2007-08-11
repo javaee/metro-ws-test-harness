@@ -14,6 +14,7 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 import java.beans.Introspector;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -90,7 +91,8 @@ public class ClientExecutor extends Executor {
         Reader r = client.script.read();
         try {
             if(client.parent.setUpScript!=null)
-                engine.eval(client.parent.setUpScript, engine.getNameSpace(), "pre-client script" );
+                engine.eval(new StringReader(client.parent.setUpScript),
+                    engine.getNameSpace(), "pre-client script" );
             engine.eval(r, engine.getNameSpace(), client.script.getName() );
         } catch(TargetError e) {
             throw e.getTarget();
