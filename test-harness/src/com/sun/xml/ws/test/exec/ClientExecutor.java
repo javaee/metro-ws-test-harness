@@ -3,6 +3,7 @@ package com.sun.xml.ws.test.exec;
 import bsh.Interpreter;
 import bsh.NameSpace;
 import bsh.EvalError;
+import bsh.TargetError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -84,6 +85,8 @@ public class ClientExecutor extends Executor {
         Reader r = client.script.read();
         try {
             engine.eval(r, engine.getNameSpace(), client.script.getName() );
+        } catch(TargetError e) {
+            throw e.getTarget();
         } finally {
             r.close();
         }
