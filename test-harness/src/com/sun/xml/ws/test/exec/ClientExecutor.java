@@ -89,6 +89,8 @@ public class ClientExecutor extends Executor {
         // executes the script
         Reader r = client.script.read();
         try {
+            if(client.parent.setUpScript!=null)
+                engine.eval(r, engine.getNameSpace(), client.parent.setUpScript );
             engine.eval(r, engine.getNameSpace(), client.script.getName() );
         } catch(TargetError e) {
             throw e.getTarget();

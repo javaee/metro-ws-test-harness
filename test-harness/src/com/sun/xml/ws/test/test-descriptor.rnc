@@ -78,6 +78,14 @@ start = element descriptor {
 
     }* &
 
+    # If specified, this bean shell script gets run before every
+    # 'client' script execution. Useful for defining common variables
+    # or shared functions.
+    #
+    element pre-client {
+        text
+    }? &
+
     # 'service' element holds information for a particular 
     #
     # There must be at least one 'service' element per test.

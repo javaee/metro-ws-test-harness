@@ -119,6 +119,12 @@ public class TestDescriptor {
     public final List<TestClient> clients = new ArrayList<TestClient>();
 
     /**
+     * Optional "set up" script executed before each client script.
+     */
+    @Nullable
+    public final String setUpScript;
+
+    /**
      * Java client.
      */
     @NotNull
@@ -162,6 +168,7 @@ public class TestDescriptor {
         this.supportedTransport = TransportSet.ALL;
         this.description = description;
         this.skip=false;
+        this.setUpScript = null;
     }
 
     /**
@@ -216,6 +223,9 @@ public class TestDescriptor {
         this.name = path.substring(testCaseIndex).replace(File.separatorChar,'.');
 
         this.home = descriptor.getParentFile();
+
+        this.setUpScript = root.elementText("pre-client");
+
         List<Element> clientList = root.elements("client");
         for (Element client : clientList) {
             versionProcessor = new VersionProcessor(client);
