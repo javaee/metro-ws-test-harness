@@ -43,8 +43,12 @@ public abstract class Script {
          * Use a portion of the script as the name.
          */
         public String getName() {
-            if(description!=null)   return description;
-            String text = script.replace('\n',' ');
+            String text;
+            if(description!=null)
+                text = description;
+            else
+                text = script;
+            text = text.replace('\n',' ').replace(";","").replace(":","");
             if(text.length()>60)
                 return text.substring(0,60)+" ...";
             else
