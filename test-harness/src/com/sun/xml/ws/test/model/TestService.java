@@ -68,15 +68,26 @@ public class TestService {
      */
     public boolean isSTS;
 
-    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl, boolean sts) throws IOException {
+    /**
+     * @param explicitServiceClassName
+     *      Descriptor can explicitly specify the service class name.
+     *      If this happens, we won't search for @WebService classes and just use this instead.
+     *      Used for deploying inner classes and testing inheritance.
+     */
+    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl, boolean sts, @Nullable String explicitServiceClassName) throws IOException {
         this.parent = parent;
         this.name = name;
         this.wsdl = wsdl;
         this.baseDir = baseDir;
         this.isSTS = sts;
 
-        // search for classes with @WebService
-        findEndpoints(baseDir);
+        if(explicitServiceClassName==null) {
+            // search for classes with @WebService
+            findEndpoints(baseDir);
+        } else {
+            String shortName = explicitServiceClassName.substring(explicitServiceClassName.lastIndexOf('.')+1);
+            endpoints.add(new TestEndpoint(shortName,explicitServiceClassName,false));
+        }
     }
 
     /**

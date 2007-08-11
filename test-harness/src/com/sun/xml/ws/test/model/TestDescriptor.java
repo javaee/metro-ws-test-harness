@@ -409,48 +409,47 @@ public class TestDescriptor {
         }
     }
 
-    private void populateServices (List<Element> serviceList,File testDir,boolean isSTS) throws IOException {
-
-
+    private void populateServices(List<Element> serviceList, File testDir, boolean isSTS) throws IOException {
         for (Element service : serviceList) {
-            String baseDir = service.attributeValue("basedir",".");
+            String baseDir = service.attributeValue("basedir", ".");
 
             String serviceName;
             File serviceBaseDir;
-            if (!baseDir.equals(".")){
-                serviceBaseDir = new File(testDir,baseDir);
-                serviceName= serviceBaseDir.getCanonicalFile().getName();
+            if (!baseDir.equals(".")) {
+                serviceBaseDir = new File(testDir, baseDir);
+                serviceName = serviceBaseDir.getCanonicalFile().getName();
             } else {
-                serviceName="";
+                serviceName = "";
                 serviceBaseDir = testDir;
             }
 
-            File wsdl ;
+            File wsdl;
             WSDL wsdlInfo = null;
             if (service.element("wsdl") != null) {
-                String wsdlAttribute =service.element("wsdl").attributeValue("href","test.wsdl");
-                wsdl = parseFile(serviceBaseDir,wsdlAttribute);
+                String wsdlAttribute = service.element("wsdl").attributeValue("href", "test.wsdl");
+                wsdl = parseFile(serviceBaseDir, wsdlAttribute);
                 File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
                 File[] wsdls = serviceBaseDir.listFiles(new WSDLFilter(wsdlAttribute));
                 List<File> importedWsdls = Arrays.asList(wsdls);
                 List<File> schemaFiles = Arrays.asList(schemas);
-                wsdlInfo = new WSDL(wsdl,importedWsdls, schemaFiles);
+                wsdlInfo = new WSDL(wsdl, importedWsdls, schemaFiles);
 
             }
 
-            TestService testService = new TestService(this,serviceName,serviceBaseDir,wsdlInfo,isSTS);
-File customization = parseFile(serviceBaseDir,"custom-server.xml");
-          if (customization.exists() ) {
-              testService.customizations.add(customization);
-          }
-          File schemaCustomization = parseFile(serviceBaseDir,"custom-schema-server.xml");
-          if (schemaCustomization.exists() ) {
-              testService.customizations.add(schemaCustomization);
-          }
+            TestService testService = new TestService(this, serviceName, serviceBaseDir, wsdlInfo, isSTS,
+                service.attributeValue("class"));
+            File customization = parseFile(serviceBaseDir, "custom-server.xml");
+            if (customization.exists()) {
+                testService.customizations.add(customization);
+            }
+            File schemaCustomization = parseFile(serviceBaseDir, "custom-schema-server.xml");
+            if (schemaCustomization.exists()) {
+                testService.customizations.add(schemaCustomization);
+            }
 
 
-          this.services.add(testService);
+            this.services.add(testService);
 
+        }
     }
-}
 }

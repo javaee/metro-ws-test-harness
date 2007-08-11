@@ -98,6 +98,12 @@ start = element descriptor {
         # basedir defaults to ".", so that a single service test case can be written more quickly
         attribute basedir {text}?,
 
+        # (rarely used)
+        # if automatic discovery of classes with @WebService is not desirable,
+        # this attribute can be used to specify the class with @WebService.
+        # this is also needed in a rare occasion where you need to deploy inner class
+        attribute class {text}?,
+
         # 'wsdl' is optional and points to the location of a WSDL, if any.
         #
         element wsdl {
