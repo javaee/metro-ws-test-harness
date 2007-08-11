@@ -52,6 +52,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         File containerWorkDir = FileUtil.createTmpDir(true);
         containerWorkDir.mkdirs();
+        System.out.println("Container working directory: "+containerWorkDir);
 
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
