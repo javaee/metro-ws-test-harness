@@ -48,7 +48,7 @@ if (!fromWsdl) {
             if (a!=null)
                 implClass = clazz.getName();
         }
-        if(a!=null)
+        if(a!=null && !a.portName().equals(""))
           portNameToImpl.put(a.portName(),implClass);
     }
 
@@ -68,6 +68,7 @@ if (!fromWsdl) {
     i=0;
     for (String portName : portNames) {
         impl = portNameToImpl.get(portName);
+        portNameToImpl.remove(portName);
         if(impl==null)
           impl = implClass; // default
 
@@ -83,4 +84,11 @@ if (!fromWsdl) {
             "/" + service.getEndpointByImpl(implClass).name);
         beans.add(bean);
     }
+
+    // error check
+    if(!portNameToImpl.isEmpty())
+      throw new Exception("Implementations "+new ArrayList(portNameToImpl.values())+" don't have corresponding ports in WSDL."+
+       " Their declared ports are "+new ArrayList(portNameToImpl.keySet())+
+       " but actual ports are "+portNames
+       );
 }
