@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.37 2007-08-31 18:37:58 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.38 2007-08-31 21:13:50 kohsuke Exp $</div>
 
 <l:document>
 
@@ -564,7 +564,7 @@ class FooBarSgervice {
         rest of the Java source files. The harness uses the <tt>-p</tt> option of wsimport to place
         the generated artifacts into the "right" package (infered from the directory name of the service.)
       <p>
-        To further customize the compilation process, place a JAX-WS customization file named <tt>custom-server.xml</tt> to the service top directory (to refer to WSDL file and schema files from this customization file, just use the relative path from the customization file to WSDL/schemas like <tt>"./foo.xsd"</tt>.
+        To further customize the compilation process, place a JAX-WS customization file named <tt>custom-server.xml</tt> to the service top directory (to refer to WSDL file and schema files from this customization file, just use the relative path from the customization file to WSDL/schemas like <tt>"./foo.xsd"</tt>.) You can also use <tt>custom-schema-server.xml</tt> to specify additional JAXB customization file.
     </l:section>
   </l:section>
   <l:section title="Requiring certain modes">
