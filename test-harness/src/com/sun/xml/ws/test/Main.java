@@ -105,6 +105,9 @@ public class Main {
     @Option(name="-debug",usage="Generate output for debugging harness")
     boolean debug;
 
+    @Option(name="-dump",usage="Enable all transport dumps")
+    boolean dump;
+
     @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
     File reportDir = null;
 
@@ -201,6 +204,12 @@ public class Main {
      */
     public int run() throws Exception {
         fillWorld();
+
+        if(dump) {
+            System.setProperty("com.sun.xml.ws.transport.local.LocalTransportTube.dump","true");
+            System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
+            System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump","true");
+        }
 
 
         if(port==-1) {
