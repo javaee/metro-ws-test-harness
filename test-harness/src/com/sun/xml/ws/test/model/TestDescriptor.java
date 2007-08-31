@@ -17,6 +17,7 @@ import com.sun.xml.ws.test.exec.ConcurrentClientExecutor;
 import com.sun.xml.ws.test.exec.JavaClientExecutor;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
+import com.thaiopensource.xml.sax.DraconianErrorHandler;
 import junit.framework.TestSuite;
 import org.apache.tools.ant.types.FileSet;
 import org.dom4j.Document;
@@ -27,6 +28,7 @@ import org.iso_relax.jaxp.ValidatingSAXParserFactory;
 import org.iso_relax.verifier.Schema;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -371,7 +373,7 @@ public class TestDescriptor {
     private Document parse(File descriptor) throws DocumentException, SAXException, ParserConfigurationException {
         SAXParserFactory factory;
         if (descriptorSchema != null) {
-            factory = ValidatingSAXParserFactory.newInstance(descriptorSchema);
+            factory = new ValidatingSAXParserFactory(descriptorSchema);
         } else {
             factory = SAXParserFactory.newInstance();
         }
