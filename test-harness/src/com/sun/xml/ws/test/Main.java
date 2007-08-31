@@ -1,5 +1,6 @@
 package com.sun.xml.ws.test;
 
+import bsh.Interpreter;
 import com.sun.istack.test.AntXmlFormatter;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
@@ -38,8 +39,6 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import bsh.Interpreter;
 
 /**
  * Test harness driver.
@@ -549,7 +548,19 @@ public class Main {
         File descriptor = new File(dir,"test-descriptor.xml");
 
         if(descriptor.exists()) {
-            suite.addTest(new TestDescriptor(descriptor).build(container,wsimport,concurrentSideEffectFree));
+            try {
+                suite.addTest(new TestDescriptor(descriptor).build(container,wsimport,concurrentSideEffectFree));
+            } catch (IOException e) {
+                // even if we fail to process this descriptor, don't let the whole thing fail.
+                // just report that failure as a test failure.
+                suite.addTest(new FailedTest(descriptor,e));
+            } catch (DocumentException e) {
+                suite.addTest(new FailedTest(descriptor,e));
+            } catch (ParserConfigurationException e) {
+                suite.addTest(new FailedTest(descriptor,e));
+            } catch (SAXException e) {
+                suite.addTest(new FailedTest(descriptor,e));
+            }
             return;
         }
 
