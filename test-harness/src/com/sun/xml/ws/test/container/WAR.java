@@ -199,6 +199,7 @@ public final class WAR {
         if(World.debug)
             options.add("-verbose");
         options.add("-s").add(srcDir);
+        options.add("-d").add(classDir);
         options.add("-Xnocompile");
         options.add(service.service.wsdl.wsdlFile);
         if(!wsimport.isNoop()) {
