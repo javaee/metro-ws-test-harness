@@ -52,8 +52,6 @@ if (!fromWsdl) {
           portNameToImpl.put(a.portName(),implClass);
     }
 
-
-
     // create endpoint info beans
     tns = wsca.targetNamespace();
 
@@ -76,12 +74,12 @@ if (!fromWsdl) {
         // this allows us to create an instance of class that's not visible to this classloader.
         bean = create(
             "endpoint"+(i++),
-            implClass,
+            impl,
             wsdlLocation,
             new QName(tns, wsca.name()),
             new QName(tns, portName),
             "binding",
-            "/" + service.getEndpointByImpl(implClass).name);
+            "/" + service.getEndpointByImpl(impl).name);
         beans.add(bean);
     }
 
