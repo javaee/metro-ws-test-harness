@@ -284,6 +284,10 @@ public class TestDescriptor {
      */
     private void findAllJavaClients(File dir) {
         for(File child : dir.listFiles()) {
+            if(child.getName().equals("work"))
+                // don't look for the generated files, since often JAXB generates
+                // files that end with 'Test' from WSDL
+                continue;
             if(child.isDirectory())
                 findAllJavaClients(child);
             if(child.getName().endsWith("Test.java"))
