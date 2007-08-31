@@ -1,126 +1,126 @@
 <html xmlns:j="jelly:core" xmlns:d="jelly:define" xmlns:l="layout" xmlns:x="jelly:xml" xmlns:jsl="jelly:jsl">
 <head>
-	<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
-	<title>JAX-WS/Tango Test Harness User Guide</title>
-	<style>
-		H1 {
-			text-align: center;
-		}
-		
-		PRE.cmd { /* command line example */
-			background-color: #eee;
-			border: solid 1px gray;
-			font-weight: bold;
-			padding: 0.2em;
-		}
-		
-		PRE.script { /* script example */
-			background-color: #efe;
-			border: solid 1px darkgreen;
-			font-weight: bold;
-			padding: 0.2em;
-		}
-		
-		PRE.dir { /* directory layout */
-			padding: 0.2em;
-			align: center;
-		}
-		
-		DIV.tip {
-			padding: 0.2em;
-			margin: 1em;
-			margin-left: 3em;
-			border: 1px dashed black;
-			background-color: #ddf;
-		}
-	</style>
+  <meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+  <title>JAX-WS/Tango Test Harness User Guide</title>
+  <style>
+    H1 {
+      text-align: center;
+    }
+    
+    PRE.cmd { /* command line example */
+      background-color: #eee;
+      border: solid 1px gray;
+      font-weight: bold;
+      padding: 0.2em;
+    }
+    
+    PRE.script { /* script example */
+      background-color: #efe;
+      border: solid 1px darkgreen;
+      font-weight: bold;
+      padding: 0.2em;
+    }
+    
+    PRE.dir { /* directory layout */
+      padding: 0.2em;
+      align: center;
+    }
+    
+    DIV.tip {
+      padding: 0.2em;
+      margin: 1em;
+      margin-left: 3em;
+      border: 1px dashed black;
+      background-color: #ddf;
+    }
+  </style>
 </head>
 <body>
-	<!-- taglib definition -->
+  <!-- taglib definition -->
   <d:taglib uri="layout">
-  	<!-- command example -->
-	  <d:tag name="harness-cmd">
-	  	<pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
-	  </d:tag>
-  	<!-- script example -->
-	  <d:tag name="script">
-	  	<pre class="script"><d:invokeBody /></pre>
-	  </d:tag>
-  	<!-- "not yet" icon -->
-	  <d:tag name="not-yet">
-	  	<span style="color:red; font-weight:bold">(not yet implemented)</span>
-	  </d:tag>
-  	<!-- "not fully cooked" icon -->
-	  <d:tag name="not-cooked">
-	  	<span style="color:red; font-weight:bold">(not fully cooked. Feedback welcome)</span>
-	  </d:tag>
-	  <!-- box that shows a tip -->
-	  <d:tag name="tip">
-	  	<div class=tip>
-	  		<table><tr>
-	  			<td>
-			  		<img src=tip.png>
-			  	</td><td>
-				  	<d:invokeBody />
-					</td>
-				</tr></table>
-		  </div>
-	  </d:tag>
-	  <!-- section marker -->
-	  <d:tag name="section">
-			<j:set var="sectionNumber" value="${sectionNumber+1}" scope="parent" />
-			<j:set var="prefix" value="${prefix}${sectionNumber}." />
-			<j:set var="sectionNumber" value="0" /> <!-- start a new sequence for children -->
-			
-			<!-- name escaped for anchor and file names -->
-			<j:set var="safeName" value="${title.replaceAll('[^A-Za-z0-9]','_')}" />
-			
-			<j:choose>
-				<j:when test="${mode=='toc'}">
-					<!-- generate XML fragment for TOC -->
-					<TOC href="${safeName}" title="${title}">
-						<d:invokeBody />
-					</TOC>
-				</j:when>
-				<j:otherwise>
-					<a name="${safeName}">
-						<x:element name="h${depth+2}">
-							<a href="#${safeName}">${prefix}</a> ${title}
-						</x:element>
-					</a>
-					
-					<j:set var="depth" value="${depth+1}" />
-			  	<d:invokeBody />
-					<j:set var="depth" value="${depth-1}" />
-				</j:otherwise>
-			</j:choose>
-	  </d:tag>
-	  <d:tag name="document">
-	  	<x:parse var="tocTree">
-	  		<j:scope>
-	  			<ROOT>
-			  		<j:set var="mode" value="toc" />
-			  		<d:invokeBody />
-			  	</ROOT>
-		  	</j:scope>
-	  	</x:parse>
-	  	<jsl:stylesheet var="tocStylesheet">
-	  		<jsl:template match="TOC">
-	  			<x:set var="href" select="string(@href)" />
-	  			<x:set var="title" select="string(@title)" />
-	  			<li><a href="#${href}">${title}</a></li>
-	  			<ol>
-	  				<jsl:applyTemplates select="TOC" />
-	  			</ol>
-	  		</jsl:template>
-	  	</jsl:stylesheet>
-	  	<h2>Table of contents</h2>
-	  	<ol>
-	  		<jsl:style stylesheet="${tocStylesheet}" select="$tocTree" />
-	  	</ol>
-	  	<d:invokeBody />
-	  </d:tag>
-	</d:taglib>
+    <!-- command example -->
+    <d:tag name="harness-cmd">
+      <pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
+    </d:tag>
+    <!-- script example -->
+    <d:tag name="script">
+      <pre class="script"><d:invokeBody /></pre>
+    </d:tag>
+    <!-- "not yet" icon -->
+    <d:tag name="not-yet">
+      <span style="color:red; font-weight:bold">(not yet implemented)</span>
+    </d:tag>
+    <!-- "not fully cooked" icon -->
+    <d:tag name="not-cooked">
+      <span style="color:red; font-weight:bold">(not fully cooked. Feedback welcome)</span>
+    </d:tag>
+    <!-- box that shows a tip -->
+    <d:tag name="tip">
+      <div class=tip>
+        <table><tr>
+          <td>
+            <img src=tip.png>
+          </td><td>
+            <d:invokeBody />
+          </td>
+        </tr></table>
+      </div>
+    </d:tag>
+    <!-- section marker -->
+    <d:tag name="section">
+      <j:set var="sectionNumber" value="${sectionNumber+1}" scope="parent" />
+      <j:set var="prefix" value="${prefix}${sectionNumber}." />
+      <j:set var="sectionNumber" value="0" /> <!-- start a new sequence for children -->
+      
+      <!-- name escaped for anchor and file names -->
+      <j:set var="safeName" value="${title.replaceAll('[^A-Za-z0-9]','_')}" />
+      
+      <j:choose>
+        <j:when test="${mode=='toc'}">
+          <!-- generate XML fragment for TOC -->
+          <TOC href="${safeName}" title="${title}">
+            <d:invokeBody />
+          </TOC>
+        </j:when>
+        <j:otherwise>
+          <a name="${safeName}">
+            <x:element name="h${depth+2}">
+              <a href="#${safeName}">${prefix}</a> ${title}
+            </x:element>
+          </a>
+          
+          <j:set var="depth" value="${depth+1}" />
+          <d:invokeBody />
+          <j:set var="depth" value="${depth-1}" />
+        </j:otherwise>
+      </j:choose>
+    </d:tag>
+    <d:tag name="document">
+      <x:parse var="tocTree">
+        <j:scope>
+          <ROOT>
+            <j:set var="mode" value="toc" />
+            <d:invokeBody />
+          </ROOT>
+        </j:scope>
+      </x:parse>
+      <jsl:stylesheet var="tocStylesheet">
+        <jsl:template match="TOC">
+          <x:set var="href" select="string(@href)" />
+          <x:set var="title" select="string(@title)" />
+          <li><a href="#${href}">${title}</a></li>
+          <ol>
+            <jsl:applyTemplates select="TOC" />
+          </ol>
+        </jsl:template>
+      </jsl:stylesheet>
+      <h2>Table of contents</h2>
+      <ol>
+        <jsl:style stylesheet="${tocStylesheet}" select="$tocTree" />
+      </ol>
+      <d:invokeBody />
+    </d:tag>
+  </d:taglib>
 
 
 
@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.35 2007-08-11 01:37:45 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.36 2007-08-31 18:20:07 kohsuke Exp $</div>
 
 <l:document>
 
