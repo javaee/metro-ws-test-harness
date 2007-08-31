@@ -3,21 +3,21 @@ package com.sun.xml.ws.test.model;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import com.sun.istack.test.VersionProcessor;
-import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.Main;
-import com.sun.xml.ws.test.model.TransportSet.Singleton;
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
+import com.sun.xml.ws.test.exec.ClientCompileExecutor;
 import com.sun.xml.ws.test.exec.ClientExecutor;
-import com.sun.xml.ws.test.exec.DeploymentExecutor;
-import com.sun.xml.ws.test.exec.PrepareExecutor;
 import com.sun.xml.ws.test.exec.ConcurrentClientExecutor;
+import com.sun.xml.ws.test.exec.DeploymentExecutor;
 import com.sun.xml.ws.test.exec.JavaClientExecutor;
+import com.sun.xml.ws.test.exec.PrepareExecutor;
+import com.sun.xml.ws.test.model.TransportSet.Singleton;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
-import com.thaiopensource.xml.sax.DraconianErrorHandler;
 import junit.framework.TestSuite;
 import org.apache.tools.ant.types.FileSet;
 import org.dom4j.Document;
@@ -28,15 +28,18 @@ import org.iso_relax.jaxp.ValidatingSAXParserFactory;
 import org.iso_relax.verifier.Schema;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.io.IOException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Root object of the test model. Describes one test.
@@ -336,6 +339,11 @@ public class TestDescriptor {
             DeploymentExecutor dt = new DeploymentExecutor(s);
             deployTests.add(dt);
             suite.addTest(dt);
+        }
+
+        if(context.services.isEmpty()) {
+            // no services. just run the clients as tests
+            suite.addTest(new ClientCompileExecutor(context));
         }
 
         // run client test scripts

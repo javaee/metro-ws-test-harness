@@ -3,6 +3,8 @@ package com.sun.xml.ws.test.exec;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import junit.framework.TestCase;
 
+import java.io.File;
+
 /**
  * Executes a part of a test.
  *
@@ -25,4 +27,10 @@ abstract class Executor extends TestCase {
      * Error happened during this will be recorded as a test failure.
      */
     public abstract void runBare() throws Throwable;
+
+    protected final File makeWorkDir(String dirName) {
+        File gensrcDir = new File(context.workDir, dirName);
+        gensrcDir.mkdirs();
+        return gensrcDir;
+    }
 }

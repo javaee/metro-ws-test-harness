@@ -189,12 +189,6 @@ public class DeploymentExecutor extends Executor {
             context.serviceClass.add(cl.loadClass(name));
     }
 
-    private File makeWorkDir(String dirName) {
-        File gensrcDir = new File(context.parent.workDir, dirName);
-        gensrcDir.mkdirs();
-        return gensrcDir;
-    }
-
     /**
      * Creates another test to be exeucted at the end
      * to undeploy the service that this test deployed.
