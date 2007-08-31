@@ -201,8 +201,10 @@ public final class WAR {
         options.add("-s").add(srcDir);
         options.add("-Xnocompile");
         options.add(service.service.wsdl.wsdlFile);
-        System.out.println("Generating server artifacts from " + service.service.wsdl.wsdlFile);
-        options.invoke(wsimport);
+        if(!wsimport.isNoop()) {
+            System.out.println("Generating server artifacts from " + service.service.wsdl.wsdlFile);
+            options.invoke(wsimport);
+        }
 
         // copy WSDL into a war file
         File wsdlDir = new File(webInfDir,"wsdl");
