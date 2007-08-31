@@ -45,7 +45,7 @@ start = element descriptor {
     #
     element client {
         # human readable description of the test case.
-        element description {text}?,
+        attribute description {text}?,
         
         # see http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/docs/build/index.html#Side_effect_free_tests
         attribute sideEffectFree {"true"}?,
@@ -61,7 +61,11 @@ start = element descriptor {
             # alternatively, a beanshell script can be specified inline.
             #   this is particularly useful for short scripts, as you
             #   don't have to manage million short files.
-            text
+            (
+                # when you do that, a short human readable name is mandatory
+                attribute name {text},
+                text
+            )
         ),
 
 
