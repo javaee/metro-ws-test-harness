@@ -4,7 +4,6 @@ import com.sun.xml.ws.test.tool.WsTool;
 import org.codehaus.cargo.container.LocalContainer;
 
 import java.net.URL;
-import java.util.Random;
 
 /**
  * Common implementation of {@link EmbeddedCargoApplicationContainer}

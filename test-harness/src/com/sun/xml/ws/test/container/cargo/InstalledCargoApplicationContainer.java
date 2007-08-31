@@ -1,17 +1,17 @@
 package com.sun.xml.ws.test.container.cargo;
 
 import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.cargo.gf.GlassfishStandaloneLocalConfiguration;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalContainer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalDeployer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
+import com.sun.xml.ws.test.container.cargo.gf.GlassfishStandaloneLocalConfiguration;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.FileUtil;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
-import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
+import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
