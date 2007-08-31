@@ -52,7 +52,7 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
         }
 
         WAR war = (WAR)new DefaultDeployableFactory().createDeployable(
-            container.getId(), archive, DeployableType.WAR);
+            container.getId(), archive.getAbsolutePath(), DeployableType.WAR);
 
         war.setContext(contextPath);
 

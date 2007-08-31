@@ -1,25 +1,22 @@
 package com.sun.xml.ws.test.container.gf;
 
-import com.sun.xml.ws.test.container.AbstractApplicationContainer;
-import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.Application;
-import com.sun.xml.ws.test.container.DeployedService;
-import com.sun.xml.ws.test.container.WAR;
-import com.sun.xml.ws.test.tool.WsTool;
-import com.sun.xml.ws.test.World;
-import com.sun.istack.NotNull;
 import com.sun.enterprise.deployapi.SunDeploymentFactory;
+import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.container.AbstractApplicationContainer;
+import com.sun.xml.ws.test.container.Application;
+import com.sun.xml.ws.test.container.ApplicationContainer;
+import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.tool.WsTool;
 
+import javax.enterprise.deploy.spi.DeploymentManager;
+import javax.enterprise.deploy.spi.Target;
+import javax.enterprise.deploy.spi.TargetModuleID;
+import javax.enterprise.deploy.spi.status.DeploymentStatus;
+import javax.enterprise.deploy.spi.status.ProgressEvent;
+import javax.enterprise.deploy.spi.status.ProgressListener;
+import javax.enterprise.deploy.spi.status.ProgressObject;
 import java.io.File;
 import java.net.URL;
-
-import javax.enterprise.deploy.spi.Target;
-import javax.enterprise.deploy.spi.DeploymentManager;
-import javax.enterprise.deploy.spi.TargetModuleID;
-import javax.enterprise.deploy.spi.status.ProgressObject;
-import javax.enterprise.deploy.spi.status.ProgressListener;
-import javax.enterprise.deploy.spi.status.ProgressEvent;
-import javax.enterprise.deploy.spi.status.DeploymentStatus;
 
 /**
  * {@link ApplicationContainer} implementation for Glassfish.

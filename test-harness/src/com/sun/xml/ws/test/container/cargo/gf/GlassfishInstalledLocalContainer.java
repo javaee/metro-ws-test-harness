@@ -56,18 +56,18 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     }
 
     private File getAsadminExecutable() {
-        File home = getHome();
-        if(home==null || !home.exists())
+        String home = getHome();
+        if(home==null || !new File(home).exists())
             throw new CargoException("Glassfish home directory is not set");
 
         File exec;
 
         if(File.pathSeparatorChar==';') {
             // on Windows
-            exec = new File(home,"bin/asadmin.bat");
+            exec = new File(new File(home),"bin/asadmin.bat");
         } else {
             // on other systems
-            exec = new File(home,"bin/asadmin");
+            exec = new File(new File(home),"bin/asadmin");
         }
 
         if(!exec.exists())
@@ -88,7 +88,7 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
         invokeAsAdmin(true, "start-domain",
             "--interactive=false",
             "--domaindir",
-            getConfiguration().getHome().getAbsolutePath(),
+            new File(getConfiguration().getHome()).getAbsolutePath(),
             "cargo-domain-" + getConfiguration().getPropertyValue(ServletPropertySet.PORT)
             );
 
@@ -106,10 +106,10 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     protected void doStop(Java java) throws Exception {
         invokeAsAdmin(false, "stop-domain",
             "--domaindir",
-            getConfiguration().getHome().getAbsolutePath(),
+            new File(getConfiguration().getHome()).getAbsolutePath(),
             "cargo-domain-" + getConfiguration().getPropertyValue(ServletPropertySet.PORT)
             );
-        FileUtil.deleteRecursive(getConfiguration().getHome());
+        FileUtil.deleteRecursive(new File(getConfiguration().getHome()));
     }
 
     public String getId() {

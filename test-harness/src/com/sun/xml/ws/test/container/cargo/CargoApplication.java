@@ -1,14 +1,11 @@
 package com.sun.xml.ws.test.container.cargo;
 
-import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.container.AbstractHttpApplication;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
-import com.sun.xml.ws.test.container.AbstractHttpApplication;
-import com.sun.xml.ws.test.model.TestEndpoint;
 import org.codehaus.cargo.container.deployable.Deployable;
 import org.codehaus.cargo.container.deployer.Deployer;
 
-import java.net.URI;
 import java.net.URL;
 
 /**

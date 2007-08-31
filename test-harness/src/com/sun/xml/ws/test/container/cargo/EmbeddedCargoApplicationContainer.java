@@ -30,7 +30,7 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
             new DefaultConfigurationFactory();
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
-                containerId, ConfigurationType.STANDALONE );
+                containerId, ContainerType.EMBEDDED, ConfigurationType.STANDALONE );
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         configuration.setLogger(new SimpleLogger());

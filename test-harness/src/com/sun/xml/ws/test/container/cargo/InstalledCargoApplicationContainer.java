@@ -45,10 +45,10 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         // needed until glassfish becomes a part of Cargo
         ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
-        configurationFactory.registerConfiguration("glassfish1x", ConfigurationType.STANDALONE, GlassfishStandaloneLocalConfiguration.class);
+        configurationFactory.registerConfiguration("glassfish1x", ContainerType.INSTALLED, ConfigurationType.STANDALONE, GlassfishStandaloneLocalConfiguration.class);
         DefaultContainerFactory containerFactory = new DefaultContainerFactory();
         containerFactory.registerContainer("glassfish1x", ContainerType.INSTALLED, GlassfishInstalledLocalContainer.class);
-        deployerFactory.registerDeployer("glassfish1x", DeployerType.LOCAL, GlassfishInstalledLocalDeployer.class);
+        deployerFactory.registerDeployer("glassfish1x", DeployerType.INSTALLED, GlassfishInstalledLocalDeployer.class);
 
         File containerWorkDir = FileUtil.createTmpDir(true);
         containerWorkDir.mkdirs();
@@ -56,8 +56,8 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
-                containerId, ConfigurationType.STANDALONE,
-                containerWorkDir);
+                containerId, ContainerType.INSTALLED, ConfigurationType.STANDALONE,
+                containerWorkDir.getAbsolutePath());
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
         configuration.setLogger(new SimpleLogger());
@@ -77,7 +77,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         container = (InstalledLocalContainer) containerFactory.createContainer(
             containerId, ContainerType.INSTALLED, configuration);
-        container.setHome(homeDir);
+        container.setHome(homeDir.getAbsolutePath());
     }
 
     public String toString() {

@@ -7,6 +7,7 @@ import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.spi.deployer.AbstractLocalDeployer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
     }
 
     public DeployerType getType() {
-        return DeployerType.LOCAL;
+        return DeployerType.INSTALLED;
     }
 
     public void deploy(Deployable deployable) {
@@ -49,7 +50,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
 
         addConnectOptions(args);
 
-        args.add(deployable.getFile().getAbsolutePath());
+        args.add(new File(deployable.getFile()).getAbsolutePath());
 
         getLocalContainer().invokeAsAdmin(false, args.toArray(new String[args.size()]));
     }
@@ -61,7 +62,7 @@ public class GlassfishInstalledLocalDeployer extends AbstractLocalDeployer {
         addConnectOptions(args);
 
         // not too sure how asadmin determines 'name'
-        args.add(cutExtension(deployable.getFile().getName()));
+        args.add(cutExtension(new File(deployable.getFile()).getName()));
 
         getLocalContainer().invokeAsAdmin(false, args.toArray(new String[args.size()]));
     }

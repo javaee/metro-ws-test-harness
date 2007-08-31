@@ -48,7 +48,7 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
             new DefaultConfigurationFactory();
         RuntimeConfiguration configuration =
             (RuntimeConfiguration) configurationFactory.createConfiguration(
-                containerId, ConfigurationType.RUNTIME);
+                containerId, ContainerType.REMOTE, ConfigurationType.RUNTIME);
 
         configuration.setProperty(RemotePropertySet.USERNAME, userName);
         configuration.setProperty(RemotePropertySet.PASSWORD, password);

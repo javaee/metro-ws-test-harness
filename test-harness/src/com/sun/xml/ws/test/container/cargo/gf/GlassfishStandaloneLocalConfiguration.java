@@ -26,8 +26,9 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
      *
      * @param home
      *      The work directory where files needed to run Glassfish will be created.
+     *      Uses String, not File as per Cargo convention.
      */
-    public GlassfishStandaloneLocalConfiguration(File home) {
+    public GlassfishStandaloneLocalConfiguration(String home) {
         super(home);
 
         // default properties
@@ -68,7 +69,7 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
         if(password.length()<8)
             throw new CargoException("password needs to be 8 characters or longer");
 
-        getHome().mkdirs();
+        new File(getHome()).mkdirs();
         FileWriter w = new FileWriter(getPasswordFile());
         // somehow glassfish uses both. Brain-dead.
         w.write("AS_ADMIN_PASSWORD="+password+"\n");
@@ -96,7 +97,7 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
             getPropertyValueString(GlassfishPropertySet.JMX_ADMIN_PORT),
             "--template","wsit-test-domain.xml.template",
             "--domaindir",
-            getHome().getAbsolutePath(),
+            new File(getHome()).getAbsolutePath(),
 
             // it looks like domain name can be anything, but check with the dev
             "cargo-domain-" + getPropertyValue(ServletPropertySet.PORT));
@@ -109,7 +110,7 @@ public class GlassfishStandaloneLocalConfiguration extends AbstractStandaloneLoc
         // schedule cargocpc for deployment
         File cpcWar = new File(getHome(), "cargocpc.war");
         getResourceUtils().copyResource(RESOURCE_PATH + "cargocpc.war",cpcWar);
-        getDeployables().add(new WAR(cpcWar));
+        getDeployables().add(new WAR(cpcWar.getAbsolutePath()));
     }
 
     private String getPropertyValueString(String key) {
