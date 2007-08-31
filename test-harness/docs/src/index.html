@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.36 2007-08-31 18:20:07 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.37 2007-08-31 18:37:58 kohsuke Exp $</div>
 
 <l:document>
 
@@ -383,8 +383,8 @@ testdir/
   </l:section>
   <l:section title="Test Descriptor">
     <p>
-      The file <TT>test-descriptor.xml</TT> is the heart of the test data, and it contains the required configuration information for each test. A typical "fromwsdl" test descriptor could look like the following:<br>
-
+      The file <TT>test-descriptor.xml</TT> is the heart of the test data, and it contains the required configuration information for each test. A typical "fromwsdl" test descriptor could look like the following:
+		</p>
 <pre><xmp>
 <descriptor>
    <description>this is a very useful test that tests stuff</description> 
@@ -394,9 +394,23 @@ testdir/
    </service>
 </despcriptor>
 </xmp></pre>
-		<p>
-			The structure of the test descriptor is defined in <a href="test-descriptor.rnc">a schema</a>, and the harness performs an XML validation to make sure the data is in the expected format.
-	</l:section>
+    <p>
+      The structure of the test descriptor is defined in <a href="test-descriptor.rnc">a schema</a>, and the harness performs an XML validation to make sure the data is in the expected format.
+    </p>
+    <l:section title="Linking to Relevant Bugs">
+      <p>
+        It is recommended that you link test cases to relevant bugs, so that in the future we can take
+        advantage of information programatically. To do this, use the bugs attribute on the descriptor element.
+        It takes whitespace-separated list of bugs,where each of them are either 7-digit bugster ID or
+        a java.net proeject name followed by an issue number.
+      </p>
+<pre><xmp>
+<descriptor bugs="6420352 wsit-123 jax-ws-234">
+  ...
+</descriptor>
+</xmp></pre>
+    </l:section>
+  </l:section>
   <l:section title="Client Test Scripts">
     <p>
       Client test scripts are the programs that are executed after all the services are set up. These scripts are expected to make some service invocations and perform assretions.
@@ -406,11 +420,11 @@ testdir/
       <li>
         files. They can be anywhere and have any name, since the harness locates them through <tt>&lt;client href="..."></tt> inside the descriptor. However, we recommend keeping them at the top directory and use ".bsh" suffix.
       <li>
-        Inline inside the test descriptor, as illustrated below. This is particularly convenient for small test clients:
+        Inline inside the test descriptor, as illustrated below. This is particularly convenient for small test clients. The name attribute indicates human readable short summary of a test:
 <pre><xmp>
 <descriptor>
   <description>this is a very useful test that tests stuff</description> 
-  <client>
+  <client name="echo test">
     assertEquals("hello",fooPort.echo("hello"));
   </client>
   ...
