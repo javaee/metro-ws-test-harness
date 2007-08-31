@@ -31,28 +31,19 @@ public abstract class Script {
      * {@link Script} where the script is given as literal text.
      */
     public static final class Inline extends Script {
+        private final String name;
         private final String script;
-        private final String description;
 
-        public Inline(String script, String description) {
+        public Inline(String name, String script) {
+            this.name = name;
             this.script = script;
-            this.description = description;
         }
 
         /**
          * Use a portion of the script as the name.
          */
         public String getName() {
-            String text;
-            if(description!=null)
-                text = description;
-            else
-                text = script;
-            text = text.replace('\n',' ').replace(";","").replace(":","");
-            if(text.length()>60)
-                return text.substring(0,60)+" ...";
-            else
-                return text;
+            return name;
         }
 
         public Reader read() {
