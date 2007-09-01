@@ -102,6 +102,18 @@ start = element descriptor {
         text
     }? &
 
+    # XML resouce to be made available to clients
+    element xml-resource {
+        # the resource is made available by this variable name
+        attribute name {text},
+        (
+            # XML can be either defined inline
+            wellformedXml |
+            # or defined externally
+            attribute href {text}
+        )
+    }* &
+
     # 'service' element holds information for a particular 
     #
     # There must be at least one 'service' element per test.
@@ -167,3 +179,9 @@ versionAttributes =
 #   in the future consider enumeration
 #
 version = xsd:token
+
+# any well-formed XML
+wellformedXml = element * {
+    attribute * {text}*,
+    (text|wellformedXml)*
+}

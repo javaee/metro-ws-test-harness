@@ -5,7 +5,10 @@ import com.sun.istack.Nullable;
 import com.sun.istack.test.VersionProcessor;
 import com.sun.xml.ws.test.Main;
 import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.client.InlineXmlResource;
+import com.sun.xml.ws.test.client.ReferencedXmlResource;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
+import com.sun.xml.ws.test.client.XmlResource;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
@@ -37,7 +40,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -142,6 +147,11 @@ public class TestDescriptor {
     public final List<TestService> services = new ArrayList<TestService>();
 
     /**
+     * &lt;xml-resource>s.
+     */
+    public final Map<String,XmlResource> xmlResources = new HashMap<String,XmlResource>();
+
+    /**
      * Root of the test data directory.
      */
     @NotNull
@@ -195,6 +205,17 @@ public class TestDescriptor {
          */
         File resourceDir = new File(testDir,"resources");
         this.resources = resourceDir.exists()?resourceDir:null;
+
+        for( Element xre : (List<Element>)root.elements("xml-resource")) {
+            final XmlResource xr;
+            if(xre.attribute("href")==null)
+                xr = new InlineXmlResource((Element)xre.elements().get(0));
+            else
+                xr = new ReferencedXmlResource(new File(testDir,xre.attributeValue("href")));
+            xmlResources.put(xre.attributeValue("name"),xr);
+        }
+
+
         /*
          * Check if the common folder exists in the dir where the
          * test-descriptor.xml is present else it is null
@@ -203,11 +224,7 @@ public class TestDescriptor {
         this.common = commonDir.exists()?commonDir:null;
         this.applicableVersions =  new VersionProcessor(root);
 
-        String skipAttr = root.attributeValue("skip");
-        if(skipAttr==null)
-            this.skip = false;
-        else
-            this.skip = new Boolean(skipAttr).booleanValue();
+        this.skip = Boolean.parseBoolean(root.attributeValue("skip"));
 
         String transport = root.attributeValue("transport");
         if(transport==null)

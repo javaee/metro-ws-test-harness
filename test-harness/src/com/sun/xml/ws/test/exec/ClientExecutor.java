@@ -6,6 +6,7 @@ import bsh.EvalError;
 import bsh.TargetError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
+import com.sun.xml.ws.test.client.XmlResource;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
@@ -18,6 +19,7 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map.Entry;
 
 /**
  * Executes {@link TestClient}.
@@ -108,6 +110,10 @@ public class ClientExecutor extends Executor {
 
         // inject test home directory
         engine.set("home",client.parent.home);
+
+        // inject XML resources
+        for (Entry<String, XmlResource> e : context.descriptor.xmlResources.entrySet())
+            engine.set(e.getKey(),e.getValue());
 
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
