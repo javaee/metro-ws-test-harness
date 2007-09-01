@@ -9,6 +9,17 @@ import javax.xml.transform.stream.StreamSource;
  * @author Kohsuke Kawaguchi
  */
 public interface XmlResource {
+    /**
+     * Returns this XML as a {@link StreamSource}.
+     */
     StreamSource asStreamSource() throws Exception;
+    /**
+     * Returns this XML as a String literal.
+     */
     String asString() throws Exception;
+
+    /**
+     * Reads it as SAAJ SOAPMessage in SOAP 1.1 and return it.
+     */
+    Object asSOAP11Message() throws Exception;
 }
