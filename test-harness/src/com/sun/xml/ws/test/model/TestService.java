@@ -3,8 +3,19 @@ package com.sun.xml.ws.test.model;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * A service to be deployed for a test.
@@ -86,7 +97,7 @@ public class TestService {
             findEndpoints(baseDir);
         } else {
             String shortName = explicitServiceClassName.substring(explicitServiceClassName.lastIndexOf('.')+1);
-            endpoints.add(new TestEndpoint(shortName,explicitServiceClassName,false));
+            endpoints.add(new TestEndpoint(shortName,explicitServiceClassName,null,false));
         }
     }
 
@@ -144,16 +155,21 @@ public class TestService {
             boolean isWebService = false;
             boolean isProvider = false;
             boolean isInterface = false;
+            String portName=null;
 
             OUTER:
             while((line=r.readLine())!=null) {
                 if(line.startsWith("package ")) {
                     pkg = line.substring(8,line.indexOf(';'));
                 }
-                if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider"))
+                if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider")) {
                     isWebService = isProvider = true;
-                else if(line.contains("@WebService") || line.contains("@javax.jws.WebService"))
+                    portName = calcPortName(line);
+                }
+                else if(line.contains("@WebService") || line.contains("@javax.jws.WebService")) {
                     isWebService = true;
+                    portName = calcPortName(line);
+                }
 
                 // if we read until the first declared type, we should have found all the
                 // @WebService* annoations and package declaration.
@@ -190,10 +206,23 @@ public class TestService {
                 else
                     fullName = className;
 
-                endpoints.add(new TestEndpoint(className,fullName,isProvider));
+                endpoints.add(new TestEndpoint(className,fullName,portName,isProvider));
             }
         }
     }
+
+    /**
+     * Pick up portName="..." from @WebService or @WebServiceProvider.
+     */
+    private String calcPortName(String line) {
+        Matcher m = PORT_NAME.matcher(line);
+        if(m.find())
+            return m.group(1);
+        else
+            return null;
+    }
+
+    private static final Pattern PORT_NAME = Pattern.compile("portName\\s*=\\s*\"([^\"]+)\"");
 
     public String toString() {
         return name+" of "+parent.toString();

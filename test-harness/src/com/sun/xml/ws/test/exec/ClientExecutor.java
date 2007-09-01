@@ -149,19 +149,20 @@ public class ClientExecutor extends Executor {
                             //For multiple endpoints the convention for injecting the variables is
                             // portName obtained from the WebEndpoint annotation,
                             // which would be something like "addNumbersPort"
-                            String portName = Introspector.decapitalize((String)nameMethod.invoke(endpoint));
+                            String portName = (String) nameMethod.invoke(endpoint);
+                            String varName = Introspector.decapitalize(portName);
 
                             try {
-                                engine.set(portName, method.invoke(serviceInstance));
-                                engine.set(portName+"Address",svc.app.getEndpointAddress((TestEndpoint)svc.service.endpoints.toArray()[0]));
-                                addressList.append(' ').append(portName+"Address");
+                                engine.set(varName, method.invoke(serviceInstance));
+                                engine.set(varName +"Address",svc.app.getEndpointAddress(getEndpoint(svc, portName)));
+                                addressList.append(' ').append(varName).append("Address");
                             } catch (InvocationTargetException e) {
                                 if(e.getCause() instanceof Exception)
                                     throw (Exception)e.getCause();
                                 else
                                     throw e;
                             }
-                            portList.append(' ').append(portName);
+                            portList.append(' ').append(varName);
                         }
                     }
                 }
@@ -170,5 +171,18 @@ public class ClientExecutor extends Executor {
         System.out.println(serviceList);
         System.out.println(portList);
         System.out.println(addressList);
+    }
+
+    private TestEndpoint getEndpoint(DeployedService svc, String portName) {
+        // first, look for the port name match
+        for (TestEndpoint e : svc.service.endpoints) {
+            if(e.portName!=null && e.portName.equals(portName))
+                return e;
+        }
+        // nothing explicitly matched.
+        if(svc.service.endpoints.size()!=1)
+            throw new Error("Multiple ports are defined on "+svc.service.name+" yet ports are ambiguous");
+        // there's only one
+        return (TestEndpoint)svc.service.endpoints.toArray()[0];
     }
 }

@@ -1,6 +1,7 @@
 package com.sun.xml.ws.test.model;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 
 /**
  * Endpoint exposed from {@link TestService}.
@@ -34,6 +35,13 @@ public class TestEndpoint {
     public final String className;
 
     /**
+     * Encoded port name "{uri}local". This value is obtained from the @WebService/Provider class,
+     * and may not be always available.
+     */
+    @Nullable
+    public final String portName;
+
+    /**
      * URL pattern like "/foo" where this service is bound.
      */
     @NotNull
@@ -44,9 +52,10 @@ public class TestEndpoint {
      */
     public final boolean isProvider;
 
-    public TestEndpoint(String name, String className, boolean isProvider) {
+    public TestEndpoint(String name, String className, String portName, boolean isProvider) {
         this.name = name;
         this.className = className;
+        this.portName = portName;
         this.isProvider = isProvider;
     }
 }
