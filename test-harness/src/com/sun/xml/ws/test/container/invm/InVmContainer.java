@@ -135,10 +135,8 @@ public class InVmContainer extends AbstractApplicationContainer {
             if(!address.getName().equals("address"))
                 continue;
 
-            if(!address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap/") ||
-                   !address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap12/"))
-                continue;
-
+            if(address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap/") ||
+                   address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap12/"))
             return address;
         }
         return null;
