@@ -17,7 +17,6 @@ public interface XmlResource {
      * Returns this XML as a String literal.
      */
     String asString() throws Exception;
-
     /**
      * Reads it as SAAJ SOAPMessage in SOAP 1.1 and return it.
      */
