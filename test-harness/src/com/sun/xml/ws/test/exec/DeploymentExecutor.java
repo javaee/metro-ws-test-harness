@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * {@link TestCase} that deploys a {@link TestService} to
@@ -86,10 +87,8 @@ public class DeploymentExecutor extends Executor {
         }
         
         classpath.add(new File(context.warDir, "WEB-INF/classes").toURL());
-        ClassLoader cl =
-                new URLClassLoader( classpath.toArray(new URL[0]), baseCl );
 
-        context.parent.clientClassLoader=cl;
+        context.parent.clientClassLoader= new URLClassLoader( classpath.toArray(new URL[classpath.size()]), baseCl );
 
     }
     /**
@@ -161,13 +160,10 @@ public class DeploymentExecutor extends Executor {
          */
         if (context.parent.clientClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)context.parent.clientClassLoader).getURLs();
-
-            for (URL classloaderURL :urls ){
-                classpath.add(classloaderURL);
-
-            }
+            classpath.addAll(Arrays.asList(urls));
         }
-        ClassLoader cl = new URLClassLoader( classpath.toArray(new URL[0]),
+
+        ClassLoader cl = new URLClassLoader( classpath.toArray(new URL[classpath.size()]),
                 World.runtime.getClassLoader() );
 
         context.parent.clientClassLoader = cl;
