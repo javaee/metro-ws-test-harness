@@ -16,8 +16,11 @@ if (!fromWsdl) {
     }
 } else {
     portNames = new ArrayList();
+
     // if we find multiple implClass, use the port local name to match them
     portNameToImpl = new HashMap();
+    // port name to service name
+    portNameToServiceName = new HashMap();
 
     wsca = null;
     implClass=null;
@@ -33,9 +36,11 @@ if (!fromWsdl) {
                     String name = a.name();
                     if (!name.equals("")) {
                         portNames.add(name);
+                        portNameToServiceName.put(name,new QName(wsca.targetNamespace(),wsca.name()));
                     }
                 }
             }
+            continue;
         }
 
         a = clazz.getAnnotation(WebService.class);
@@ -76,7 +81,7 @@ if (!fromWsdl) {
             "endpoint"+(i++),
             impl,
             wsdlLocation,
-            new QName(tns, wsca.name()),
+            portNameToServiceName.get(portName),
             new QName(tns, portName),
             "binding",
             "/" + service.getEndpointByImpl(impl).name);
