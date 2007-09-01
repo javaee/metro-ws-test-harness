@@ -107,8 +107,12 @@ public class InVmContainer extends AbstractApplicationContainer {
 
         for (Element port : ports) {
             String portName = port.attributeValue("name");
+            Element address = getSoapAddress(port);
 
-            Element address = (Element)port.elements().get(0);
+            //Looks like invalid wsdl:port, MUST have a soap:address
+            //TODO: give some error message
+            if(address == null)
+                continue;
 
             Attribute locationAttr = address.attribute("location");
             String newLocation =
@@ -121,6 +125,23 @@ public class InVmContainer extends AbstractApplicationContainer {
         FileOutputStream os = new FileOutputStream(wsdl);
         new XMLWriter(os).write(doc);
         os.close();
+    }
+
+    private Element getSoapAddress(Element port){
+        for(Object obj : port.elements()){
+            Element address = (Element) obj;
+
+            //it might be extensibility element, just skip it
+            if(!address.getName().equals("address"))
+                continue;
+
+            if(!address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap/") ||
+                   !address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap12/"))
+                continue;
+
+            return address;
+        }
+        return null;
     }
 
 }
