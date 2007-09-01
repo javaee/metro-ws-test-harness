@@ -127,14 +127,16 @@ public final class WAR {
     /**
      * Gets the path of the WSDL.
      *
+     * <p>
      * This is either copied from the test data (for "fromwsdl" tests),
      * or generated (for "fromjava" tests.) For fromjava tests with
      * multiple <tt>WebService</tt> classes, you may get more than one WSDLs.
+     *
+     * <p>
+     * In a situation where there's no WSDL and just provider service,
+     * the list may be empty.
      */
     public @NotNull List<File> getWSDL() {
-        // by the time this method is called,
-        // it should be eithre copied into a war or generated
-        assert !wsdl.isEmpty() : "Does this test has any service?";
         return wsdl;
     }
 
