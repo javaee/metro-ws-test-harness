@@ -129,6 +129,12 @@ public class TestDescriptor {
     public final List<TestClient> clients = new ArrayList<TestClient>();
 
     /**
+     * Possibly empty list of JAXB/JAX-WS external binding customizations.
+     */
+    @NotNull
+    public final List<File> clientCustomizations = new ArrayList<File>();
+
+    /**
      * Optional "set up" script executed before each client script.
      */
     @Nullable
@@ -262,14 +268,6 @@ public class TestDescriptor {
                 for( String relPath : fs.getDirectoryScanner(World.project).getIncludedFiles() ) {
                     TestClient testClient = new TestClient(this,versionProcessor,
                             new Script.File(new File(testDir,relPath)),sideEffectFree);
-                    File customization = parseFile(testDir,"custom-client.xml");
-                    if (customization.exists() ) {
-                        testClient.customizations.add(customization);
-                    }
-                    File schemaCustomization = parseFile(testDir,"custom-schema-client.xml");
-                    if (schemaCustomization.exists() ) {
-                        testClient.customizations.add(schemaCustomization);
-                    }
                     this.clients.add(testClient);
                 }
             } else {
@@ -277,17 +275,16 @@ public class TestDescriptor {
                 TestClient testClient = new TestClient(this,versionProcessor,
                     new Script.Inline(client.attributeValue("name"),client.getText()),
                     sideEffectFree);
-                File customization = parseFile(testDir,"custom-client.xml");
-                if (customization.exists() ) {
-                    testClient.customizations.add(customization);
-                }
-                File schemaCustomization = parseFile(testDir,"custom-schema-client.xml");
-                if (schemaCustomization.exists() ) {
-                    testClient.customizations.add(schemaCustomization);
-                }
                 this.clients.add(testClient);
             }
         }
+
+        File customization = parseFile(testDir,"custom-client.xml");
+        if (customization.exists() )
+            clientCustomizations.add(customization);
+        File schemaCustomization = parseFile(testDir,"custom-schema-client.xml");
+        if (schemaCustomization.exists() )
+            clientCustomizations.add(schemaCustomization);
 
         findAllJavaClients(home);
 

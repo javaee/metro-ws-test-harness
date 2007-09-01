@@ -113,12 +113,8 @@ public class DeploymentExecutor extends Executor {
             options.add("-extension");
 
             //Add user's additional customization files
-            if(!context.parent.descriptor.clients.isEmpty()) {
-                TestClient tc = context.parent.descriptor.clients.get(0);
-                for (File custFile : tc.customizations) {
-                    options.add("-b").add(custFile);
-                }
-            }
+            for (File custFile : context.parent.descriptor.clientCustomizations)
+                options.add("-b").add(custFile);
 
             //Other options
             if(World.debug)

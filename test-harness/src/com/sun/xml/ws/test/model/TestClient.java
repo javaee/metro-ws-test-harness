@@ -33,14 +33,6 @@ public class TestClient {
     @NotNull
     public final TestDescriptor parent;
 
-     /**
-     * Possibly empty list of JAXB/JAX-WS external binding customizations.
-     *
-     *
-     */
-    @NotNull
-    public final List<File> customizations = new ArrayList<File>();
-
     /**
      * If true, it indicates that this test doesn't leave any side-effect
      * on the client or the server. With a proper option,
