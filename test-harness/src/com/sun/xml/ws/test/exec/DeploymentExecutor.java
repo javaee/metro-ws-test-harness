@@ -174,7 +174,7 @@ public class DeploymentExecutor extends Executor {
         findServiceClass(gensrcDir,serviceClazzNames);
 
         if (serviceClazzNames.isEmpty())
-            throw new RuntimeException ("Cannot find the generated 'service' class that extends from javax.xml.ws.Service");
+            System.out.println("WARNING: Cannot find the generated 'service' class that extends from javax.xml.ws.Service. Assuming provider-only service");
 
         for (String name : serviceClazzNames)
             context.serviceClass.add(cl.loadClass(name));
