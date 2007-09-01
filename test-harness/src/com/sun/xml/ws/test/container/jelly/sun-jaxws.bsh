@@ -72,8 +72,11 @@ if (!fromWsdl) {
     for (String portName : portNames) {
         impl = portNameToImpl.get(portName);
         portNameToImpl.remove(portName);
-        if(impl==null)
+        if(impl==null) {
+          if(portNames.size()>1)
+            throw new Exception("There's more than one port here. Please add @WebService/Provider(portName=...) so that harness knows which is for which");
           impl = implClass; // default
+        }
 
         // call EndpointInfoBean.create thanks to static import.
         // this allows us to create an instance of class that's not visible to this classloader.
