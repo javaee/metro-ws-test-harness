@@ -1,5 +1,5 @@
-x = fooPort.echo(1);
+x = foo.echo(1);
 assertEquals(x,1);
 
-y = barPort.echo(2);
+y = bar.echo(2);
 assertEquals(y,2);
