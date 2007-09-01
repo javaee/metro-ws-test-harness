@@ -6,8 +6,8 @@ import com.sun.xml.ws.test.model.TestClient;
 
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Executes {@link TestClient} in concurrent fashion via

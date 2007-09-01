@@ -3,7 +3,6 @@ package com.sun.xml.ws.test.exec;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.DeployedService;
-import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
 import com.sun.xml.ws.test.util.JavacTask;
@@ -15,8 +14,8 @@ import java.io.FileReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link TestCase} that deploys a {@link TestService} to

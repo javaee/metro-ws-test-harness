@@ -1,8 +1,8 @@
 package com.sun.xml.ws.test.exec;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
-import bsh.EvalError;
 import bsh.TargetError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
