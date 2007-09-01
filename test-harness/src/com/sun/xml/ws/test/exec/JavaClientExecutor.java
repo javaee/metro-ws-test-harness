@@ -106,7 +106,7 @@ public class JavaClientExecutor extends Executor {
             new TestCase() {
                 protected void runTest() throws Exception {
                     System.out.println(msg);
-                    throw new Exception(error);
+                    throw new Exception(msg,error);
                 }
             }.run(result);
         }
