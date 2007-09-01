@@ -364,6 +364,22 @@ public class Main {
             throw new CmdLineException("No -cp option is specified, nor were we able to guess the -cp option");
         }
 
+        // pick up ${HARNESS_HOME}/ext jars
+        String harnessHome = System.getProperty("HARNESS_HOME");
+        if(harnessHome!=null) {
+            File extDir = new File(new File(harnessHome),"ext");
+            if(extDir.exists()) {
+                for( File f : extDir.listFiles(new FileFilter() {
+                    public boolean accept(File f) {
+                        return f.getName().endsWith(".jar");
+                    }
+                })) {
+                    runtime.addJar(f);
+                }
+            }
+        }
+
+
         // put tools.jar in the tools classpath
         File jreHome = new File(System.getProperty("java.home"));
         File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
