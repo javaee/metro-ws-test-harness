@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.39 2007-09-02 18:05:13 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.40 2007-09-02 18:20:44 kohsuke Exp $</div>
 
 <l:document>
 
@@ -360,6 +360,10 @@ work/                    (root test directory)
     <p>
       The <tt>-report DIR</tt> option causes the harness to generate JUnit test report files into the specified directory. This allows the reports to be combined with other JUnit or TestNG-based tests (such as per-class unit test.)
       These XML reports can be then formatted into HTML (via &lt;junitreport> ant task) or picked up by Hudson for further processing.
+  </l:section>
+  <l:section title="Generating Coverage Report">
+    <p>
+      The test harness can generate <a href="http://emma.sourceforge.net/">EMMA</a> coverage report of the tests by specifying the <tt>-emma OUTPUTFILE</tt> option. The coverage will include both the runtime as well as tools. See <a href="http://emma.sourceforge.net/userguide/ar01s02s03.html">Emma User's Guide</a> for how to generate various reports from the coverage data file.
   </l:section>
 </l:section>
 <l:section title="Writing Tests">
