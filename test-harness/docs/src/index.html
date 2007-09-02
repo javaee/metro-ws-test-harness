@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.38 2007-08-31 21:13:50 kohsuke Exp $</div>
+<div align=right>$Id: index.html,v 1.39 2007-09-02 18:05:13 kohsuke Exp $</div>
 
 <l:document>
 
@@ -590,10 +590,26 @@ class FooBarSgervice {
     <p>
       If test programs need to use image files, binary files, or other data files, they should be put in <TT>resources</TT> directory at test's top-level. This is optional. Those resources can be loaded by using the helper methods as follows:
 <l:script>
-File f = resource("foo.xml");  // load resources/foo.xml
+File f = resource("foo.jpg");  // load resources/foo.jpg
 </l:script>
     <p>
-      <l:not-cooked /> we are hoping to define more convenience methods and define how to access resources from server.
+      For resources that are XML, you can define them by using &lt;xml-resource> elements.
+    </p>
+<pre><xmp>
+<!-- define it inline -->
+<xml-resource name="foo">
+  <echoRequest>123</echoRequest>
+</xml-resource>
+
+<!-- define it externally -->
+<xml-resource name="bar" href="my.xml" />
+</xmp></pre>
+    <p>
+      Such XML resources are injected into clients as variables of the type <a href="http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/src/com/sun/xml/ws/test/client/XmlResource.java"><tt>XmlResource</tt></a>, so you can use them like this:
+    </p>
+<l:script>
+echoPort.echoString(foo.asString());
+</l:script>
   </l:section>
   <l:section title="Common source files">
     <p>
