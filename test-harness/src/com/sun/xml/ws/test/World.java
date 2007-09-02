@@ -1,12 +1,8 @@
 package com.sun.xml.ws.test;
 
+import com.sun.xml.ws.test.emma.Emma;
 import org.apache.tools.ant.Project;
 import org.codehaus.classworlds.ClassRealm;
-
-import java.util.Properties;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 /**
  * "Global variables" for the test harness. Use with caution.
@@ -55,4 +51,9 @@ public final class World {
      * @see Main#debug
      */
     public static boolean debug = false;
+
+    /**
+     * @see Main#emma
+     */
+    public static Emma emma = null;
 }

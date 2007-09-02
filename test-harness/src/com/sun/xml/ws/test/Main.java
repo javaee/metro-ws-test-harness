@@ -9,6 +9,7 @@ import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.gf.GlassfishContainer;
 import com.sun.xml.ws.test.container.invm.InVmContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
+import com.sun.xml.ws.test.emma.Emma;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
 import junit.framework.Test;
@@ -113,6 +114,9 @@ public class Main {
 
     @Option(name="-concurrent-side-effect-free",usage="Run all side-effect free tests as concurrent")
     boolean concurrentSideEffectFree = false;
+
+    @Option(name="-emma",usage="Generate emma coverage report")
+    File emma = null;
 
 
     /*
@@ -273,6 +277,8 @@ public class Main {
         } finally {
             if(!leave)
                 container.shutdown();
+            if(World.emma!=null)
+                World.emma.write(emma);
         }
     }
 
@@ -281,6 +287,7 @@ public class Main {
      */
     private void fillWorld() throws Exception {
         World.debug = this.debug;
+        World.emma = emma!=null ? new Emma() : null;
 
         Realm runtime = World.runtime;
         Realm tool = World.tool;
