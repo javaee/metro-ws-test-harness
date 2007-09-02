@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
+ * {@link ClassLoader} that performs on-the-fly instrumentation.
+ *
  * @author Kohsuke Kawaguchi
  */
 final class InstrumentingClassLoader extends AntClassLoader2 {

@@ -1,3 +1,11 @@
+/* Copyright (C) 2003 Vladimir Roubtsov. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Common Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/cpl-v10.html
+ *
+ * $Id: Emma.java,v 1.2 2007-09-02 18:04:30 kohsuke Exp $
+ */
 package com.sun.xml.ws.test.emma;
 
 import com.vladium.emma.EMMAProperties;
@@ -17,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Hides details of the emma and provide convenient API for the rest of the harness.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Emma {
@@ -42,9 +52,9 @@ public class Emma {
         // but looks like they are used to allow emma configurations
         // to be given from different sources
         
-        IProperties appProperties = RT.getAppProperties(); // try to use app props consistent with RT's view of them
-        if (appProperties == null) appProperties = EMMAProperties.getAppProperties(); // don't use combine()
-        metadata = DataFactory.newMetaData(CoverageOptionsFactory.create (appProperties));
+        IProperties appProperties = RT.getAppProperties();
+        if (appProperties == null) appProperties = EMMAProperties.getAppProperties();
+        metadata = DataFactory.newMetaData(CoverageOptionsFactory.create(appProperties));
 
         coverage = RT.getCoverageData();
 
