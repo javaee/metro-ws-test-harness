@@ -49,7 +49,8 @@ final class InVmApplication implements Application {
     @NotNull
     public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
         // I'm not too confident if endpoint.name is always the port local name.
-        return baseEndpointAddress.resolve('?'+endpoint.name);
+        //verify with KK.
+        return baseEndpointAddress.resolve('?'+(endpoint.portName ==null?endpoint.name:endpoint.portName));
     }
 
     /**
