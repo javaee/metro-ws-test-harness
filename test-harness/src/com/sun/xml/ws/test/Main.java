@@ -384,6 +384,7 @@ public class Main {
                         return f.getName().endsWith(".jar");
                     }
                 })) {
+                    System.out.println("Picking up extension: "+f);
                     runtime.addJar(f);
                 }
             }
