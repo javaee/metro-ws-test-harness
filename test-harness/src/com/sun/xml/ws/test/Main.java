@@ -2,6 +2,7 @@ package com.sun.xml.ws.test;
 
 import bsh.Interpreter;
 import com.sun.istack.test.AntXmlFormatter;
+import com.sun.istack.test.VersionNumber;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.EmbeddedCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
@@ -118,6 +119,8 @@ public class Main {
     @Option(name="-emma",usage="Generate emma coverage report")
     File emma = null;
 
+    @Option(name="-version",usage="Specify the target JAX-WS version being tested. This determines test exclusions",handler=VersionNumberHandler.class)
+    VersionNumber version = null;
 
     /*
       Container variables
@@ -581,7 +584,11 @@ public class Main {
 
         if(descriptor.exists()) {
             try {
-                suite.addTest(new TestDescriptor(descriptor).build(container,wsimport,concurrentSideEffectFree));
+                TestDescriptor td = new TestDescriptor(descriptor);
+                if(version==null || td.applicableVersions.isApplicable(version))
+                    suite.addTest(td.build(container,wsimport,concurrentSideEffectFree));
+                else
+                    System.out.println("Skipping "+dir);
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
                 // just report that failure as a test failure.
