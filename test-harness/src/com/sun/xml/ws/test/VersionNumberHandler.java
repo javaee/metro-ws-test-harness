@@ -13,7 +13,7 @@ import org.kohsuke.args4j.Option;
  * 
  * @author Kohsuke Kawaguchi
  */
-class VersionNumberHandler extends OptionHandler<VersionNumber> {
+public class VersionNumberHandler extends OptionHandler<VersionNumber> {
     public VersionNumberHandler(CmdLineParser parser, Option option, Setter<? super VersionNumber> setter) {
         super(parser, option, setter);
     }
