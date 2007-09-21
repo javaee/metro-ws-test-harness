@@ -381,7 +381,8 @@ public class Main {
         String harnessHome = System.getProperty("HARNESS_HOME");
         if(harnessHome!=null) {
             File extDir = new File(new File(harnessHome),"ext");
-            System.err.println("Searching extensions in "+extDir);
+            if(debug)
+                System.err.println("Searching extensions in "+extDir);
             if(extDir.exists()) {
                 for( File f : extDir.listFiles(new FileFilter() {
                     public boolean accept(File f) {
