@@ -387,12 +387,12 @@ public class Main {
                         return f.getName().endsWith(".jar");
                     }
                 })) {
-                    System.out.println("Picking up extension: "+f);
+                    System.err.println("Picking up extension: "+f);
                     runtime.addJar(f);
                 }
             }
         } else {
-            System.out.println("No extension jar");
+            System.err.println("No extension jar");
         }
 
 
@@ -593,7 +593,7 @@ public class Main {
                 if(version==null || td.applicableVersions.isApplicable(version))
                     suite.addTest(td.build(container,wsimport,clientScriptName,concurrentSideEffectFree));
                 else
-                    System.out.println("Skipping "+dir);
+                    System.err.println("Skipping "+dir);
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
                 // just report that failure as a test failure.
