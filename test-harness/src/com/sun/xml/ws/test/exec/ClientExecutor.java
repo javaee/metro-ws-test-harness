@@ -45,6 +45,7 @@ public class ClientExecutor extends Executor {
 
         NameSpace ns = engine.getNameSpace();
         // import namespaces. what are the other namespaces to be imported?
+        ns.importPackage("javax.activation");
         ns.importPackage("javax.xml.ws");
         ns.importPackage("javax.xml.ws.soap");
         ns.importPackage("javax.xml.ws.handler");
