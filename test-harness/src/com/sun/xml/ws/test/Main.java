@@ -9,6 +9,7 @@ import com.sun.xml.ws.test.container.cargo.InstalledCargoApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.RemoteCargoApplicationContainer;
 import com.sun.xml.ws.test.container.gf.GlassfishContainer;
 import com.sun.xml.ws.test.container.invm.InVmContainer;
+import com.sun.xml.ws.test.container.javase.JavaSeContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.emma.Emma;
 import com.sun.xml.ws.test.model.TestDescriptor;
@@ -153,6 +154,9 @@ public class Main {
         usage="loads Jetty into the harness VM and test with it.")
     File embeddedJetty;
 
+    @Option(name="-javase",usage="tests using the Java lightweight HTTP server")
+    boolean javaSe = false;
+    
     @Option(name="-glassfish-remote",metaVar="CONFIG",
         usage=
             "Test with remote Glassfish. Needs both JMX connection info and HTTP URL.\n"+
@@ -358,7 +362,7 @@ public class Main {
         if(jaxwsImage!=null) {
             tool.addJar(            new File(jaxwsImage,"lib/jaxws-tools.jar"));
             tool.addJar(            new File(jaxwsImage,"lib/jaxb-xjc.jar"));
-            runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
+            runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar","mimepull.jar");
         } else
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
@@ -552,6 +556,11 @@ public class Main {
             return new GlassfishContainer(
                 wsimport, wsgen, new URL(httpUrl), host, Integer.parseInt(port), userName, password
             );
+        }
+
+        if (javaSe) {
+            System.err.println("Using the built-in Java SE lightweight HTTP server");
+            return new JavaSeContainer(wsimport,wsgen,port);
         }
 
         if(legacyLocalTransport) {
