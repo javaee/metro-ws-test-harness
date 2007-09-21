@@ -182,7 +182,7 @@ public class ClientExecutor extends Executor {
         }
         // nothing explicitly matched.
         if(svc.service.endpoints.size()!=1)
-            throw new Error("Multiple ports are defined on "+svc.service.name+" yet ports are ambiguous");
+            throw new Error("Multiple ports are defined on '"+svc.service.name+"', yet ports are ambiguous. Please use @WebService/Provider(portName=)");
         // there's only one
         return (TestEndpoint)svc.service.endpoints.toArray()[0];
     }
