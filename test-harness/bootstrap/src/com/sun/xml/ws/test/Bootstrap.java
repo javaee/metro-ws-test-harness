@@ -72,7 +72,8 @@ public class Bootstrap {
         String res = Bootstrap.class.getClassLoader().getResource("com/sun/xml/ws/test/Bootstrap.class").toExternalForm();
         if(res.startsWith("jar:")) {
             res = res.substring(4,res.lastIndexOf('!'));
-            return new File(new URL(res).getFile()).getParentFile();
+            // different classloader behaves differently when it comes to space
+            return new File(new URL(res).getFile().replace("%20"," ")).getParentFile();
         }
         throw new IllegalStateException("I can't figure out where the harness is loaded from: "+res);
     }
