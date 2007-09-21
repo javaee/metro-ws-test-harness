@@ -319,12 +319,14 @@ public class TestDescriptor {
      * is executed, you execute this test.
      *
      * @param container The container to host the services.
+     * @param clientScriptName
+     *      See {@link Main#clientScriptName}
      * @param concurrentSideEffectFree
      *      See {@link Main#concurrentSideEffectFree}
      * @return
      *      {@link TestSuite} that contains test execution plan for this test.
      */
-    public TestSuite build(ApplicationContainer container, WsTool wsimport, boolean concurrentSideEffectFree) throws IOException {
+    public TestSuite build(ApplicationContainer container, WsTool wsimport, String clientScriptName, boolean concurrentSideEffectFree) throws IOException {
 
         TestSuite suite = new TestSuite();
 
@@ -362,6 +364,8 @@ public class TestDescriptor {
 
         // run client test scripts
         for (TestClient c : clients) {
+            if(clientScriptName!=null && !c.script.getName().equals(clientScriptName))
+                continue; // skip
             if(concurrentSideEffectFree && c.sideEffectFree) {
                 suite.addTest(new ConcurrentClientExecutor.Fixed(context,c));
                 suite.addTest(new ConcurrentClientExecutor.Cached(context,c));

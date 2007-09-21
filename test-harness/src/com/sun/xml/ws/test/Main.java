@@ -122,6 +122,9 @@ public class Main {
     @Option(name="-version",usage="Specify the target JAX-WS version being tested. This determines test exclusions",handler=VersionNumberHandler.class)
     VersionNumber version = null;
 
+    @Option(name="-client",usage="Just run a single client script, instead of all")
+    String clientScriptName = null;
+
     /*
       Container variables
       -------------------
@@ -587,7 +590,7 @@ public class Main {
             try {
                 TestDescriptor td = new TestDescriptor(descriptor);
                 if(version==null || td.applicableVersions.isApplicable(version))
-                    suite.addTest(td.build(container,wsimport,concurrentSideEffectFree));
+                    suite.addTest(td.build(container,wsimport,clientScriptName,concurrentSideEffectFree));
                 else
                     System.out.println("Skipping "+dir);
             } catch (IOException e) {
