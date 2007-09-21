@@ -77,7 +77,7 @@ if (!fromWsdl) {
             if(portNameToImpl.isEmpty())
               throw new Exception("There's more than one port here, but none of them has @WebService/Provider(portName)");
             else
-              throw new Exception("There's more than one port here, and none matched "+portName+" (we have "+portNameToImpl+". Please add @WebService/Provider(portName=...) so that harness knows which is for which");
+              throw new Exception("There's more than one port here, and none matched '"+portName+"' (we have "+portNameToImpl+". Please add @WebService/Provider(portName=...) so that harness knows which is for which");
           }
           impl = implClass; // default
         }
