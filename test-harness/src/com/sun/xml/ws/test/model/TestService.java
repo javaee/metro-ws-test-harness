@@ -164,12 +164,13 @@ public class TestService {
                 }
                 if(line.contains("@WebServiceProvider") || line.contains("@javax.xml.ws.WebServiceProvider")) {
                     isWebService = isProvider = true;
-                    portName = calcPortName(line);
                 }
                 else if(line.contains("@WebService") || line.contains("@javax.jws.WebService")) {
                     isWebService = true;
-                    portName = calcPortName(line);
                 }
+
+                if(isWebService && portName==null) // portName attribute of @WebService/Provider may come in a few lines later
+                    portName = calcPortName(line);
 
                 // if we read until the first declared type, we should have found all the
                 // @WebService* annoations and package declaration.
