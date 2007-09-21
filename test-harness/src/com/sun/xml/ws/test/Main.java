@@ -391,6 +391,8 @@ public class Main {
                     runtime.addJar(f);
                 }
             }
+        } else {
+            System.out.println("No extension jar");
         }
 
 
@@ -406,8 +408,7 @@ public class Main {
 
 
         if(debug) {
-            if(debug)
-                Interpreter.DEBUG = true;
+            Interpreter.DEBUG = true;
             System.err.println("runtime realm");
             runtime.dump(System.err);
             System.err.println("tool realm");
