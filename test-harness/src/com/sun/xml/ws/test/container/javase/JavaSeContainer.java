@@ -21,16 +21,9 @@ import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
-
-import javax.xml.ws.Endpoint;
 import java.io.File;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 
 public class JavaSeContainer extends AbstractApplicationContainer {
     
