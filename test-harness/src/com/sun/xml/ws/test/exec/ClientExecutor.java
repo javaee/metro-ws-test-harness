@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Map.Entry;
 
 /**
@@ -118,6 +119,9 @@ public class ClientExecutor extends Executor {
 
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
+                // inject WSDL URLs
+                engine.set("wsdlUrls",svc.app.getWSDL());
+
                 for (Class clazz : svc.serviceClass) {
                     String packageName = clazz.getPackage().getName();
                     //  import the artifact package
