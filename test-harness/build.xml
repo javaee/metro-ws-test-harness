@@ -186,7 +186,7 @@
 
       <!-- test data -->
       <arg value="-r" />
-      <arg path="test/testcases/jaxws" />
+      <arg path="test/testcases" />
 
       <arg line="${test.options}"/>
     </java>
