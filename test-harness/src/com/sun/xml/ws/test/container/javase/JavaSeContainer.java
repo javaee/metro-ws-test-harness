@@ -88,13 +88,23 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         InterpreterEx i = new InterpreterEx(serviceClassLoader);
         TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
         Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
-        Object endpointInstance = endpointClass.newInstance();
-        i.set("endpointAddress",endpointAddress);
-        i.set("endpointInstance",endpointInstance);
-        //FIXME
         
-        Object server = i.eval("javax.xml.ws.Endpoint.publish(endpointAddress,endpointInstance);");
-        //Object server = i.eval("System.out.println(\"BEANSHELL: \" + serviceClass );");
+        Object endpointImpl = endpointClass.newInstance();
+        i.set("endpointAddress",endpointAddress);
+        i.set("endpointImpl",endpointImpl);
+        
+        Object server = i.eval(
+            "javax.xml.ws.BindingType bindingType = endpointImpl.getClass().getAnnotation(javax.xml.ws.BindingType.class);" +
+            "String bindingId;" +
+            "if (bindingType == null) {bindingId = javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING; } else {bindingId = bindingType.value();}" +
+            "System.out.println(\"bindingId before = \" + bindingId);" +
+            "if (bindingId.equals(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)) { bindingId = com.sun.xml.ws.binding.SOAPBindingImpl.X_SOAP12HTTP_BINDING; }" +
+            "System.out.println(\"bindingId after = \" + bindingId);" +
+            "javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(bindingId,endpointImpl);" +
+            "System.out.println(\"endpointAddress = \" + endpointAddress);" +
+            "endpoint.publish(endpointAddress);" +
+            "return endpoint;");
+        // Object server = i.eval("javax.xml.ws.Endpoint.publish(endpointAddress,endpointInstance);");
 
         return new JavaSeApplication(war,server,new URI(endpointAddress));
     }
