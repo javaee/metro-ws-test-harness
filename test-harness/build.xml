@@ -143,7 +143,7 @@
   </target>
     
   <target name="run-harness" if="netbeans.home"
-      depends="dist"
+      depends="jar"
       description="Run the test harness with same options used for debug">
           
     <echo message="starting harness with arguments: ${test.args}"/>
