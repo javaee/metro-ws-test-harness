@@ -1,7 +1,7 @@
 <project name="test-harness" basedir="." default="dist">
 
   <property name="name" value="test-harness-core" />
-
+  <property file="build.properties"/>
 
   <!-- default build id -->
   <tstamp>
@@ -114,15 +114,19 @@
   </target>
   
   <!-- ********** Target added for debugging in NetBeans ********** -->
+
+  <!-- Override in build.properties if necessary -->
+  <property name="test.args" value="-debug -cp:jaxws ${basedir}/../../jax-ws-sources/jaxws-ri ${basedir}/test/testcases/jaxws/mtom"/>
+  
   <path id="debug.sourcepath">
     <pathelement location="src"/>
   </path>
   
   <target name="debug-harness" if="netbeans.home"
-      depends="dist"
+      depends="jar"
       description="Debug the test harness (from within NetBeans)">
           
-    <echo message="starting harness with arguments: ${args}"/>
+    <echo message="starting harness with arguments: ${test.args}"/>
     
     <nbjpdastart name="WsTest" addressproperty="any.prop.name"
         transport="dt_socket">
@@ -131,7 +135,7 @@
     </nbjpdastart>
 
     <java fork="true" classname="WsTest">
-      <arg line="${args}"/>
+      <arg line="${test.args}"/>
       <jvmarg value="-Xdebug"/>
       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${any.prop.name}"/>
       <classpath refid="runtime.classpath"/>
@@ -142,10 +146,10 @@
       depends="dist"
       description="Run the test harness with same options used for debug">
           
-    <echo message="starting harness with arguments: ${args}"/>
+    <echo message="starting harness with arguments: ${test.args}"/>
     
     <java fork="true" classname="WsTest">
-      <arg line="${args}"/>
+      <arg line="${test.args}"/>
       <classpath refid="runtime.classpath"/>
     </java>
   </target>

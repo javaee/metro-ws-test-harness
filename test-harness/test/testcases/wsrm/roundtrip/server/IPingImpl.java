@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.soap.*;
 import javax.xml.ws.*;
 
-@WebService(endpointInterface="wsrm.roundtrip.server.IPing")
+@WebService(endpointInterface="wsrm.roundtrip.server.IPing", targetNamespace="http://tempuri.org/", serviceName="PingService", portName="WSHttpBinding_IPing")
 @BindingType(SOAPBinding.SOAP12HTTP_BINDING)
 public class IPingImpl {
 

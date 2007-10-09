@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="test-harness-IDE">
+    <property file="nbproject/project.properties"/>
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/55/freeform-config.html#compilesingle) -->
+    <target name="compile-selected-files-in-src">
+        <fail unless="files">Must set property 'files'</fail>
+        <mkdir dir="build/classes"/>
+        <javac destdir="build/classes" includes="${files}" source="1.5" srcdir="src">
+            <compilerarg value="-Xlint:unchecked"/>
+            <classpath path="lib/ant.jar:lib/args4j-2.0.5.jar:lib/bsh.jar:lib/cargo-core-uberjar-0.9-SNAPSHOT.jar:lib/classworlds-1.0.jar:lib/commons-beanutils-1.6.jar:lib/commons-collections-2.1.jar:lib/commons-jelly-1.0.jar:lib/commons-jelly-tags-define-1.0.jar:lib/commons-jelly-tags-xml-1.1.jar:lib/commons-jexl-1.0.jar:lib/commons-lang-2.0.jar:lib/commons-logging-1.1.jar:lib/commons-logging-adapters-1.1.jar:lib/commons-logging-api-1.1.jar:lib/dom4j.jar:lib/isorelax.jar:lib/istack-commons-runtime.jar:lib/istack-commons-test.jar:lib/jaxws-api.jar:lib/jing-rnc-driver.jar:lib/jing.jar:lib/jsr181-api.jar:lib/junit.jar:lib/optional.jar:lib/parallel-junit.jar:lib/http.jar"/>
+        </javac>
+    </target>
+</project>

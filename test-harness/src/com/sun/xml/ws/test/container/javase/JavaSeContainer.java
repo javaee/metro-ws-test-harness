@@ -1,8 +1,29 @@
+/*
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License).  You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the license at
+ * https://glassfish.dev.java.net/public/CDDLv1.0.html.
+ * See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at https://glassfish.dev.java.net/public/CDDLv1.0.html.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * you own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Copyright 2006, 2007 Sun Microsystems Inc. All Rights Reserved
+ */
+
 package com.sun.xml.ws.test.container.javase;
 
-import com.sun.net.httpserver.HttpServer;
-
 import com.sun.istack.NotNull;
+import com.sun.net.httpserver.HttpServer;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -11,34 +32,37 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InterpreterEx;
+import java.io.File;
 import java.io.FileWriter;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
-import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 public class JavaSeContainer extends AbstractApplicationContainer {
     
     private HttpServer appServer;
     private ExecutorService appExecutorService;
 
-    private String sepChar;
-    private File webappsDir;
-    private File classesDir;
+    final private String sepChar;
+    final private File webappsDir;
+    final private File classesDir;
     private boolean stopped;
-    private int port;
+    final private int port;
     
     public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port) {
         super(wsimport,wsgen);
-        //String homeDir = System.getProperty ("user.dir");
         String j2seServerDir = System.getProperty ("j2se.server.home");  // TODO -- Get location from main
         System.out.println("Server dir="+j2seServerDir);
         sepChar = System.getProperty ("file.separator");
@@ -48,22 +72,11 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         this.port = port;
     }
     
-    /*
-    public static void main(String[] args) throws Exception {
-        new JavaSeContainer();   
-    }
-    */
-
     public String getTransport() {
         return "http";
     }
 
     public void start() throws Exception {
-        //appServer = HttpServer.create(new InetSocketAddress(port), 5);
-        //appExecutorService = Executors.newFixedThreadPool(5);
-        //appServer.setExecutor(appExecutorService);
-        //appServer.start();
-        //System.out.println("AppServer started");
     }
     
     public void shutdown() {
@@ -71,68 +84,50 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
    @NotNull
     public Application deploy(DeployedService service) throws Exception {
-        String id = service.service.getGlobalUniqueName();
-        WAR war = assembleWar(service);
+        final String id = service.service.getGlobalUniqueName();
+        final WAR war = assembleWar(service);
 
-        String endpointAddress = new String("http://localhost:" + port + "/" + id);
+        final String endpointAddress = new String("http://localhost:" + port + "/" + id);
 
         if (service.service.isSTS)
             updateWsitClient(service, endpointAddress);
 
-        for (File wsdl : war.getWSDL())
+        HashMap<QName,String> portToNamespace = new HashMap<QName,String>();
+        for (File wsdl : war.getWSDL()) {
             patchWsdl(wsdl,endpointAddress);
+        }
 
-        URLClassLoader serviceClassLoader = new URLClassLoader(
+        final URLClassLoader serviceClassLoader = new URLClassLoader(
             new URL[]{new File(service.warDir,"WEB-INF/classes").toURL()},
             World.runtime.getClassLoader());
-        InterpreterEx i = new InterpreterEx(serviceClassLoader);
-        TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
-        Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
+        final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
+        final TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
+        final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
         
-        Object endpointImpl = endpointClass.newInstance();
-        i.set("endpointAddress",endpointAddress);
-        i.set("endpointImpl",endpointImpl);
+        final Object endpointImpl = endpointClass.newInstance();
+        interpreter.set("endpointAddress",endpointAddress);
+        interpreter.set("endpointImpl",endpointImpl);
+        interpreter.set("metadataFiles", war.getWSDL());
         
-        Object server = i.eval(
-            "javax.xml.ws.BindingType bindingType = endpointImpl.getClass().getAnnotation(javax.xml.ws.BindingType.class);" +
-            "String bindingId;" +
-            "if (bindingType == null) {bindingId = javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING; } else {bindingId = bindingType.value();}" +
-            "System.out.println(\"bindingId before = \" + bindingId);" +
-            "if (bindingId.equals(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)) { bindingId = com.sun.xml.ws.binding.SOAPBindingImpl.X_SOAP12HTTP_BINDING; }" +
-            "System.out.println(\"bindingId after = \" + bindingId);" +
-            "javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(bindingId,endpointImpl);" +
+        final Object server = interpreter.eval(
+            "java.util.List metadata = new java.util.LinkedList();" +
+            "for(java.io.File file : metadataFiles) {" +
+            "    javax.xml.transform.Source source = new javax.xml.transform.stream.StreamSource(new java.io.FileInputStream(file));" +
+            "    source.setSystemId(file.toURL().toExternalForm());" +
+            "    metadata.add(source);" +
+            "}" +
+            "javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
             "System.out.println(\"endpointAddress = \" + endpointAddress);" +
+            "endpoint.setMetadata(metadata);" +
             "endpoint.publish(endpointAddress);" +
             "return endpoint;");
-        // Object server = i.eval("javax.xml.ws.Endpoint.publish(endpointAddress,endpointInstance);");
 
         return new JavaSeApplication(war,server,new URI(endpointAddress));
     }
 
     
-     
- /*
-    private void createEndpoint(Adapter adapter, File warDirFile)
-    throws Exception {
-        
-        //String url = "http://localhost:8080/"+warDir+endpointInfo.getUrlPattern();
-        //EndpointFactory.newInstance ().publish (url, endpointInfo.getImplementor());
-        
-        String urlPattern = adapter.urlPattern;
-        if (urlPattern.endsWith("/*")) {
-            urlPattern = urlPattern.substring(0, urlPattern.length() - 2);
-        }
-        String warDirName = warDirFile.getName();
-        String contextRoot = "/"+warDirName+urlPattern;
-        System.out.println("Context Root="+contextRoot);
-        HttpContext context = appServer.createContext (contextRoot);
-        
-        // Creating endpoint from backdoor (and this publishes it, too)
-        Endpoint endpoint = new EndpointImpl(adapter.getEndpoint(),context);
-    }
- */
-
-        public void updateWsitClient(DeployedService deployedService, String newLocation)throws Exception {
+    public void updateWsitClient(DeployedService deployedService, String newLocation)
+        throws DocumentException, IOException {
         File wsitClientFile = new File(deployedService.service.parent.resources,"wsit-client.xml");
         if (wsitClientFile.exists() ){
             SAXReader reader = new SAXReader();
@@ -159,23 +154,25 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         }
     }
 
+    
     /**
      * Fix the address in the WSDL. to the local address.
      */
-
     private void patchWsdl(File wsdl, String endpointAddress) throws Exception {
         Document doc = new SAXReader().read(wsdl);
-        List<Element> ports = doc.getRootElement().element("service").elements("port");
+        List ports = doc.getRootElement().element("service").elements("port");
 
-        for (Element port : ports) {
-            String portName = port.attributeValue("name");
+        for (Object port : ports) {
+            Element castPort = (Element) port;
+            String portName = castPort.attributeValue("name");
+            Element address = getSoapAddress(castPort);
 
-            Element address = (Element)port.elements().get(0);
+            //Looks like invalid wsdl:port, MUST have a soap:address
+            if(address == null)
+                throw new RuntimeException("Did not find a soap:address for wsdl:port " + portName);
 
             Attribute locationAttr = address.attribute("location");
-            String newLocation =
-                endpointAddress + "/" + portName;
-                // "in-vm://" + id + "/?" + portName;
+            String newLocation = endpointAddress + "/" + portName;
             newLocation = newLocation.replace('\\', '/');
             locationAttr.setValue(newLocation);
         }
@@ -185,4 +182,20 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         new XMLWriter(os).write(doc);
         os.close();
     }
+
+    private Element getSoapAddress(Element port){
+        for(Object obj : port.elements()){
+            Element address = (Element) obj;
+
+            //it might be extensibility element, just skip it
+            if(!address.getName().equals("address"))
+                continue;
+
+            if(address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap/") ||
+               address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap12/"))
+            return address;
+        }
+        return null;
+    }
+
 }
