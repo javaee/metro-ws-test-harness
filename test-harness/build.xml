@@ -50,24 +50,30 @@
     </jar>
   </target>
 
-  <target name="clean">
+  <target name="clean" description="Delete all build artifacts">
     <ant dir="bootstrap" target="clean" inheritall="false"/>
     <ant dir="docs" target="clean" inheritall="false"/>
     <delete dir="build"/>
   </target>
 
-  <target name="dist" depends="jar, src-zip">
+  <target name="dist-jar" depends="jar"
+          description="Build all JAR files for this project">
     <ant dir="bootstrap" target="dist" inheritall="false"/>
-    <ant dir="docs" target="doc" inheritall="false"/>
     <mkdir dir="build/dist" />
     <copy tofile="build/dist/harness.jar" file="bootstrap/build/bootstrap.jar" />
-    <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
     <!-- create library uberjar -->
+    <delete file="build/dist/harness-lib.jar" quiet="true"/>
     <zip file="build/dist/harness-lib.jar">
       <zipgroupfileset dir="lib" includes="**/*.jar" />
       <zipfileset src="build/test-harness-core.jar" />
       <zipfileset dir="lib/licenses" prefix="META-INF/licenses" />
     </zip>
+  </target>
+
+  <target name="dist" depends="dist-jar, src-zip">
+    <ant dir="docs" target="doc" inheritall="false"/>
+    <mkdir dir="build/dist" />
+    <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
     <!-- library uber source zip -->
     <zip file="build/dist/harness-lib.src.zip">
       <zipgroupfileset dir="lib" includes="**/*.zip" />
