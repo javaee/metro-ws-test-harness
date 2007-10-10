@@ -51,6 +51,8 @@
   </target>
 
   <target name="clean">
+    <ant dir="bootstrap" target="clean" inheritall="false"/>
+    <ant dir="docs" target="clean" inheritall="false"/>
     <delete dir="build"/>
   </target>
 
