@@ -136,21 +136,20 @@
           
     <echo message="starting harness with arguments: ${test.args}"/>
     
-    <nbjpdastart name="WsTest" addressproperty="any.prop.name"
+    <nbjpdastart name="test-harness" addressproperty="jpda.address"
         transport="dt_socket">
       <classpath refid="runtime.classpath"/>
       <sourcepath refid="debug.sourcepath"/>
     </nbjpdastart>
 
-    <java fork="true" classname="WsTest">
+    <java fork="true" jar="build/dist/harness.jar">
       <arg line="${test.args}"/>
       <jvmarg value="-Xdebug"/>
-      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${any.prop.name}"/>
-      <classpath refid="runtime.classpath"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
     </java>
   </target>
     
-  <target name="run-harness"
+  <target name="run-harness" 
       depends="dist-jar"
       description="Run the test harness with same options used for debug">
           
