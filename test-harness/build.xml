@@ -150,15 +150,14 @@
     </java>
   </target>
     
-  <target name="run-harness" if="netbeans.home"
-      depends="jar"
+  <target name="run-harness"
+      depends="dist-jar"
       description="Run the test harness with same options used for debug">
           
     <echo message="starting harness with arguments: ${test.args}"/>
     
-    <java fork="true" classname="WsTest">
+    <java fork="true" jar="build/dist/harness.jar">
       <arg line="${test.args}"/>
-      <classpath refid="runtime.classpath"/>
     </java>
   </target>
 
