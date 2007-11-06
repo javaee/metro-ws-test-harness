@@ -608,13 +608,13 @@ public class Main {
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
                 // just report that failure as a test failure.
-                suite.addTest(new FailedTest(descriptor,e));
+                suite.addTest(new FailedTest("invalid descriptor",e));
             } catch (DocumentException e) {
-                suite.addTest(new FailedTest(descriptor,e));
+                suite.addTest(new FailedTest("invalid descriptor",e));
             } catch (ParserConfigurationException e) {
-                suite.addTest(new FailedTest(descriptor,e));
+                suite.addTest(new FailedTest("invalid descriptor",e));
             } catch (SAXException e) {
-                suite.addTest(new FailedTest(descriptor,e));
+                suite.addTest(new FailedTest("invalid descriptor",e));
             }
             return;
         }

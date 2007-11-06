@@ -17,9 +17,11 @@ class FailedTest extends TestCase {
         this.t = t;
     }
 
-    public FailedTest(File f, Throwable t) {
-        this(f.getPath(),t);
-    }
+// this turns out to be a bad idea because in this way the full path name will appear as the test suite name,
+// which messes up <junitreport> because it tries to use that as the package name. 
+//    public FailedTest(File f, Throwable t) {
+//        this(f.getPath(),t);
+//    }
 
     protected void runTest() throws Throwable {
         throw new Exception(t);
