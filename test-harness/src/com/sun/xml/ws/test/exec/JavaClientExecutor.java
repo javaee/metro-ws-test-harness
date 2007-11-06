@@ -68,28 +68,28 @@ public class JavaClientExecutor extends Executor {
             return;
         }
 
-        TestSuite ts;
-        try {
-            Class<?> testClass = context.clientClassLoader.loadClass(testClassName);
-
-            // let JUnit parse all the test cases
-            ts = new TestSuite(testClass);
-
-            for(int i=0; i<ts.testCount(); i++) {
-                Test t = ts.testAt(i);
-                inject(t);
-            }
-        } catch (Exception e) {
-            failAll(result,"failed to prepare JUnit test class "+testClassName,e);
-            return;
-        }
-
         // when invoking JAX-WS, we need to set the context classloader accordingly
         // so that it can discover classes from the right places.
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(context.clientClassLoader);
 
         try {
+            TestSuite ts;
+            try {
+                Class<?> testClass = context.clientClassLoader.loadClass(testClassName);
+
+                // let JUnit parse all the test cases
+                ts = new TestSuite(testClass);
+
+                for(int i=0; i<ts.testCount(); i++) {
+                    Test t = ts.testAt(i);
+                    inject(t);
+                }
+            } catch (Exception e) {
+                failAll(result,"failed to prepare JUnit test class "+testClassName,e);
+                return;
+            }
+            
             ts.run(result);
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
