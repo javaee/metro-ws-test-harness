@@ -39,7 +39,7 @@ start = element descriptor {
           # 7 digits number indicates a bugster ID
           xsd:string { pattern="[0-9]{7}" } |
           # java.net bugs are projectName-number, like "wsit-123"
-          xsd:string { pattern="[A-Za-z0-9]+-[1-9][0-9]*" }
+          xsd:string { pattern="[A-Za-z0-9\-]+-[1-9][0-9]*" }
         )*
       }
     }? &
