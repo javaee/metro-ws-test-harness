@@ -23,7 +23,7 @@
     <mkdir dir="build/classes"/>
     <javac srcdir="src"
            destdir="build/classes"
-           debug="on">
+           source="1.5" target="1.5" debug="on">
       <classpath refid="javac.classpath"/>
     </javac>
     <copy todir="build/classes">
