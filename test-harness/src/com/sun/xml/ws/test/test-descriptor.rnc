@@ -49,6 +49,11 @@ start = element descriptor {
     #
     element description {text} &
 
+    # list of options passed to wsimport for generating client artifacts
+    # and server artifacts respectively.
+    element wsimport-client {text}? &
+    element wsimport-server {text}? &
+
     # 'client' element holds the information necessary for a given
     #   test client to run. In particular it points to the beanshell
     #   source code for a given test client.
