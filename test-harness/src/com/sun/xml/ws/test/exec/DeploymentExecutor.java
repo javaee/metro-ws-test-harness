@@ -124,6 +124,7 @@ public class DeploymentExecutor extends Executor {
             options.add(wsdl);
             if(World.debug)
                 System.out.println("wsdl = " + wsdl);
+            options.addAll(context.service.parent.wsimportClientOptions);
             // compile WSDL to generate client-side artifact
             options.invoke(context.parent.wsimport);
         }

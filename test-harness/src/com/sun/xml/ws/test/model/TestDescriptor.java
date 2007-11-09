@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 /**
  * Root object of the test model. Describes one test.
@@ -163,6 +164,16 @@ public class TestDescriptor {
     @NotNull
     public final File home;
 
+    /**
+     * Additional command-line arguments to wsimport for generating client artifacts.
+     */
+    public final List<String> wsimportClientOptions = new ArrayList<String>();
+    /**
+     * Additional command-line arguments to wsimport for generating server artifacts
+     * for Java-first case.
+     */
+    public final List<String> wsimportServerOptions = new ArrayList<String>();
+
 
     public static final Schema descriptorSchema;
 
@@ -232,6 +243,9 @@ public class TestDescriptor {
 
         this.skip = Boolean.parseBoolean(root.attributeValue("skip"));
 
+        parseArguments(root.elementText("wsimport-client"),wsimportClientOptions);
+        parseArguments(root.elementText("wsimport-server"),wsimportServerOptions);
+
         String transport = root.attributeValue("transport");
         if(transport==null)
             this.supportedTransport = TransportSet.ALL;
@@ -294,6 +308,13 @@ public class TestDescriptor {
         List<Element> stsList = root.elements("sts");
         populateServices(stsList,testDir,true);
        
+    }
+
+    /**
+     * Tokenize the given string and add them to the given list.
+     */
+    private void parseArguments(String s, List<String> result) {
+        result.addAll(Arrays.asList(s.split("\\p{Space}+")));
     }
 
     /**

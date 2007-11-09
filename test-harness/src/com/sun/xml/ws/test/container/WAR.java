@@ -204,6 +204,7 @@ public final class WAR {
         options.add("-d").add(classDir);
         options.add("-Xnocompile");
         options.add(service.service.wsdl.wsdlFile);
+        options.addAll(service.service.parent.wsimportServerOptions);
         if(!wsimport.isNoop()) {
             System.out.println("Generating server artifacts from " + service.service.wsdl.wsdlFile);
             options.invoke(wsimport);

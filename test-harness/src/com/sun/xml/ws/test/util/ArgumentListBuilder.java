@@ -6,6 +6,7 @@ import org.apache.tools.ant.types.Path;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,6 +45,11 @@ public final class ArgumentListBuilder {
 
     public ArgumentListBuilder add(Path cp) {
         return add(cp.toString());
+    }
+
+    public ArgumentListBuilder addAll(Collection<String> values) {
+        args.addAll(values);
+        return this;
     }
 
 
