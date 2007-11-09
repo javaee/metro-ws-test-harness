@@ -314,7 +314,8 @@ public class TestDescriptor {
      * Tokenize the given string and add them to the given list.
      */
     private void parseArguments(String s, List<String> result) {
-        result.addAll(Arrays.asList(s.split("\\p{Space}+")));
+        if(s!=null)
+            result.addAll(Arrays.asList(s.split("\\p{Space}+")));
     }
 
     /**
