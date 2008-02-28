@@ -269,7 +269,7 @@ public final class WAR {
                 System.out.println("wsgen classpath arg = " + cp);
             options.add("-cp").add(cp);
             options.add("-s").add(classDir);
-            options.add("-d").add(classDir);
+            options.add("-d").add(service.service.parent.disgardWsGenOutput ? classDir : NOWHERE);
 
             // obtain a report file from wsgen
             File report = new File(wsdlDir,"wsgen.report");
@@ -287,4 +287,6 @@ public final class WAR {
             wsdl.add(new File(dom.getRootElement().elementTextTrim("wsdl")));
         }
     }
+
+    private static final File NOWHERE = new File(System.getProperty("java.io.tmpdir"));
 }

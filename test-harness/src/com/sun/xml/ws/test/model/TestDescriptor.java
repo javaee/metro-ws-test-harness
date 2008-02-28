@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 /**
  * Root object of the test model. Describes one test.
@@ -179,6 +178,14 @@ public class TestDescriptor {
 
     private boolean skip;
 
+    /**
+     * If true, we don't want to package the result of wsgen so that
+     * we can test the generation of wrapper beans at the runtime.
+     *
+     * False otherwise.
+     */
+    public final boolean disgardWsGenOutput;
+
     static {
         URL url = World.class.getResource("test-descriptor.rnc");
         try {
@@ -191,12 +198,13 @@ public class TestDescriptor {
     }
 
 
-    public TestDescriptor(String shortName, File home, File resources, File common,VersionProcessor applicableVersions, String description) {
+    public TestDescriptor(String shortName, File home, File resources, File common, VersionProcessor applicableVersions, String description, boolean disgardWsGenOutput) {
         this.name = shortName;
         this.home = home;
         this.resources = resources;
         this.common = common;
         this.applicableVersions = applicableVersions;
+        this.disgardWsGenOutput = disgardWsGenOutput;
         this.supportedTransport = TransportSet.ALL;
         this.description = description;
         this.skip=false;
@@ -209,12 +217,12 @@ public class TestDescriptor {
      * @param descriptor
      *      Test descriptor XML file.
      */
-    public TestDescriptor(File descriptor) throws IOException,DocumentException,ParserConfigurationException,
-            SAXException{
+    public TestDescriptor(File descriptor, boolean disgardWsGenOutput) throws IOException,DocumentException,ParserConfigurationException, SAXException {
+        this.disgardWsGenOutput = disgardWsGenOutput;
         File testDir = descriptor.getParentFile();
         Element root = parse(descriptor).getRootElement();
 
-        VersionProcessor versionProcessor ;
+        VersionProcessor versionProcessor;
         this.description = root.elementTextTrim("description");
         /*
          * Check if the resources folder exists in the dir where the

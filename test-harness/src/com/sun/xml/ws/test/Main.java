@@ -179,6 +179,10 @@ public class Main {
     @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = 18080;
 
+    // TODO for Jitu to complete
+    @Option(name="-wsgen")
+    WsGenMode wsGenMode;
+
     public static File[] containerClasspathPrefix;
 
     public static void main(String[] args) throws Exception {
@@ -600,7 +604,7 @@ public class Main {
 
         if(descriptor.exists()) {
             try {
-                TestDescriptor td = new TestDescriptor(descriptor);
+                TestDescriptor td = new TestDescriptor(descriptor,false/*TODO for Jitu*/);
                 if(version==null || td.applicableVersions.isApplicable(version))
                     suite.addTest(td.build(container,wsimport,clientScriptName,concurrentSideEffectFree));
                 else
