@@ -179,7 +179,12 @@ public class Main {
     @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = 18080;
 
-    @Option(name="-wsgen")
+    @Option(name="-wsgen",usage=
+            "Control the packaging of Wrapper and Exception beans.\n"+
+            "always - Beans are packaged.\n"+
+            "both - Test case is executed twice, with and without packaging beans.\n"+
+            "ignore - Beans are NOT packaged.", metaVar="[always|both|ignore]"
+    )
     WsGenMode wsGenMode = WsGenMode.ALWAYS;
 
     public static File[] containerClasspathPrefix;
