@@ -179,9 +179,8 @@ public class Main {
     @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = 18080;
 
-    // TODO for Jitu to complete
     @Option(name="-wsgen")
-    WsGenMode wsGenMode;
+    WsGenMode wsGenMode = WsGenMode.ALWAYS;
 
     public static File[] containerClasspathPrefix;
 
@@ -604,11 +603,24 @@ public class Main {
 
         if(descriptor.exists()) {
             try {
-                TestDescriptor td = new TestDescriptor(descriptor,false/*TODO for Jitu*/);
-                if(version==null || td.applicableVersions.isApplicable(version))
-                    suite.addTest(td.build(container,wsimport,clientScriptName,concurrentSideEffectFree));
-                else
+                TestDescriptor td[] = new TestDescriptor[2];
+                if (wsGenMode == WsGenMode.ALWAYS) {
+                    td[0] = new TestDescriptor(descriptor, false);
+                } else if (wsGenMode == WsGenMode.BOTH ) {
+                    td[0] = new TestDescriptor(descriptor, false);
+                    td[1] = new TestDescriptor(descriptor, true);
+                } else if (wsGenMode == WsGenMode.IGNORE) {
+                    td[0] = new TestDescriptor(descriptor, true);
+                } else {
+                    throw new RuntimeException("Shouldn't happen. WsGenMode="+wsGenMode);
+                }
+                if (version != null && !td[0].applicableVersions.isApplicable(version)) {
                     System.err.println("Skipping "+dir);
+                } else {
+                    suite.addTest(td[0].build(container,wsimport,clientScriptName,concurrentSideEffectFree));
+                    if (td[1] != null)
+                        suite.addTest(td[1].build(container,wsimport,clientScriptName,concurrentSideEffectFree));
+                }
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
                 // just report that failure as a test failure.
