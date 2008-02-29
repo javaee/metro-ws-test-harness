@@ -4,7 +4,7 @@
  * the terms of the Common Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/cpl-v10.html
  *
- * $Id: Emma.java,v 1.2 2007-09-02 18:04:30 kohsuke Exp $
+ * $Id: Emma.java,v 1.3 2008-02-29 18:23:31 kohsuke Exp $
  */
 package com.sun.xml.ws.test.emma;
 
