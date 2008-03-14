@@ -192,6 +192,10 @@ public class Main {
 
     @Option(name="-javase",usage="tests using the Java lightweight HTTP server")
     boolean javaSe = false;
+
+    @Option(name="-jdk6",usage="tests using JAX-WS in JDK")
+    boolean jdk6 = false;
+
     
     @Option(name="-glassfish-remote",metaVar="CONFIG",
         usage=
@@ -368,7 +372,7 @@ public class Main {
             runtime.addJarFolder(new File(embeddedJetty,"lib"));
         }
 
-        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null)
+        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null && !jdk6)
             guessWorkspace();
 
         // fill in runtime and tool realms
@@ -421,6 +425,15 @@ public class Main {
             runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
+        } else if (jdk6) {
+            System.out.println("Using JAX-WS in JDK");
+            File jreHome = new File(System.getProperty("java.home"));
+            externalWsGen = new File( jreHome.getParent(), "bin/wsgen" );
+            externalWsImport = new File( jreHome.getParent(), "bin/wsimport" );
+            System.out.println("Using wsgen from "+externalWsGen);
+            System.out.println("Using wsimport from "+externalWsImport);
+            javaSe = true;
+            System.out.println("Going to use SE lightweight http server");
         } else {
             throw new CmdLineException("No -cp option is specified, nor were we able to guess the -cp option");
         }
