@@ -39,6 +39,7 @@ package com.sun.xml.ws.test.model;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import com.sun.istack.test.VersionProcessor;
+import com.sun.istack.test.VersionNumber;
 import com.sun.xml.ws.test.Main;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InlineXmlResource;
@@ -392,7 +393,8 @@ public class TestDescriptor {
      * @return
      *      {@link TestSuite} that contains test execution plan for this test.
      */
-    public TestSuite build(ApplicationContainer container, WsTool wsimport, String clientScriptName, boolean concurrentSideEffectFree) throws IOException {
+    public TestSuite build(ApplicationContainer container, WsTool wsimport, String clientScriptName,
+                           boolean concurrentSideEffectFree, VersionNumber version) throws IOException {
 
         TestSuite suite = new TestSuite();
 
@@ -432,6 +434,10 @@ public class TestDescriptor {
         for (TestClient c : clients) {
             if(clientScriptName!=null && !c.script.getName().equals(clientScriptName))
                 continue; // skip
+            if (version != null && ! c.applicableVersions.isApplicable(version)) {
+                System.err.println("Not applicable to current version="+version+". Skipping "+c.script.getName());
+                continue;
+            }
             if(concurrentSideEffectFree && c.sideEffectFree) {
                 suite.addTest(new ConcurrentClientExecutor.Fixed(context,c));
                 suite.addTest(new ConcurrentClientExecutor.Cached(context,c));

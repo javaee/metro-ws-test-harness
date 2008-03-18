@@ -671,9 +671,9 @@ public class Main {
                 if (version != null && !td[0].applicableVersions.isApplicable(version)) {
                     System.err.println("Skipping "+dir);
                 } else {
-                    suite.addTest(td[0].build(container,wsimport,clientScriptName,concurrentSideEffectFree));
+                    suite.addTest(td[0].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
                     if (td[1] != null)
-                        suite.addTest(td[1].build(container,wsimport,clientScriptName,concurrentSideEffectFree));
+                        suite.addTest(td[1].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
                 }
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
