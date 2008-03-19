@@ -139,7 +139,7 @@ public class JavaClientExecutor extends Executor {
 
     private void failAll(TestResult result, final String msg, final Exception error) {
         for(int i=0;i<testCount;i++) {
-            new TestCase() {
+            new TestCase(testClassName) {
                 protected void runTest() throws Exception {
                     System.out.println(msg);
                     throw new Exception(msg,error);
