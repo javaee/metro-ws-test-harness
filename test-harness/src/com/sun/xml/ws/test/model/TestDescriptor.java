@@ -215,6 +215,8 @@ public class TestDescriptor {
 
     private boolean skip;
 
+    private static final String JDK6_EXCLUDE_VERSION = "jdk6";
+
     /**
      * If true, we don't want to package the result of wsgen so that
      * we can test the generation of wrapper beans at the runtime.
@@ -222,6 +224,8 @@ public class TestDescriptor {
      * False otherwise.
      */
     public final boolean disgardWsGenOutput;
+
+    public final boolean jdk6;
 
     static {
         URL url = World.class.getResource("test-descriptor.rnc");
@@ -235,7 +239,7 @@ public class TestDescriptor {
     }
 
 
-    public TestDescriptor(String shortName, File home, File resources, File common, VersionProcessor applicableVersions, String description, boolean disgardWsGenOutput) {
+    public TestDescriptor(String shortName, File home, File resources, File common, VersionProcessor applicableVersions, String description, boolean disgardWsGenOutput, boolean jdk6) {
         this.name = shortName;
         this.home = home;
         this.resources = resources;
@@ -246,6 +250,7 @@ public class TestDescriptor {
         this.description = description;
         this.skip=false;
         this.setUpScript = null;
+        this.jdk6 = jdk6;
     }
 
     /**
@@ -254,8 +259,9 @@ public class TestDescriptor {
      * @param descriptor
      *      Test descriptor XML file.
      */
-    public TestDescriptor(File descriptor, boolean disgardWsGenOutput) throws IOException,DocumentException,ParserConfigurationException, SAXException {
+    public TestDescriptor(File descriptor, boolean disgardWsGenOutput, boolean jdk6) throws IOException,DocumentException,ParserConfigurationException, SAXException {
         this.disgardWsGenOutput = disgardWsGenOutput;
+        this.jdk6 = jdk6;
         File testDir = descriptor.getParentFile();
         Element root = parse(descriptor).getRootElement();
 
@@ -284,7 +290,7 @@ public class TestDescriptor {
          */
         File commonDir = new File(testDir,"common");
         this.common = commonDir.exists()?commonDir:null;
-        this.applicableVersions =  new VersionProcessor(root);
+        this.applicableVersions =  getVersionProcessor(root);
 
         this.skip = Boolean.parseBoolean(root.attributeValue("skip"));
 
@@ -315,7 +321,7 @@ public class TestDescriptor {
 
         List<Element> clientList = root.elements("client");
         for (Element client : clientList) {
-            versionProcessor = new VersionProcessor(client);
+            versionProcessor = getVersionProcessor(client);
 
             boolean sideEffectFree = client.attribute("sideEffectFree")!=null;
 
@@ -555,5 +561,17 @@ public class TestDescriptor {
             this.services.add(testService);
 
         }
+    }
+
+    private VersionProcessor getVersionProcessor(Element e) {
+        // <client excludeFrom="jdk6" is excluded when run with -jdk6 flag
+        String excludeFrom = e.attributeValue("excludeFrom", null);
+        if (jdk6 && excludeFrom != null && excludeFrom.contains(JDK6_EXCLUDE_VERSION)) {
+            excludeFrom = "all" ;
+        }
+        return new VersionProcessor(
+            e.attributeValue("since",null),
+            e.attributeValue("until",null),
+            excludeFrom);
     }
 }

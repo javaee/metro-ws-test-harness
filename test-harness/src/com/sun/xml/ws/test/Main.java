@@ -659,12 +659,12 @@ public class Main {
             try {
                 TestDescriptor td[] = new TestDescriptor[2];
                 if (wsGenMode == WsGenMode.ALWAYS) {
-                    td[0] = new TestDescriptor(descriptor, false);
+                    td[0] = new TestDescriptor(descriptor, false, jdk6);
                 } else if (wsGenMode == WsGenMode.BOTH ) {
-                    td[0] = new TestDescriptor(descriptor, false);
-                    td[1] = new TestDescriptor(descriptor, true);
+                    td[0] = new TestDescriptor(descriptor, false, jdk6);
+                    td[1] = new TestDescriptor(descriptor, true, jdk6);
                 } else if (wsGenMode == WsGenMode.IGNORE) {
-                    td[0] = new TestDescriptor(descriptor, true);
+                    td[0] = new TestDescriptor(descriptor, true, jdk6);
                 } else {
                     throw new RuntimeException("Shouldn't happen. WsGenMode="+wsGenMode);
                 }
