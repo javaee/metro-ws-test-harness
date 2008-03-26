@@ -566,8 +566,12 @@ public class TestDescriptor {
     private VersionProcessor getVersionProcessor(Element e) {
         // <client excludeFrom="jdk6" is excluded when run with -jdk6 flag
         String excludeFrom = e.attributeValue("excludeFrom", null);
-        if (jdk6 && excludeFrom != null && excludeFrom.contains(JDK6_EXCLUDE_VERSION)) {
-            excludeFrom = "all" ;
+        if (excludeFrom != null && excludeFrom.contains(JDK6_EXCLUDE_VERSION)) {
+            if (jdk6) {
+                excludeFrom = "all";
+            } else {
+                excludeFrom = excludeFrom.replace(JDK6_EXCLUDE_VERSION, "");
+            }
         }
         return new VersionProcessor(
             e.attributeValue("since",null),
