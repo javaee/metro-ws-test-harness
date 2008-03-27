@@ -58,8 +58,8 @@ final class JavaSeApplication implements Application {
     WAR war;
 
     /**
-     * "local://path/to/exploded/dir" portion of the endpoint address.
-     * Adding "?portName" makes it the full endpoint address.
+     * "http://host:port/context" portion of the endpoint address.
+     * Adding "/portName" makes it the full endpoint address.
      */
     private final @NotNull
     URI baseEndpointAddress;
@@ -84,7 +84,7 @@ final class JavaSeApplication implements Application {
     @NotNull
     public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
         // I'm not too confident if endpoint.name is always the port local name.
-        return baseEndpointAddress.resolve('?'+endpoint.name);
+        return baseEndpointAddress.resolve("./"+endpoint.name);
     }
 
     /**

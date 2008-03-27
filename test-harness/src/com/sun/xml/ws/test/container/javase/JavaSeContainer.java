@@ -104,7 +104,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         final String id = service.service.getGlobalUniqueName();
         final WAR war = assembleWar(service);
 
-        final String endpointAddress = new String("http://localhost:" + port + "/" + id);
+        final String endpointAddress = new String("http://localhost:" + port + "/" + id+"/");
 
         if (service.service.isSTS) {
             updateWsitClient(service, endpointAddress);
