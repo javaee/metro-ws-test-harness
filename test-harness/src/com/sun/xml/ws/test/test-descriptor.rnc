@@ -25,6 +25,8 @@ start = element descriptor {
     # optional transport declaration, in case a test requires a certain
     # kind of transport. If specified, tests will only run with the declared
     # transport and skipped otherwise.
+    #
+    # See also 'client' element's 'transport' description.
     attribute transport {"http"|"local"}? &
 
     # optional flag to force test to be skipped
@@ -63,6 +65,11 @@ start = element descriptor {
     element client {
         # human readable description of the test case.
         element description {text}?,
+
+        # optional transport declaration, in case a testcase requires a certain
+        # kind of transport. If specified, tests will only run with the declared
+        # transport and skipped otherwise.
+        attribute transport {"http"|"local"}?,
         
         # see http://kohsuke.sfbay/hudson/job/jaxws-test-harness/ws/docs/build/index.html#Side_effect_free_tests
         attribute sideEffectFree {"true"}?,

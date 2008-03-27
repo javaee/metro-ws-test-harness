@@ -324,6 +324,10 @@ public class TestDescriptor {
             versionProcessor = getVersionProcessor(client);
 
             boolean sideEffectFree = client.attribute("sideEffectFree")!=null;
+            String clientTransport = client.attributeValue("transport");
+            TransportSet clientSupportedTransport = (clientTransport==null)
+                ? TransportSet.ALL : new Singleton(clientTransport);
+
 
             if(client.attribute("href")!=null) {
                 // reference to script files
@@ -331,13 +335,13 @@ public class TestDescriptor {
                 fs.setDir(testDir);
                 fs.setIncludes(client.attributeValue("href"));
                 for( String relPath : fs.getDirectoryScanner(World.project).getIncludedFiles() ) {
-                    TestClient testClient = new TestClient(this,versionProcessor,
+                    TestClient testClient = new TestClient(this,versionProcessor, clientSupportedTransport,
                             new Script.File(new File(testDir,relPath)),sideEffectFree);
                     this.clients.add(testClient);
                 }
             } else {
                 // literal text
-                TestClient testClient = new TestClient(this,versionProcessor,
+                TestClient testClient = new TestClient(this,versionProcessor, clientSupportedTransport,
                     new Script.Inline(client.attributeValue("name"),client.getText()),
                     sideEffectFree);
                 this.clients.add(testClient);
@@ -442,6 +446,10 @@ public class TestDescriptor {
                 continue; // skip
             if (version != null && ! c.applicableVersions.isApplicable(version)) {
                 System.err.println("Not applicable to current version="+version+". Skipping "+c.script.getName());
+                continue;
+            }
+            if(!c.supportedTransport.contains(container.getTransport())) {
+                System.out.println("Skipping "+c.script.getName()+" as it's not applicable to "+container.getTransport());
                 continue;
             }
             if(concurrentSideEffectFree && c.sideEffectFree) {

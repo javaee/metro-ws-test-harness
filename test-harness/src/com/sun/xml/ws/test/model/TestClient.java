@@ -77,9 +77,12 @@ public class TestClient {
      */
     public final boolean sideEffectFree;
 
-    public TestClient(TestDescriptor parent, VersionProcessor applicableVersions, Script script, boolean sideEffectFree) {
+    public final TransportSet supportedTransport;
+
+    public TestClient(TestDescriptor parent, VersionProcessor applicableVersions, TransportSet supportedTransport, Script script, boolean sideEffectFree) {
         this.parent = parent;
         this.applicableVersions = applicableVersions;
+        this.supportedTransport = supportedTransport;
         this.script = script;
         this.sideEffectFree = sideEffectFree;
     }
