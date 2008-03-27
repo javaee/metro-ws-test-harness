@@ -57,6 +57,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -68,6 +69,10 @@ import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+/**
+ * @author Ken Hofsass
+ * @author Jitendra Kotamraju
+ */
 public class JavaSeContainer extends AbstractApplicationContainer {
 
     private HttpServer appServer;
@@ -122,11 +127,23 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
         final Object endpointImpl = endpointClass.newInstance();
 
-        final List<Source> metadata = new LinkedList<Source>();
-        for (File file : war.getWSDL()) {
-            Source source = new StreamSource(new FileInputStream(file));
-            source.setSystemId(file.toURL().toExternalForm());
-            metadata.add(source);
+        // Collect all WSDL, Schema metadata for this service
+        final List<Source> metadata = new ArrayList<Source>();
+        if (service.service.wsdl != null) {
+            File primaryWsdl = service.service.wsdl.wsdlFile;
+            Source primary = new StreamSource(new FileInputStream(primaryWsdl));
+            primary.setSystemId(primaryWsdl.getCanonicalFile().toURL().toExternalForm());
+            metadata.add(primary);
+            for(File file: service.service.wsdl.importedWsdls) {
+                Source source = new StreamSource(new FileInputStream(file));
+                source.setSystemId(file.getCanonicalFile().toURL().toExternalForm());
+                metadata.add(source);
+            }
+            for(File file: service.service.wsdl.schemas) {
+                Source source = new StreamSource(new FileInputStream(file));
+                source.setSystemId(file.getCanonicalFile().toURL().toExternalForm());
+                metadata.add(source);
+            }
         }
         
         interpreter.set("endpointAddress", endpointAddress);
