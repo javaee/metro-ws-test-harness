@@ -433,6 +433,9 @@ public class Main {
             System.out.println("Using wsgen from "+externalWsGen);
             System.out.println("Using wsimport from "+externalWsImport);
             javaSe = true;
+            if (version == null) {
+                version = new VersionNumber("2.1.1");
+            }
             System.out.println("Going to use SE lightweight http server");
         } else {
             throw new CmdLineException("No -cp option is specified, nor were we able to guess the -cp option");
