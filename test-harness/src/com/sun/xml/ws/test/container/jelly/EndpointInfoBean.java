@@ -92,9 +92,17 @@ public class EndpointInfoBean {
     public String getService() {
         return (service == null ? null : service.toString());
     }
+
+    public QName getServiceName() {
+        return service;
+    }
     
     public String getPort() {
         return (port == null ? null : port.toString());
+    }
+
+    public QName getPortName() {
+        return port;
     }
     
     public String getBinding() {

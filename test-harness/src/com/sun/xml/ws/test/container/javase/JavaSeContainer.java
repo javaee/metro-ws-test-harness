@@ -42,6 +42,7 @@ import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.WAR;
+import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.World;
@@ -54,10 +55,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -68,6 +66,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import sun.rmi.transport.Endpoint;
 
 /**
  * @author Ken Hofsass
@@ -108,6 +107,8 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     public Application deploy(DeployedService service) throws Exception {
         final String id = service.service.getGlobalUniqueName();
         final WAR war = assembleWar(service);
+        List<EndpointInfoBean> beans = war.getEndpointInfoBeans();
+
 
         final String endpointAddress = new String("http://localhost:" + port + "/" + id+"/");
 
@@ -123,6 +124,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
                                                                      World.runtime.getClassLoader());
         final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
         final TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
+        final EndpointInfoBean endpointInfoBean = (EndpointInfoBean)beans.toArray()[0];
         final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
 
         final Object endpointImpl = endpointClass.newInstance();
@@ -145,15 +147,30 @@ public class JavaSeContainer extends AbstractApplicationContainer {
                 metadata.add(source);
             }
         }
+        System.out.print("Setting metadata="+metadata);
+
+        // Set service name, port name
+        Map<String, Object> props = new HashMap<String, Object>();
+        if (endpointInfoBean.getServiceName() != null) {
+            // Endpoint.WSDL_SERVICE
+            props.put("javax.xml.ws.wsdl.service", endpointInfoBean.getServiceName());
+        }
+        if (endpointInfoBean.getPortName() != null) {
+            // Endpoint.WSDL_PORT
+            props.put("javax.xml.ws.wsdl.port", endpointInfoBean.getPortName());
+        }
+        System.out.println("Setting properties="+props);
         
         interpreter.set("endpointAddress", endpointAddress);
         interpreter.set("endpointImpl", endpointImpl);
         interpreter.set("metadata", metadata);
+        interpreter.set("properties", props);
 
         final Object server = interpreter.eval(
                 "javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
                 "System.out.println(\"endpointAddress = \" + endpointAddress);" +
                 "endpoint.setMetadata(metadata);" +
+                "endpoint.setProperties(properties);" +
                 "endpoint.publish(endpointAddress);" +
                 "return endpoint;");
 

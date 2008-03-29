@@ -196,6 +196,10 @@ public final class WAR {
         return infoBean.getEndpointInfoBeans();
     }
 
+    public final List<EndpointInfoBean> getEndpointInfoBeans() throws Exception {
+        return new SunJaxwsInfoBean(this).getEndpointInfoBeans();
+    }
+
     /**
      * This method uses Jelly to write the web.xml file. The
      * template file is web.jelly. The real work happens
