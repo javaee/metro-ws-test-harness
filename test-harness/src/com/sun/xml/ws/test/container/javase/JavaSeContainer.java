@@ -136,13 +136,15 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         boolean wsdlLocation = false;
         Annotation[] anns = endpointClass.getAnnotations();
         for(Annotation ann : anns) {
-            Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
-            if (method != null) {
+            try {
+                Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
                 String str = (String)method.invoke(ann);
                 if (!str.equals("")) {
                     wsdlLocation = true;
                     break;
                 }
+            } catch(NoSuchMethodException e) {
+                // OK, the annotation does not support wsdlLocation() method
             }
         }
 
