@@ -57,6 +57,8 @@ import java.net.URLClassLoader;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import org.dom4j.Attribute;
@@ -120,7 +122,8 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             patchWsdl(wsdl, endpointAddress);
         }
 
-        final URLClassLoader serviceClassLoader = new URLClassLoader(new URL[]{new File(service.warDir, "WEB-INF/classes").toURL()},
+        // classLoader.getResource("WEB-INF/wsdl/xxx.wsdl") should work
+        final URLClassLoader serviceClassLoader = new URLClassLoader(new URL[]{service.warDir.toURL(), new File(service.warDir, "WEB-INF/classes").toURL()},
                                                                      World.runtime.getClassLoader());
         final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
         final TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
@@ -129,13 +132,30 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
         final Object endpointImpl = endpointClass.newInstance();
 
+        // Check if primary wsdl is specified via @WebService(wsdlLocation="")
+        boolean wsdlLocation = false;
+        Annotation[] anns = endpointClass.getAnnotations();
+        for(Annotation ann : anns) {
+            Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
+            if (method != null) {
+                String str = (String)method.invoke(ann);
+                if (!str.equals("")) {
+                    wsdlLocation = true;
+                    break;
+                }
+            }
+        }
+
         // Collect all WSDL, Schema metadata for this service
         final List<Source> metadata = new ArrayList<Source>();
         if (service.service.wsdl != null) {
-            File primaryWsdl = service.service.wsdl.wsdlFile;
-            Source primary = new StreamSource(new FileInputStream(primaryWsdl));
-            primary.setSystemId(primaryWsdl.getCanonicalFile().toURL().toExternalForm());
-            metadata.add(primary);
+            // If primary WSDL is specified via @WebService(wsdlLocation=), exclude it from metadata
+            if (!wsdlLocation) {
+                File primaryWsdl = service.service.wsdl.wsdlFile;
+                Source primary = new StreamSource(new FileInputStream(primaryWsdl));
+                primary.setSystemId(primaryWsdl.getCanonicalFile().toURL().toExternalForm());
+                metadata.add(primary);
+            }
             for(File file: service.service.wsdl.importedWsdls) {
                 Source source = new StreamSource(new FileInputStream(file));
                 source.setSystemId(file.getCanonicalFile().toURL().toExternalForm());
