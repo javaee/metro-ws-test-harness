@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.lang.annotation.Annotation;
@@ -133,14 +134,14 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         final Object endpointImpl = endpointClass.newInstance();
 
         // Check if primary wsdl is specified via @WebService(wsdlLocation="")
-        boolean wsdlLocation = false;
+        String wsdlLocation = null;
         Annotation[] anns = endpointClass.getAnnotations();
         for(Annotation ann : anns) {
             try {
                 Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
                 String str = (String)method.invoke(ann);
                 if (!str.equals("")) {
-                    wsdlLocation = true;
+                    wsdlLocation = str;
                     break;
                 }
             } catch(NoSuchMethodException e) {
@@ -150,23 +151,15 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
         // Collect all WSDL, Schema metadata for this service
         final List<Source> metadata = new ArrayList<Source>();
-        if (service.service.wsdl != null) {
-            // If primary WSDL is specified via @WebService(wsdlLocation=), exclude it from metadata
-            if (!wsdlLocation) {
-                File primaryWsdl = service.service.wsdl.wsdlFile;
-                Source primary = new StreamSource(new FileInputStream(primaryWsdl));
-                primary.setSystemId(primaryWsdl.getCanonicalFile().toURL().toExternalForm());
-                metadata.add(primary);
-            }
-            for(File file: service.service.wsdl.importedWsdls) {
-                Source source = new StreamSource(new FileInputStream(file));
-                source.setSystemId(file.getCanonicalFile().toURL().toExternalForm());
-                metadata.add(source);
-            }
-            for(File file: service.service.wsdl.schemas) {
-                Source source = new StreamSource(new FileInputStream(file));
-                source.setSystemId(file.getCanonicalFile().toURL().toExternalForm());
-                metadata.add(source);
+        collectDocs(service.warDir.getCanonicalPath()+"/", "WEB-INF/wsdl/", serviceClassLoader, metadata);
+        // primary wsdl shouldn't be added, if it is already set via @WebService(wsdlLocation=)
+        if (wsdlLocation != null) {
+            Iterator<Source> it = metadata.iterator();
+            while(it.hasNext()) {
+                Source source = it.next();
+                if (source.getSystemId().endsWith(wsdlLocation)) {
+                    it.remove();
+                }
             }
         }
         System.out.print("Setting metadata="+metadata);
@@ -189,7 +182,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         interpreter.set("properties", props);
 
         final Object server = interpreter.eval(
-                "javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
+                "endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
                 "System.out.println(\"endpointAddress = \" + endpointAddress);" +
                 "endpoint.setMetadata(metadata);" +
                 "endpoint.setProperties(properties);" +
@@ -197,6 +190,39 @@ public class JavaSeContainer extends AbstractApplicationContainer {
                 "return endpoint;");
 
         return new JavaSeApplication(war, server, new URI(endpointAddress));
+    }
+
+    private Set<String> getResourcePaths(String root, String path) {
+        Set<String> r = new HashSet<String>();
+        File[] files = new File(root+path).listFiles();
+        if (files == null) {
+            return null;
+        }
+        for( File f : files) {
+            if(f.isDirectory()) {
+                r.add(path+f.getName()+'/');
+            } else {
+                r.add(path+f.getName());
+            }
+        }
+        return r;
+    }
+
+    /**
+     * Get all the WSDL & schema documents recursively.
+     */
+    private void collectDocs(String root, String dirPath, ClassLoader loader, List<Source> metadata) throws MalformedURLException, IOException {
+        Set<String> paths = getResourcePaths(root, dirPath);
+        if (paths != null) {
+            for (String path : paths) {
+                if (path.endsWith("/")) {
+                    collectDocs(root, path, loader, metadata);
+                } else {
+                    URL res = loader.getResource(path);
+                    metadata.add(new StreamSource(res.openStream(), res.toExternalForm()));
+                }
+            }
+        }
     }
 
     public void updateWsitClient(DeployedService deployedService, String newLocation) throws DocumentException, IOException {
