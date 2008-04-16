@@ -429,7 +429,16 @@ public class Main {
             System.out.println("Using JAX-WS in JDK");
             File jreHome = new File(System.getProperty("java.home"));
             externalWsGen = new File( jreHome.getParent(), "bin/wsgen" );
+            if (!externalWsGen.exists()) {
+                externalWsGen = new File( jreHome.getParent(), "bin/wsgen.exe" );
+            }
             externalWsImport = new File( jreHome.getParent(), "bin/wsimport" );
+            if (!externalWsImport.exists()) {
+                externalWsImport = new File( jreHome.getParent(), "bin/wsimport.exe" );
+            }
+            if (!externalWsGen.exists() || !externalWsImport.exists()) {
+                throw new CmdLineException("wsgen or wsimport command line tools are not found in jdk");
+            }
             System.out.println("Using wsgen from "+externalWsGen);
             System.out.println("Using wsimport from "+externalWsImport);
             javaSe = true;
