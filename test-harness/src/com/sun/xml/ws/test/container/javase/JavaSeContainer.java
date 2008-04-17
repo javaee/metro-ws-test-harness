@@ -37,7 +37,6 @@
 package com.sun.xml.ws.test.container.javase;
 
 import com.sun.istack.NotNull;
-import com.sun.net.httpserver.HttpServer;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -77,7 +76,6 @@ import sun.rmi.transport.Endpoint;
  */
 public class JavaSeContainer extends AbstractApplicationContainer {
 
-    private HttpServer appServer;
     private ExecutorService appExecutorService;
     private final String sepChar;
     private final File webappsDir;
