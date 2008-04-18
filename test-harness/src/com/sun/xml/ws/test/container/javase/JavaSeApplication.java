@@ -53,7 +53,7 @@ final class JavaSeApplication extends AbstractHttpApplication {
 
 
     /**
-     * <tt>JavaSeServer</tt> object. This is loaded in another classloader,
+     * <tt>javax.xml.ws.Endpoint</tt> objects. This is loaded in another classloader,
      * so we can't use a typed value.
      */
     private final @NotNull Object[] servers;

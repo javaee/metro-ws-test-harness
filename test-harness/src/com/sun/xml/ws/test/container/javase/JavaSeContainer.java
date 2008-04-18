@@ -102,7 +102,16 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
             final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
 
-            final EndpointInfoBean endpointInfoBean = (EndpointInfoBean)beans.toArray()[i];
+            // Associate an EndpointInfoBean with the TestEndpoint
+            EndpointInfoBean endpointInfoBean = null;
+            for(Object bean : beans.toArray()) {
+                EndpointInfoBean ebean = (EndpointInfoBean)bean;
+                if (ebean.getImplementation().equals(testEndpoint.className)) {
+                    endpointInfoBean = ebean;
+                    break;
+                }
+            }
+
             final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
 
             final Object endpointImpl = endpointClass.newInstance();
