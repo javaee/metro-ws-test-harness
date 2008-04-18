@@ -37,6 +37,8 @@
 package com.sun.xml.ws.test.container.javase;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
 import com.sun.xml.ws.test.container.DeployedService;
@@ -44,53 +46,29 @@ import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
-import com.sun.xml.ws.test.World;
-import com.sun.xml.ws.test.client.InterpreterEx;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLClassLoader;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
-import sun.rmi.transport.Endpoint;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 /**
+ * Container to deploy Java SE endpoints using java.xml.ws.Endpoint API
+ *
  * @author Ken Hofsass
  * @author Jitendra Kotamraju
  */
 public class JavaSeContainer extends AbstractApplicationContainer {
 
-    private ExecutorService appExecutorService;
-    private final String sepChar;
-    private final File webappsDir;
-    private final File classesDir;
-    private boolean stopped;
     private final int port;
 
     public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port) {
         super(wsimport, wsgen);
-        String j2seServerDir = System.getProperty("j2se.server.home"); // TODO -- Get location from main
-        System.out.println("Server dir=" + j2seServerDir);
-        sepChar = System.getProperty("file.separator");
-        webappsDir = new File(j2seServerDir + sepChar + "webapps");
-        classesDir = new File(webappsDir, "classes");
-        System.out.println("webapps dir=" + webappsDir.getAbsolutePath());
         this.port = port;
     }
 
@@ -110,84 +88,86 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         final WAR war = assembleWar(service);
         List<EndpointInfoBean> beans = war.getEndpointInfoBeans();
 
+        URL baseAddress = new URL("http://localhost:" + port + "/" + id+"/");
 
-        final String endpointAddress = new String("http://localhost:" + port + "/" + id+"/");
-
-        if (service.service.isSTS) {
-            updateWsitClient(service, endpointAddress);
-        }
-        HashMap<QName, String> portToNamespace = new HashMap<QName, String>();
-        for (File wsdl : war.getWSDL()) {
-            patchWsdl(wsdl, endpointAddress);
-        }
-
-        // classLoader.getResource("WEB-INF/wsdl/xxx.wsdl") should work
+        // serviceClassLoader.getResource("WEB-INF/wsdl/xxx.wsdl") should work,
+        // so adjust the classpath accordingly
         final URLClassLoader serviceClassLoader = new URLClassLoader(new URL[]{service.warDir.toURL(), new File(service.warDir, "WEB-INF/classes").toURL()},
                                                                      World.runtime.getClassLoader());
-        final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
-        final TestEndpoint testEndpoint = (TestEndpoint) service.service.endpoints.toArray()[0];
-        final EndpointInfoBean endpointInfoBean = (EndpointInfoBean)beans.toArray()[0];
-        final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
 
-        final Object endpointImpl = endpointClass.newInstance();
 
-        // Check if primary wsdl is specified via @WebService(wsdlLocation="")
-        String wsdlLocation = null;
-        Annotation[] anns = endpointClass.getAnnotations();
-        for(Annotation ann : anns) {
-            try {
-                Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
-                String str = (String)method.invoke(ann);
-                if (!str.equals("")) {
-                    wsdlLocation = str;
-                    break;
-                }
-            } catch(NoSuchMethodException e) {
-                // OK, the annotation does not support wsdlLocation() method
-            }
-        }
+        Object[] servers = new Object[service.service.endpoints.size()];
+        int i = 0;
+        for(TestEndpoint testEndpoint :service.service.endpoints) {
 
-        // Collect all WSDL, Schema metadata for this service
-        final List<Source> metadata = new ArrayList<Source>();
-        collectDocs(service.warDir.getCanonicalPath()+"/", "WEB-INF/wsdl/", serviceClassLoader, metadata);
-        // primary wsdl shouldn't be added, if it is already set via @WebService(wsdlLocation=)
-        if (wsdlLocation != null) {
-            Iterator<Source> it = metadata.iterator();
-            while(it.hasNext()) {
-                Source source = it.next();
-                if (source.getSystemId().endsWith(wsdlLocation)) {
-                    it.remove();
+            final InterpreterEx interpreter = new InterpreterEx(serviceClassLoader);
+
+            final EndpointInfoBean endpointInfoBean = (EndpointInfoBean)beans.toArray()[i];
+            final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
+
+            final Object endpointImpl = endpointClass.newInstance();
+
+            // Check if primary wsdl is specified via @WebService(wsdlLocation="")
+            String wsdlLocation = null;
+            Annotation[] anns = endpointClass.getAnnotations();
+            for(Annotation ann : anns) {
+                try {
+                    Method method = ann.getClass().getDeclaredMethod("wsdlLocation");
+                    String str = (String)method.invoke(ann);
+                    if (!str.equals("")) {
+                        wsdlLocation = str;
+                        break;
+                    }
+                } catch(NoSuchMethodException e) {
+                    // OK, the annotation does not support wsdlLocation() method
                 }
             }
-        }
-        System.out.print("Setting metadata="+metadata);
 
-        // Set service name, port name
-        Map<String, Object> props = new HashMap<String, Object>();
-        if (endpointInfoBean.getServiceName() != null) {
-            // Endpoint.WSDL_SERVICE
-            props.put("javax.xml.ws.wsdl.service", endpointInfoBean.getServiceName());
-        }
-        if (endpointInfoBean.getPortName() != null) {
-            // Endpoint.WSDL_PORT
-            props.put("javax.xml.ws.wsdl.port", endpointInfoBean.getPortName());
-        }
-        System.out.println("Setting properties="+props);
-        
-        interpreter.set("endpointAddress", endpointAddress);
-        interpreter.set("endpointImpl", endpointImpl);
-        interpreter.set("metadata", metadata);
-        interpreter.set("properties", props);
+            // Collect all WSDL, Schema metadata for this service
+            final List<Source> metadata = new ArrayList<Source>();
+            collectDocs(service.warDir.getCanonicalPath()+"/", "WEB-INF/wsdl/", serviceClassLoader, metadata);
+            
+            // primary wsdl shouldn't be added, if it is already set via @WebService(wsdlLocation=)
+            if (wsdlLocation != null) {
+                Iterator<Source> it = metadata.iterator();
+                while(it.hasNext()) {
+                    Source source = it.next();
+                    if (source.getSystemId().endsWith(wsdlLocation)) {
+                        it.remove();
+                    }
+                }
+            }
+            System.out.print("Setting metadata="+metadata);
 
-        final Object server = interpreter.eval(
-                "endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
-                "System.out.println(\"endpointAddress = \" + endpointAddress);" +
-                "endpoint.setMetadata(metadata);" +
-                "endpoint.setProperties(properties);" +
-                "endpoint.publish(endpointAddress);" +
-                "return endpoint;");
+            // Set service name, port name
+            Map<String, Object> props = new HashMap<String, Object>();
+            if (endpointInfoBean.getServiceName() != null) {
+                // Endpoint.WSDL_SERVICE
+                props.put("javax.xml.ws.wsdl.service", endpointInfoBean.getServiceName());
+            }
+            if (endpointInfoBean.getPortName() != null) {
+                // Endpoint.WSDL_PORT
+                props.put("javax.xml.ws.wsdl.port", endpointInfoBean.getPortName());
+            }
+            System.out.println("Setting properties="+props);
 
-        return new JavaSeApplication(war, server, new URI(endpointAddress));
+            String endpointAddress = baseAddress+ testEndpoint.name;
+            System.out.println("Endpoint Address="+endpointAddress);
+
+            interpreter.set("endpointAddress", endpointAddress);
+            interpreter.set("endpointImpl", endpointImpl);
+            interpreter.set("metadata", metadata);
+            interpreter.set("properties", props);
+
+            // TODO handlers
+            servers[i++] = interpreter.eval(
+                    "endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
+                    "endpoint.setMetadata(metadata);" +
+                    "endpoint.setProperties(properties);" +
+                    "endpoint.publish(endpointAddress);" +
+                    "return endpoint;");
+        }
+        return new JavaSeApplication(servers, baseAddress, service);
     }
 
     private Set<String> getResourcePaths(String root, String path) {
@@ -206,10 +186,10 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         return r;
     }
 
-    /**
+    /*
      * Get all the WSDL & schema documents recursively.
      */
-    private void collectDocs(String root, String dirPath, ClassLoader loader, List<Source> metadata) throws MalformedURLException, IOException {
+    private void collectDocs(String root, String dirPath, ClassLoader loader, List<Source> metadata) throws IOException {
         Set<String> paths = getResourcePaths(root, dirPath);
         if (paths != null) {
             for (String path : paths) {
@@ -223,72 +203,4 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         }
     }
 
-    public void updateWsitClient(DeployedService deployedService, String newLocation) throws DocumentException, IOException {
-        File wsitClientFile = new File(deployedService.service.parent.resources, "wsit-client.xml");
-        if (wsitClientFile.exists()) {
-            SAXReader reader = new SAXReader();
-            Document document = reader.read(wsitClientFile);
-            Element root = document.getRootElement();
-            Element policy = root.element("Policy");
-            Element sts = policy.element("ExactlyOne").element("All").element("PreconfiguredSTS");
-
-            Attribute endpoint = sts.attribute("endpoint");
-
-            newLocation = newLocation.replace('\\', '/');
-            endpoint.setValue(newLocation);
-
-            Attribute wsdlLoc = sts.attribute("wsdlLocation");
-            wsdlLoc.setValue(deployedService.service.wsdl.wsdlFile.toURI().toString());
-
-            XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
-            writer.write(document);
-            writer.close();
-        } else {
-            throw new RuntimeException("wsit-client.xml is absent. It is required. \n" +
-                                       "Please check " + deployedService.service.parent.resources);
-        }
-    }
-
-    /**
-     * Fix the address in the WSDL. to the local address.
-     */
-    private void patchWsdl(File wsdl, String endpointAddress) throws Exception {
-        Document doc = new SAXReader().read(wsdl);
-        List ports = doc.getRootElement().element("service").elements("port");
-
-        for (Object wsdlPort : ports) {
-            Element castPort = (Element) wsdlPort;
-            String portName = castPort.attributeValue("name");
-            Element address = getSoapAddress(castPort);
-
-            //Looks like invalid wsdl:port, MUST have a soap:address
-            if (address == null) {
-                throw new RuntimeException("Did not find a soap:address for wsdl:port " + portName);
-            }
-            Attribute locationAttr = address.attribute("location");
-            String newLocation = endpointAddress + "/" + portName;
-            newLocation = newLocation.replace('\\', '/');
-            locationAttr.setValue(newLocation);
-        }
-
-        // save file
-        FileOutputStream os = new FileOutputStream(wsdl);
-        new XMLWriter(os).write(doc);
-        os.close();
-    }
-
-    private Element getSoapAddress(Element port) {
-        for (Object obj : port.elements()) {
-            Element address = (Element) obj;
-
-            //it might be extensibility element, just skip it
-            if (!address.getName().equals("address")) {
-                continue;
-            }
-            if (address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap/") || address.getNamespaceURI().equals("http://schemas.xmlsoap.org/wsdl/soap12/")) {
-                return address;
-            }
-        }
-        return null;
-    }
 }

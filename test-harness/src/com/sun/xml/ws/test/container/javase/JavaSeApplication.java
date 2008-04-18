@@ -38,77 +38,41 @@ package com.sun.xml.ws.test.container.javase;
 
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.client.InterpreterEx;
+import com.sun.xml.ws.test.container.AbstractHttpApplication;
 import com.sun.xml.ws.test.container.Application;
-import com.sun.xml.ws.test.container.WAR;
-import com.sun.xml.ws.test.model.TestEndpoint;
+import com.sun.xml.ws.test.container.DeployedService;
 
-import java.io.File;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@link Application} implementation for {@link JavaSeContainer}.
  *
+ * @author Jitendra Kotamraju
  */
-final class JavaSeApplication implements Application {
+final class JavaSeApplication extends AbstractHttpApplication {
 
-    private final @NotNull
-    WAR war;
-
-    /**
-     * "http://host:port/context" portion of the endpoint address.
-     * Adding "/portName" makes it the full endpoint address.
-     */
-    private final @NotNull
-    URI baseEndpointAddress;
 
     /**
      * <tt>JavaSeServer</tt> object. This is loaded in another classloader,
      * so we can't use a typed value.
      */
-    private final @NotNull Object server;
+    private final @NotNull Object[] servers;
 
-    /** Creates a new instance of LocalApplication */
-    JavaSeApplication(@NotNull WAR war, Object server, URI endpointAddress) {
-        this.war = war;
-        this.server = server;
-        this.baseEndpointAddress = endpointAddress;
-    }
 
-    /**
-     * Returns the actual endpoint address to which the given {@link TestEndpoint}
-     * is deployed.
-     */
-    @NotNull
-    public URI getEndpointAddress(@NotNull TestEndpoint endpoint) throws Exception {
-        // I'm not too confident if endpoint.name is always the port local name.
-        return baseEndpointAddress.resolve("./"+endpoint.name);
-    }
-
-    /**
-     * Gets the WSDL of this service.
-     *
-     * <p>
-     * This WSDL will be compiled to generate client artifacts during a test.
-     */
-    @NotNull
-    public List<URL> getWSDL() throws Exception {
-        List<URL> urls = new ArrayList<URL>();
-        for (File w : war.getWSDL()) {
-            urls.add(w.toURL());
-        }
-        return urls;
+    JavaSeApplication(Object[] servers, URL baseAddress, DeployedService service) {
+        super(baseAddress, service);
+        this.servers = servers;
     }
 
     /**
      * Removes this application from the container.
      */
     public void undeploy() throws Exception {
-        InterpreterEx i = new InterpreterEx(server.getClass().getClassLoader());
-        i.set("server",server);
-        i.eval("server.stop()");
+        for(Object server : servers) {
+            InterpreterEx i = new InterpreterEx(server.getClass().getClassLoader());
+            i.set("server",server);
+            i.eval("server.stop()");
+        }
     }
 }
 
