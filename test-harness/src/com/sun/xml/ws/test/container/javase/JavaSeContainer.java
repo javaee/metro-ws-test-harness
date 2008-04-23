@@ -55,6 +55,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.ServerSocket;
 import java.util.*;
 
 /**
@@ -65,11 +66,11 @@ import java.util.*;
  */
 public class JavaSeContainer extends AbstractApplicationContainer {
 
-    private final int port;
+    //private final int port;
 
     public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port) {
         super(wsimport, wsgen);
-        this.port = port;
+        //this.port = port;
     }
 
     public String getTransport() {
@@ -88,7 +89,9 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         final WAR war = assembleWar(service);
         List<EndpointInfoBean> beans = war.getEndpointInfoBeans();
 
-        URL baseAddress = new URL("http://localhost:" + port + "/" + id+"/");
+        // Using a free port rather than a standard port since starting and
+        // stopping multiple times has BindingException with light weight http server
+        URL baseAddress = new URL("http://localhost:" + getFreePort() + "/" + id+"/");
 
         // serviceClassLoader.getResource("WEB-INF/wsdl/xxx.wsdl") should work,
         // so adjust the classpath accordingly
@@ -194,6 +197,18 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         }
         return r;
     }
+
+    private static int getFreePort() {
+        int port = -1;
+        try {
+            ServerSocket soc = new ServerSocket(0);
+            port = soc.getLocalPort();
+            soc.close();
+        } catch (IOException e) {
+        }
+        return port;
+    }
+
 
     /*
      * Get all the WSDL & schema documents recursively.
