@@ -47,6 +47,7 @@ import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
 import com.sun.xml.ws.test.model.TestEndpoint;
+import com.sun.xml.ws.test.World;
 
 import java.beans.Introspector;
 import java.io.InputStreamReader;
@@ -75,8 +76,9 @@ public class ClientExecutor extends Executor {
     }
 
     public void runBare() throws Throwable {
-        if(context.clientClassLoader==null)
-            fail("this test is skipped because of other failures");
+        if(context.clientClassLoader==null) {
+             context.clientClassLoader = World.runtime.getClassLoader();
+        }
 
         Interpreter engine = new InterpreterEx(context.clientClassLoader);
 
@@ -157,6 +159,24 @@ public class ClientExecutor extends Executor {
             if (! svc.service.isSTS) {
                 // inject WSDL URLs
                 engine.set("wsdlUrls",svc.app.getWSDL());
+
+                /*
+                 TODO: some more work here
+                // Server side may be provider endpoint that doesn't expose WSDL
+                // So there are no generated services.
+                if (svc.serviceClass.size() == 0) {
+
+                    String portName = null;
+                    for (TestEndpoint e : svc.service.endpoints) {
+                        portName = e.portName;
+                        break;
+                    }
+                    String varName = Introspector.decapitalize(portName);
+                    engine.set(varName +"Address",svc.app.getEndpointAddress(getEndpoint(svc, portName)));
+                    addressList.append(' ').append(varName).append("Address");
+                    continue;
+                }
+                */
 
                 for (Class clazz : svc.serviceClass) {
                     String packageName = clazz.getPackage().getName();

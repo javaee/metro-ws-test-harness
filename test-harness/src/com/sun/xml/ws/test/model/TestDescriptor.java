@@ -435,7 +435,7 @@ public class TestDescriptor {
             suite.addTest(dt);
         }
 
-        if(context.services.isEmpty()) {
+        if(context.services.isEmpty() && new File(context.descriptor.home,"client").exists()) {
             // no services. just run the clients as tests
             suite.addTest(new ClientCompileExecutor(context));
         }
