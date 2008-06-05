@@ -190,11 +190,11 @@ public class Main {
         usage="loads Jetty into the harness VM and test with it.")
     File embeddedJetty;
 
-    @Option(name="-javase",usage="tests using the Java lightweight HTTP server")
-    boolean javaSe = false;
+    @Option(name="-lwhs",usage="tests using the Java lightweight HTTP server")
+    boolean lwhs = false;
 
-    @Option(name="-jdk6",usage="tests using JAX-WS in JDK")
-    boolean jdk6 = false;
+    @Option(name="-jaxwsInJDK",usage="tests using JAX-WS impl in JDK")
+    boolean jaxwsInJDK = false;
 
     
     @Option(name="-glassfish-remote",metaVar="CONFIG",
@@ -372,7 +372,7 @@ public class Main {
             runtime.addJarFolder(new File(embeddedJetty,"lib"));
         }
 
-        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null && !jdk6)
+        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null && !jaxwsInJDK)
             guessWorkspace();
 
         // fill in runtime and tool realms
@@ -425,7 +425,7 @@ public class Main {
             runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
-        } else if (jdk6) {
+        } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
             File jreHome = new File(System.getProperty("java.home"));
             externalWsGen = new File( jreHome.getParent(), "bin/wsgen" );
@@ -441,7 +441,7 @@ public class Main {
             }
             System.out.println("Using wsgen from "+externalWsGen);
             System.out.println("Using wsimport from "+externalWsImport);
-            javaSe = true;
+            lwhs = true;
             if (version == null) {
                 version = new VersionNumber("2.1.1");
             }
@@ -627,7 +627,7 @@ public class Main {
             );
         }
 
-        if (javaSe) {
+        if (lwhs) {
             System.err.println("Using the built-in Java SE lightweight HTTP server");
             return new JavaSeContainer(wsimport,wsgen,port);
         }
@@ -671,12 +671,12 @@ public class Main {
             try {
                 TestDescriptor td[] = new TestDescriptor[2];
                 if (wsGenMode == WsGenMode.ALWAYS) {
-                    td[0] = new TestDescriptor(descriptor, false, jdk6);
+                    td[0] = new TestDescriptor(descriptor, false, jaxwsInJDK);
                 } else if (wsGenMode == WsGenMode.BOTH ) {
-                    td[0] = new TestDescriptor(descriptor, false, jdk6);
-                    td[1] = new TestDescriptor(descriptor, true, jdk6);
+                    td[0] = new TestDescriptor(descriptor, false, jaxwsInJDK);
+                    td[1] = new TestDescriptor(descriptor, true, jaxwsInJDK);
                 } else if (wsGenMode == WsGenMode.IGNORE) {
-                    td[0] = new TestDescriptor(descriptor, true, jdk6);
+                    td[0] = new TestDescriptor(descriptor, true, jaxwsInJDK);
                 } else {
                     throw new RuntimeException("Shouldn't happen. WsGenMode="+wsGenMode);
                 }
