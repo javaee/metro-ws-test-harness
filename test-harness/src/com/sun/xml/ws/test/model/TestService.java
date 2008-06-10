@@ -46,6 +46,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -180,6 +181,9 @@ public class TestService {
                 return child.getName().endsWith(".java");
             }
         });
+        // Sort the files so that sun-jaxws.xml list the endpoints in order
+        Arrays.sort(javas);
+
         for (File src : javas) {
             // parse the Java file, looking for @WebService
             // this isn't very robust, but works without compiling them
