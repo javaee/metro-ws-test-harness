@@ -53,10 +53,12 @@ import java.beans.Introspector;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map.Entry;
 
 /**
@@ -77,7 +79,9 @@ public class ClientExecutor extends Executor {
 
     public void runBare() throws Throwable {
         if(context.clientClassLoader==null) {
-             context.clientClassLoader = World.runtime.getClassLoader();
+            context.clientClassLoader = context.descriptor.resources != null
+                    ? new URLClassLoader(new URL[]{context.descriptor.resources.toURL()}, World.runtime.getClassLoader())
+                    : World.runtime.getClassLoader();
         }
 
         Interpreter engine = new InterpreterEx(context.clientClassLoader);

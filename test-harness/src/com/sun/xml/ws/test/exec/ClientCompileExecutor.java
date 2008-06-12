@@ -69,9 +69,11 @@ public class ClientCompileExecutor extends Executor {
             // if we are just reusing the existing artifacts, no need to recompile.
             javac.execute();
 
-        // load the generated classes
-        ClassLoader cl = new URLClassLoader( new URL[]{classDir.toURL()},
-                World.runtime.getClassLoader() );
+        // load the generated classes and resources
+        URL[] url = (context.descriptor.resources == null)
+                ? new URL[] {classDir.toURL()}
+                : new URL[] {classDir.toURL(),context.descriptor.resources.toURL()};
+        ClassLoader cl = new URLClassLoader( url, World.runtime.getClassLoader() );
 
         context.clientClassLoader = cl;
     }
