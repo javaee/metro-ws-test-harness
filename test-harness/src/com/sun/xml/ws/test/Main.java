@@ -117,6 +117,9 @@ public class Main {
     @Option(name="-cp:wsit",usage="classpath option\npath to WSIT workspace",metaVar="WSIT_HOME")
     File wsitWs = null;
 
+    @Option(name="-cp:metrov3-image",usage="classpath option\npath to the Metro for GlassFish v3 workspace",metaVar="WSIT_HOME")
+    File metroV3Image = null;
+
     @Option(name="-cp:jaxws-image",usage="classpath option\npath to JAX-WS RI dist image",metaVar="JAXWS_HOME")
     File jaxwsImage = null;
 
@@ -308,6 +311,7 @@ public class Main {
             TestRunner testRunner = new TestRunner() {
                 private AntXmlFormatter formatter;
 
+                @Override
                 protected TestResult createTestResult() {
                     TestResult result = super.createTestResult();
 
@@ -319,6 +323,7 @@ public class Main {
                     return result;
                 }
 
+                @Override
                 public TestResult doRun(Test test) {
                     try {
                         return super.doRun(test);
@@ -372,7 +377,7 @@ public class Main {
             runtime.addJarFolder(new File(embeddedJetty,"lib"));
         }
 
-        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null && !jaxwsInJDK)
+        if(wsitImage==null && wsitWs==null && metroV3Image == null && jaxwsImage==null && jaxwsWs==null && !jaxwsInJDK)
             guessWorkspace();
 
         // fill in runtime and tool realms
@@ -406,6 +411,21 @@ public class Main {
             runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));*/
             tool.addClassFolder(    new File(wsitWs,"tools/build/classes"));
             tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
+        } else
+        if(metroV3Image!=null) {
+            File apiJar = new File(metroV3Image,"webservices-api.jar");
+            runtime.addJar(apiJar);
+
+            File rtJar = new File(metroV3Image,"webservices-rt.jar");
+            runtime.addJar(rtJar);
+            
+            File toolJar = new File(metroV3Image,"webservices-tools.jar");
+            tool.addJar(toolJar);
+            
+            containerClasspathPrefix = new File[3];
+            containerClasspathPrefix[0] = apiJar;
+            containerClasspathPrefix[1] = rtJar;
+            containerClasspathPrefix[2] = toolJar;
         } else
         if(jaxwsImage!=null) {
             tool.addJar(            new File(jaxwsImage,"lib/jaxws-tools.jar"));
@@ -613,17 +633,17 @@ public class Main {
 
             String userName = defaultsTo(matcher.group(2),"admin");
             String password = defaultsTo(matcher.group(3),"adminadmin");
-            String host = matcher.group(4);
-            String port = defaultsTo(matcher.group(6),"4848");
+            String remoteHost = matcher.group(4);
+            String remotePort = defaultsTo(matcher.group(6),"4848");
             String httpUrl = matcher.group(8);
 
             if(httpUrl==null) {
                 // defaulted
-                httpUrl = "http://"+host+":8080/";
+                httpUrl = "http://"+remoteHost+":8080/";
             }
 
             return new GlassfishContainer(
-                wsimport, wsgen, new URL(httpUrl), host, Integer.parseInt(port), userName, password
+                wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password
             );
         }
 
