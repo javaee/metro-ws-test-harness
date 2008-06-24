@@ -62,6 +62,7 @@ abstract class Executor extends TestCase {
      *
      * Error happened during this will be recorded as a test failure.
      */
+    @Override
     public abstract void runBare() throws Throwable;
 
     protected final File makeWorkDir(String dirName) {
