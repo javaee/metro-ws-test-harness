@@ -648,6 +648,7 @@ public class Main {
             System.err.println("Using the built-in Java SE lightweight HTTP server");
             Set<String> unsupportedUses = new HashSet<String>();
             unsupportedUses.add("servlet");
+            unsupportedUses.add("multi-endpoint");
             if (jaxwsInJDK) {
                 unsupportedUses.add("ri-api");
             }
