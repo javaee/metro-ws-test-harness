@@ -29,6 +29,8 @@ start = element descriptor {
     # See also 'client' element's 'transport' description.
     attribute transport {"http"|"local"}? &
 
+    attribute uses { list { ("servlet"|"ri-api")+ } }? &
+
     # optional flag to force test to be skipped
     # to be used only in cases such as when the harness itself
     # is the cause of test failures and similar dilemmas

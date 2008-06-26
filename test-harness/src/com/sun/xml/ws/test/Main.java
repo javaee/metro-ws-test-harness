@@ -72,10 +72,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -649,7 +646,12 @@ public class Main {
 
         if (lwhs) {
             System.err.println("Using the built-in Java SE lightweight HTTP server");
-            return new JavaSeContainer(wsimport,wsgen,port);
+            Set<String> unsupportedUses = new HashSet<String>();
+            unsupportedUses.add("servlet");
+            if (jaxwsInJDK) {
+                unsupportedUses.add("ri-api");
+            }
+            return new JavaSeContainer(wsimport,wsgen,port,unsupportedUses);
         }
 
         if(legacyLocalTransport) {

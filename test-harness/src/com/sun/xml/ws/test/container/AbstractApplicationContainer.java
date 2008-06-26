@@ -39,11 +39,14 @@ package com.sun.xml.ws.test.container;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.World;
+import com.sun.istack.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
@@ -57,10 +60,17 @@ import java.util.List;
 public abstract class AbstractApplicationContainer implements ApplicationContainer {
     private final WsTool wsimport;
     private final WsTool wsgen;
+    private final Set<String> unsupportedUses;
 
     protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen) {
         this.wsimport = wsimport;
         this.wsgen = wsgen;
+        this.unsupportedUses = new HashSet<String>();
+    }
+
+    @NotNull
+    public Set<String> getUnsupportedUses() {
+        return unsupportedUses;
     }
 
     /**

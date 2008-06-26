@@ -67,10 +67,18 @@ import java.util.*;
 public class JavaSeContainer extends AbstractApplicationContainer {
 
     //private final int port;
+    private final Set<String> unsupportedUses;
 
-    public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port) {
+    public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port, Set<String> unsupportedUses) {
         super(wsimport, wsgen);
         //this.port = port;
+        this.unsupportedUses = unsupportedUses;
+    }
+
+    @Override
+    @NotNull
+    public Set<String> getUnsupportedUses() {
+        return unsupportedUses;
     }
 
     public String getTransport() {

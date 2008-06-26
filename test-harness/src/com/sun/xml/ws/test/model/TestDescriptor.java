@@ -75,13 +75,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Root object of the test model. Describes one test.
@@ -147,6 +141,11 @@ public class TestDescriptor {
      */
     @NotNull
     public final TransportSet supportedTransport;
+
+    /**
+     * Represents a set of Use keywords that are used by this test
+     */
+    public final Set<String> useSet;
 
     /**
      * Bugster IDs that are related to this test.
@@ -251,6 +250,7 @@ public class TestDescriptor {
         this.skip=false;
         this.setUpScript = null;
         this.jdk6 = jdk6;
+        this.useSet = new HashSet<String>();
     }
 
     /**
@@ -302,6 +302,15 @@ public class TestDescriptor {
             this.supportedTransport = TransportSet.ALL;
         else
             this.supportedTransport = new Singleton(transport);
+
+        this.useSet = new HashSet<String>();
+        String uses = root.attributeValue("uses");
+        if (uses != null) {
+            StringTokenizer st = new StringTokenizer(uses);
+            while(st.hasMoreTokens()) {
+                useSet.add(st.nextToken());
+            }
+        }
 
         String path = testDir.getCanonicalPath();
         String testCasesPattern = "testcases" + File.separatorChar;
@@ -415,6 +424,13 @@ public class TestDescriptor {
 
         if(!supportedTransport.contains(container.getTransport())) {
             System.out.println("Skipping "+name+" as it's not applicable to "+container.getTransport());
+            return suite;
+        }
+
+        Set<String> temp = new HashSet<String>(useSet);
+        temp.retainAll(container.getUnsupportedUses());
+        if (temp.size() > 0) {
+            System.out.println("Skipping "+name+" as the container "+container+" doesn't support "+temp);
             return suite;
         }
 
