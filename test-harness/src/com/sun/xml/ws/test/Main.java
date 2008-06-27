@@ -650,7 +650,7 @@ public class Main {
             unsupportedUses.add("servlet");
             unsupportedUses.add("multi-endpoint");
             if (jaxwsInJDK) {
-                unsupportedUses.add("ri-api");
+                unsupportedUses.add("ri");
             }
             return new JavaSeContainer(wsimport,wsgen,port,unsupportedUses);
         }
