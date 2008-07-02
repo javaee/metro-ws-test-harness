@@ -144,7 +144,9 @@ public class DeploymentExecutor extends Executor {
             //options.add(genClientCustomizationFile(context).getAbsolutePath());
 
             // set package name. use 'client' to avoid collision between server artifacts
-            options.add("-p").add(context.parent.descriptor.name +".client");
+            if (!context.service.parent.wsimportClientOptions.contains("-p")) {
+                options.add("-p").add(context.parent.descriptor.name +".client");
+            }
             options.add("-extension");
 
             //Add user's additional customization files
