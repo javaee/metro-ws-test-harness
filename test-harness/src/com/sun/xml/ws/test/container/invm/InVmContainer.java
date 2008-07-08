@@ -50,6 +50,7 @@ import java.io.FileWriter;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
@@ -147,14 +148,22 @@ public class InVmContainer extends AbstractApplicationContainer {
 
             //Looks like invalid wsdl:port, MUST have a soap:address
             //TODO: give some error message
-            if(address == null)
+            if (address == null)
                 continue;
 
             Attribute locationAttr = address.attribute("location");
             String newLocation =
-                "in-vm://" + id + "/?" + portName;
+                    "in-vm://" + id + "/?" + portName;
             newLocation = newLocation.replace('\\', '/');
             locationAttr.setValue(newLocation);
+
+            //Patch wsa:Address in wsa:EndpointReference as well
+            Element wsaEprEl = port.element(QName.get("EndpointReference", "wsa", "http://www.w3.org/2005/08/addressing"));
+            if (wsaEprEl != null) {
+                Element wsaAddrEl = wsaEprEl.element(QName.get("Address", "wsa", "http://www.w3.org/2005/08/addressing"));
+                wsaAddrEl.setText(newLocation);
+
+            }
         }
 
         // save file
