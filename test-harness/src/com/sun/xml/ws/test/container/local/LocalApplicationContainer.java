@@ -48,6 +48,7 @@ import java.io.FileWriter;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
@@ -138,6 +139,14 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
                 "local://" + service.warDir.getAbsolutePath() + "?" + portName;
             newLocation = newLocation.replace('\\', '/');
             locationAttr.setValue(newLocation);
+
+            //Patch wsa:Address in wsa:EndpointReference as well
+            Element wsaEprEl = port.element(QName.get("EndpointReference", "wsa", "http://www.w3.org/2005/08/addressing"));
+            if (wsaEprEl != null) {
+                Element wsaAddrEl = wsaEprEl.element(QName.get("Address", "wsa", "http://www.w3.org/2005/08/addressing"));
+                wsaAddrEl.setText(newLocation);
+
+            }
         }
 
         // save file
