@@ -90,7 +90,7 @@ public abstract class ConcurrentClientExecutor extends ClientExecutor {
         // if any error, print first 20 of them
         if(!errors.isEmpty())
             System.out.printf("Found %d errors\n",errors.size());
-        for (Throwable error : errors.subList(0,Math.max(errors.size(),20)))
+        for (Throwable error : errors.subList(0,Math.min(errors.size(),20)))
             error.printStackTrace();
         if(!errors.isEmpty())
             throw errors.get(0);    // and throw the first failure to make the test fail
