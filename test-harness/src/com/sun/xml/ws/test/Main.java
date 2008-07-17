@@ -631,6 +631,7 @@ public class Main {
             Set<String> unsupportedUses = new HashSet<String>();
             unsupportedUses.add("servlet");
             unsupportedUses.add("multi-endpoint");
+            unsupportedUses.add("skip-lwhs");
             if (jaxwsInJDK) {
                 unsupportedUses.add("ri");
             }
