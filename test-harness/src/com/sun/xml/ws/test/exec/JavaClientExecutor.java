@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,18 +38,21 @@ package com.sun.xml.ws.test.exec;
 
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
+import com.sun.xml.ws.test.model.TestEndpoint;
+import java.beans.Introspector;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 /**
  * Execute Java client.
@@ -94,10 +97,12 @@ public class JavaClientExecutor extends Executor {
         return name;
     }
 
+    @Override
     public int countTestCases() {
         return testCount;
     }
 
+    @Override
     public void run(TestResult result) {
         if(context.clientClassLoader==null) {
             failAll(result,"this test is skipped because of other failures",null);
@@ -112,6 +117,7 @@ public class JavaClientExecutor extends Executor {
         try {
             TestSuite ts;
             try {
+                injectResources();
                 Class<?> testClass = context.clientClassLoader.loadClass(testClassName);
 
                 // let JUnit parse all the test cases
@@ -140,6 +146,7 @@ public class JavaClientExecutor extends Executor {
     private void failAll(TestResult result, final String msg, final Exception error) {
         for(int i=0;i<testCount;i++) {
             new TestCase(testClassName) {
+                @Override
                 protected void runTest() throws Exception {
                     System.out.println(msg);
                     throw new Exception(msg,error);
@@ -181,5 +188,67 @@ public class JavaClientExecutor extends Executor {
                 }
             }
         }
+    }
+
+    private void injectResources() throws Exception {
+        StringBuilder addressList = new StringBuilder("injected addresses:");
+
+        Properties properties = System.getProperties();
+
+        for (DeployedService svc : context.services.values()) {
+            if (! svc.service.isSTS) {
+                for (Class clazz : svc.serviceClass) {
+                    String packageName = clazz.getPackage().getName();
+                    //  use reflection to list up all methods with 'javax.xml.ws.WebEndpoint' annotations
+                    //  invoke that method via reflection to obtain the Port object.
+                    //  set the endpoint address to that port object
+                    //  inject it to the scripting engine
+                    Method[] methods = clazz.getMethods();
+
+                    // annotation that serviceClass loads and annotation that this code
+                    // uses might be different
+                    Class<? extends Annotation> webendpointAnnotation = clazz.getClassLoader()
+                            .loadClass("javax.xml.ws.WebEndpoint").asSubclass(Annotation.class);
+                    Method nameMethod = webendpointAnnotation.getDeclaredMethod("name");
+
+                    for (Method method : methods) {
+                        Annotation endpoint = method.getAnnotation(webendpointAnnotation);
+						// don't inject variables for methods like getHelloPort(WebServiceFeatures)
+                        if (endpoint != null && method.getParameterTypes().length == 0) {
+
+                            //For multiple endpoints the convention for injecting the variables is
+                            // portName obtained from the WebEndpoint annotation,
+                            // which would be something like "addNumbersPort"
+                            String portName = (String) nameMethod.invoke(endpoint);
+                            String varName = Introspector.decapitalize(portName);
+
+                            try {
+                                properties.setProperty(varName +"Address",svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString());
+                                addressList.append(' ').append(varName).append("Address");
+                            } catch (InvocationTargetException e) {
+                                if(e.getCause() instanceof Exception)
+                                    throw (Exception)e.getCause();
+                                else
+                                    throw e;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println(addressList);
+    }
+
+    private TestEndpoint getEndpoint(DeployedService svc, String portName) {
+        // first, look for the port name match
+        for (TestEndpoint e : svc.service.endpoints) {
+            if(e.portName!=null && e.portName.equals(portName))
+                return e;
+        }
+        // nothing explicitly matched.
+        if(svc.service.endpoints.size()!=1)
+            throw new Error("Multiple ports are defined on '"+svc.service.name+"', yet ports are ambiguous. Please use @WebService/Provider(portName=)");
+        // there's only one
+        return (TestEndpoint)svc.service.endpoints.toArray()[0];
     }
 }
