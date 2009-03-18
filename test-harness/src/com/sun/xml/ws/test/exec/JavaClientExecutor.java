@@ -89,7 +89,7 @@ public class JavaClientExecutor extends Executor {
                 line = line.substring("package ".length());
                 packageName = line.substring(0,line.indexOf(';'));
             }
-            if(line.startsWith("@VersionRequirement") || line.startsWith("@com.sun.istack.test.VersionRequirement")) {
+            if(line.startsWith("@VersionRequirement") || line.startsWith("@com.sun.xml.ws.test.VersionRequirement")) {
                 versionProcessor = new VersionProcessor(grabAttributeValue(line,"since"),
                         grabAttributeValue(line,"until"),
                         grabAttributeValue(line,"excludeFrom"));
