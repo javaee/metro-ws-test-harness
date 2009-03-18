@@ -477,7 +477,7 @@ public class TestDescriptor {
 
         // run client Java tests
         for (File f : javaClients)
-            suite.addTest(new JavaClientExecutor(context,f));
+            suite.addTest(new JavaClientExecutor(context,f,version));
 
         // undeploy all services
         for (DeploymentExecutor dt : deployTests) {

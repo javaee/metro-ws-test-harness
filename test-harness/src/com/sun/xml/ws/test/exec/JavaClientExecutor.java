@@ -39,6 +39,10 @@ package com.sun.xml.ws.test.exec;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestEndpoint;
+import com.sun.istack.test.VersionRequirement;
+import com.sun.istack.test.VersionNumber;
+import com.sun.istack.test.VersionProcessor;
+
 import java.beans.Introspector;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -53,6 +57,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Execute Java client.
@@ -69,28 +75,48 @@ public class JavaClientExecutor extends Executor {
 
     private final int testCount;
 
-    public JavaClientExecutor(DeploymentContext context, File sourceFile) throws IOException {
+    private final boolean skipTest;
+    public JavaClientExecutor(DeploymentContext context, File sourceFile, VersionNumber version) throws IOException {
         super(cutExtension(sourceFile.getName()), context);
         this.testSourceFile = sourceFile;
-
         String packageName=null;
         int count=0;
         BufferedReader in = new BufferedReader(new FileReader(testSourceFile));
         String line;
+        VersionProcessor versionProcessor = null;
         while((line=in.readLine())!=null) {
             line = line.trim();
             if(line.startsWith("package ")) {
                 line = line.substring("package ".length());
                 packageName = line.substring(0,line.indexOf(';'));
             }
+            if(line.startsWith("@VersionRequirement") || line.startsWith("@com.sun.istack.test.VersionRequirement")) {
+                versionProcessor = new VersionProcessor(grabAttributeValue(line,"since"),
+                        grabAttributeValue(line,"until"),
+                        grabAttributeValue(line,"excludeFrom"));
+            }
             if(line.startsWith("public void test"))
                 count++;
         }
-
         this.testClassName = packageName+'.'+cutExtension(sourceFile.getName());
-        this.testCount = count;
+        if(version != null && versionProcessor!=null && !versionProcessor.isApplicable(version)) {
+            skipTest = true;
+            this.testCount = 0;
+        } else {
+            skipTest = false;
+            this.testCount = count;
+        }
     }
 
+    private String grabAttributeValue(String str, String attr) {
+        String patternStr=attr+"\\s*=\\s*\"(.+)\"";
+        Pattern pattern = Pattern.compile(patternStr);
+        Matcher matcher = pattern.matcher(str);
+        if(matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
     private static String cutExtension(String name) {
         int idx = name.lastIndexOf('.');
         name = name.substring(0,idx);
@@ -104,6 +130,10 @@ public class JavaClientExecutor extends Executor {
 
     @Override
     public void run(TestResult result) {
+        if(skipTest) {
+            System.out.printf("Version Requirement not satisfied, Skipping Test"+ testClassName);
+            return;
+        }
         if(context.clientClassLoader==null) {
             failAll(result,"this test is skipped because of other failures",null);
             return;
