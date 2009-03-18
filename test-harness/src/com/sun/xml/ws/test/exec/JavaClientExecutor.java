@@ -39,7 +39,6 @@ package com.sun.xml.ws.test.exec;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestEndpoint;
-import com.sun.istack.test.VersionRequirement;
 import com.sun.istack.test.VersionNumber;
 import com.sun.istack.test.VersionProcessor;
 
