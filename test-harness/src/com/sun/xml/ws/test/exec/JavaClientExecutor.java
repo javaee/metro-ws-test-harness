@@ -108,7 +108,7 @@ public class JavaClientExecutor extends Executor {
     }
 
     private String grabAttributeValue(String str, String attr) {
-        String patternStr=attr+"\\s*=\\s*\"(.+)\"";
+        String patternStr=attr+"\\s*=\\s*\"(.+?)\"";
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(str);
         if(matcher.find()) {
