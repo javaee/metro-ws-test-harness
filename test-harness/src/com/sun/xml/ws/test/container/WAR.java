@@ -235,8 +235,16 @@ public final class WAR {
             options.add("-b").add(custFile);
         }
         options.add("-extension");
-        options.add("-p").add(service.service.getGlobalUniqueName());
 
+        //Don't add the default package option if -noPackage is specified
+        // this will be helpful in testing default/customization behavior.
+        if (!service.service.parent.testOptions.contains("-noPackage")) {
+
+            // set package name if not specified in wsimport-server options
+            if (!service.service.parent.wsimportServerOptions.contains("-p")) {
+                options.add("-p").add(service.service.getGlobalUniqueName());
+            }
+        }
         //Other options
         if(World.debug)
             options.add("-verbose");

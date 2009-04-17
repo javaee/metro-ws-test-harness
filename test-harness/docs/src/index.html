@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.44 2009-03-18 18:04:43 ramapulavarthi Exp $</div>
+<div align=right>$Id: index.html,v 1.45 2009-04-17 07:14:16 ramapulavarthi Exp $</div>
 
 <l:document>
 
@@ -427,6 +427,18 @@ testdir/
 <descriptor>
    <description>this is a very useful test that tests stuff</description>
    <wsimport-client>-abc -def -ghi</wsimport-client>
+</despcriptor>
+</xmp></pre>
+    </l:section>
+    <l:section title="Specifying test specific options">
+      <p>
+        If your test special configuration from the default harness behavior, <tt>test-options</tt> is the place to specify those.
+          <pre>Supported Options are:
+    -noPackage : to not use the default harness behavior of specifying -p option to wsimport.</pre>
+<pre><xmp>
+<descriptor>
+   <description>this is a very useful test that tests stuff</description>
+   <test-options>-noPackage</test-options>
 </despcriptor>
 </xmp></pre>
     </l:section>

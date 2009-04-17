@@ -53,6 +53,12 @@ start = element descriptor {
     #
     element description {text} &
 
+    # list of options passed to test harness that help in test specific configuration
+    # of the harness execution.
+    element test-options {text}? &
+
+
+
     # list of options passed to wsimport for generating client artifacts
     # and server artifacts respectively.
     element wsimport-client {text}? &

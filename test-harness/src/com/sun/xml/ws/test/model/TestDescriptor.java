@@ -200,6 +200,12 @@ public class TestDescriptor {
     public final File home;
 
     /**
+     * Additional arguments to configure the harness behavior per test.
+     */
+    public final List<String> testOptions = new ArrayList<String>();
+
+
+    /**
      * Additional command-line arguments to wsimport for generating client artifacts.
      */
     public final List<String> wsimportClientOptions = new ArrayList<String>();
@@ -294,6 +300,7 @@ public class TestDescriptor {
 
         this.skip = Boolean.parseBoolean(root.attributeValue("skip"));
 
+        parseArguments(root.elementText("test-options"),testOptions);
         parseArguments(root.elementText("wsimport-client"),wsimportClientOptions);
         parseArguments(root.elementText("wsimport-server"),wsimportServerOptions);
 
