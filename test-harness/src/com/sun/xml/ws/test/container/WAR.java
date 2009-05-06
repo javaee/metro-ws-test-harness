@@ -208,9 +208,15 @@ public final class WAR {
      *
      * @see WebXmlInfoBean
      */
-    final void generateWebXml(List<EndpointInfoBean> endpoints) throws Exception {
+    final void generateWebXml(List<EndpointInfoBean> endpoints, boolean httpspi) throws Exception {
         Jelly jelly = new Jelly(getClass(),"jelly/web.jelly");
-        WebXmlInfoBean infoBean = new WebXmlInfoBean(service.parent,endpoints);
+        String listenerClass = httpspi
+                ? "com.sun.xml.ws.transport.httpspi.servlet.WSSPIContextListener"
+                : "com.sun.xml.ws.transport.http.servlet.WSServletContextListener"  ;
+        String servletClass = httpspi
+                ? "com.sun.xml.ws.transport.httpspi.servlet.WSSPIServlet"
+                : "com.sun.xml.ws.transport.http.servlet.WSServlet";
+        WebXmlInfoBean infoBean = new WebXmlInfoBean(service.parent,endpoints, listenerClass, servletClass );
         jelly.set("data", infoBean);
         jelly.run(new File(webInfDir, "web.xml"));
     }

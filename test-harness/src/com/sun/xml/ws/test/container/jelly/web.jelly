@@ -48,13 +48,13 @@
     <description>${data.description}</description>
   
     <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+        <listener-class>${data.listenerClass}</listener-class>
     </listener>
     <servlet>
         <servlet-name>${data.servletName}</servlet-name>
         <display-name>${data.displayName}</display-name>
         <description>${data.description}</description>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <servlet-class>${data.servletClass}</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     

@@ -53,6 +53,8 @@ public class WebXmlInfoBean {
     private final String displayName;
     private final String servletName;
     private final List<EndpointInfoBean> endpoints;
+    private final String listenerClass;
+    private final String servletClass;
 
     /**
      * The constructor creates the fields queried by the Jelly script.
@@ -63,10 +65,13 @@ public class WebXmlInfoBean {
      * TODO: support for multiple ports. Currently hard-coding
      * url pattern and assuming only one port/service.
      */
-    public WebXmlInfoBean(DeploymentContext context, List<EndpointInfoBean> endpoints) {
+    public WebXmlInfoBean(DeploymentContext context, List<EndpointInfoBean> endpoints,
+                          String listenerClass, String servletClass) {
         description = context.descriptor.description;
         displayName = context.descriptor.name;
         servletName = context.descriptor.name;
+        this.listenerClass = listenerClass;
+        this.servletClass = servletClass;
         this.endpoints = endpoints;
     }
 
@@ -80,6 +85,14 @@ public class WebXmlInfoBean {
 
     public String getServletName() {
         return servletName;
+    }
+
+    public String getServletClass() {
+        return servletClass;
+    }
+
+    public String getListenerClass() {
+        return listenerClass;
     }
 
     /**

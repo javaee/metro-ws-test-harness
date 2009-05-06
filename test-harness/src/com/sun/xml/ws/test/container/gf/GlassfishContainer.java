@@ -84,8 +84,8 @@ public final class GlassfishContainer extends AbstractApplicationContainer {
      * @param password
      *      Admin user password.
      */
-    public GlassfishContainer(WsTool wsimport, WsTool wsgen, URL httpServerUrl, String host, int port, String userName, String password) throws Exception {
-        super(wsimport, wsgen);
+    public GlassfishContainer(WsTool wsimport, WsTool wsgen, URL httpServerUrl, String host, int port, String userName, String password, boolean httpspi) throws Exception {
+        super(wsimport, wsgen, httpspi);
 
         this.httpServerUrl = httpServerUrl;
 

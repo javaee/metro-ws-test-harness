@@ -61,11 +61,13 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
     private final WsTool wsimport;
     private final WsTool wsgen;
     private final Set<String> unsupportedUses;
+    private final boolean httpspi;
 
-    protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen) {
+    protected AbstractApplicationContainer(WsTool wsimport, WsTool wsgen, boolean httpspi) {
         this.wsimport = wsimport;
         this.wsgen = wsgen;
         this.unsupportedUses = new HashSet<String>();
+        this.httpspi = httpspi;
     }
 
     @NotNull
@@ -90,7 +92,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         if(!isSkipMode()) {
             List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
-            war.generateWebXml(endpoints);
+            war.generateWebXml(endpoints, httpspi);
 
             // we only need this for Glassfish, but it's harmless to generate for other containers.
             // TODO: figure out how not to do this for other containers

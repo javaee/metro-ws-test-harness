@@ -75,8 +75,8 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
      * @param password
      *      The password of the admin. Necessary to deploy a war remotely
      */
-    public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, URL server, String userName, String password) throws Exception {
-        super(wsimport,wsgen);
+    public RemoteCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, URL server, String userName, String password, boolean httpspi) throws Exception {
+        super(wsimport,wsgen,httpspi);
 
         this.serverUrl = server;
 

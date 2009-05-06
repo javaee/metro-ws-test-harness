@@ -76,8 +76,8 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
      * @param homeDir
      *      The installation of the container. For Tomcat, this is
      */
-    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir, int port) throws IOException {
-        super(wsimport,wsgen,port);
+    public InstalledCargoApplicationContainer(WsTool wsimport, WsTool wsgen, String containerId, File homeDir, int port, boolean httpspi) throws IOException {
+        super(wsimport,wsgen,port,httpspi);
 
         // needed until glassfish becomes a part of Cargo
         ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();

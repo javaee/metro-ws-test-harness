@@ -70,7 +70,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     private final Set<String> unsupportedUses;
 
     public JavaSeContainer(WsTool wsimport, WsTool wsgen, int port, Set<String> unsupportedUses) {
-        super(wsimport, wsgen);
+        super(wsimport, wsgen, false);
         //this.port = port;
         this.unsupportedUses = unsupportedUses;
     }

@@ -193,6 +193,9 @@ public class Main {
     @Option(name="-jaxwsInJDK",usage="tests using JAX-WS impl in JDK")
     boolean jaxwsInJDK = false;
 
+    @Option(name="-httpspi",usage="use JAX-WS 2.2 httpspi API deployment for servlet containers")
+    boolean httpspi = false;
+
     
     @Option(name="-glassfish-remote",metaVar="CONFIG",
         usage=
@@ -565,17 +568,17 @@ public class Main {
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
             return new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x",tomcat,port);
+                wsimport, wsgen, "tomcat5x",tomcat,port,httpspi);
         }
 
         if(embeddedTomcat!=null) {
             return new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x",port);
+                wsimport, wsgen, "tomcat5x",port,httpspi);
         }
 
         if(embeddedJetty!=null) {
             return new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "jetty6x",port);
+                wsimport, wsgen, "jetty6x",port,httpspi);
         }
 
         if(remoteTomcat!=null) {
@@ -592,14 +595,15 @@ public class Main {
                     Integer.parseInt(defaultsTo(matcher.group(6),"8080")),
                     "/"),
                 defaultsTo(matcher.group(2),"admin"),
-                defaultsTo(matcher.group(3),"admin")
+                defaultsTo(matcher.group(3),"admin"),
+                httpspi
                 );
         }
 
         if(localGlassfish!=null) {
             System.err.println("Using local Glassfish from "+localGlassfish);
             return new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "glassfish1x",localGlassfish,port);
+                wsimport, wsgen, "glassfish1x",localGlassfish,port,httpspi);
         }
 
         if(remoteGlassfish!=null) {
@@ -622,7 +626,7 @@ public class Main {
             }
 
             return new GlassfishContainer(
-                wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password
+                wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password, httpspi
             );
         }
 

@@ -69,7 +69,7 @@ import java.util.List;
 public class InVmContainer extends AbstractApplicationContainer {
 
     public InVmContainer(WsTool wsimport, WsTool wsgen) {
-        super(wsimport,wsgen);
+        super(wsimport,wsgen,false);
     }
 
     public String getTransport() {

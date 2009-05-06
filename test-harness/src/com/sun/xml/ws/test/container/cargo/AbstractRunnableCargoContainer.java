@@ -54,8 +54,8 @@ abstract class AbstractRunnableCargoContainer<C extends LocalContainer> extends 
 
     protected final int httpPort;
 
-    protected AbstractRunnableCargoContainer(WsTool wsimport, WsTool wsgen, int port) {
-        super(wsimport, wsgen);
+    protected AbstractRunnableCargoContainer(WsTool wsimport, WsTool wsgen, int port, boolean httpspi) {
+        super(wsimport, wsgen, httpspi);
         httpPort = port;
     }
 

@@ -67,8 +67,8 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
     protected final DefaultDeployerFactory deployerFactory = new DefaultDeployerFactory();
 
 
-    protected AbstractCargoContainer(WsTool wsimport, WsTool wsgen) {
-        super(wsimport, wsgen);
+    protected AbstractCargoContainer(WsTool wsimport, WsTool wsgen, boolean httpspi) {
+        super(wsimport, wsgen, httpspi);
     }
 
     public String getTransport() {

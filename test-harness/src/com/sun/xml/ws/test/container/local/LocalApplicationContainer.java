@@ -67,7 +67,7 @@ import java.util.List;
 public class LocalApplicationContainer extends AbstractApplicationContainer {
 
     public LocalApplicationContainer(WsTool wsimport, WsTool wsgen) {
-        super(wsimport,wsgen);
+        super(wsimport,wsgen,false);
     }
 
     public String getTransport() {
