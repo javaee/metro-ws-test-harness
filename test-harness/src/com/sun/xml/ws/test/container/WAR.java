@@ -322,7 +322,7 @@ public final class WAR {
             if(World.debug)
                 System.out.println("wsgen classpath arg = " + cp);
             options.add("-cp").add(cp);
-            options.add("-s").add(classDir);
+            options.add("-s").add(service.service.parent.disgardWsGenOutput ? NOWHERE : classDir);
             options.add("-d").add(service.service.parent.disgardWsGenOutput ? NOWHERE : classDir);
 
             // obtain a report file from wsgen
