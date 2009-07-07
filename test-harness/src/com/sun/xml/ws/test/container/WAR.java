@@ -161,6 +161,14 @@ public final class WAR {
     }
 
     /**
+     * Copies resources under the directory in to <tt>WEB-INF/classes</tt>
+     */
+    public void copyResources(File resourcesDir) {
+        if(resourcesDir != null)
+            FileUtil.copyDir(resourcesDir, classDir);
+    }
+
+    /**
      * Gets the path of the WSDL.
      *
      * <p>

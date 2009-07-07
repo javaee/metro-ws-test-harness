@@ -105,6 +105,9 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         }
         //Package Handler Configuration files
         war.copyHandlerChainFiles(service.service.getHandlerConfiguration());
+
+        //copy resources to amke it available on classpath.
+        war.copyResources(service.service.parent.resources);
         return war;
     }
 
