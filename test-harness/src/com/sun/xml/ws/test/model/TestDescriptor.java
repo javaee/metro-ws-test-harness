@@ -215,6 +215,11 @@ public class TestDescriptor {
      */
     public final List<String> wsimportServerOptions = new ArrayList<String>();
 
+   /**
+     * Additional command-line arguments to wsgen for generating artifacts.
+     */
+    public final List<String> wsgenOptions = new ArrayList<String>();
+
 
     public static final Schema descriptorSchema;
 
@@ -303,6 +308,7 @@ public class TestDescriptor {
         parseArguments(root.elementText("test-options"),testOptions);
         parseArguments(root.elementText("wsimport-client"),wsimportClientOptions);
         parseArguments(root.elementText("wsimport-server"),wsimportServerOptions);
+        parseArguments(root.elementText("wsgen-options"),wsgenOptions);
 
         String transport = root.attributeValue("transport");
         if(transport==null)

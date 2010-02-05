@@ -339,6 +339,9 @@ public final class WAR {
 
             options.add(endpt.className);
 
+            // additional wsgen options from test descriptor
+            options.addAll(service.service.parent.wsgenOptions);
+
             System.out.println("Generating WSDL");
             if(World.debug)
                 System.out.println(options);

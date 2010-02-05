@@ -64,6 +64,10 @@ start = element descriptor {
     element wsimport-client {text}? &
     element wsimport-server {text}? &
 
+    # list of options passed to wsgen for generating artifacts
+    element wsgen-options {text}? &
+
+
     # 'client' element holds the information necessary for a given
     #   test client to run. In particular it points to the beanshell
     #   source code for a given test client.
