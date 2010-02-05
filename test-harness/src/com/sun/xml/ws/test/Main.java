@@ -445,7 +445,7 @@ public class Main {
             System.out.println("Using wsimport from "+externalWsImport);
             lwhs = true;
             if (version == null) {
-                version = new VersionNumber("2.1.1");
+                version = new VersionNumber("2.1.6");
             }
             System.out.println("Going to use SE lightweight http server");
         } else {
