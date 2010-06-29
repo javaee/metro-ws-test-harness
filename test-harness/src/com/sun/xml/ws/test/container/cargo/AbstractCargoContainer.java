@@ -47,6 +47,7 @@ import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.deployer.Deployer;
 import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.deployer.URLDeployableMonitor;
+import org.codehaus.cargo.generic.AbstractFactoryRegistry;
 import org.codehaus.cargo.generic.deployable.DefaultDeployableFactory;
 import org.codehaus.cargo.generic.deployer.DefaultDeployerFactory;
 
@@ -64,7 +65,8 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
      */
     protected C container;
 
-    protected final DefaultDeployerFactory deployerFactory = new DefaultDeployerFactory();
+    protected final DefaultDeployerFactory deployerFactory = new DefaultDeployerFactory(AbstractFactoryRegistry.class.getClassLoader());
+    protected final DefaultDeployableFactory deployableFactory = new DefaultDeployableFactory(AbstractFactoryRegistry.class.getClassLoader());
 
 
     protected AbstractCargoContainer(WsTool wsimport, WsTool wsgen, boolean httpspi) {
@@ -87,7 +89,7 @@ abstract class AbstractCargoContainer<C extends Container> extends AbstractAppli
             archive = assembleWar(service).root;
         }
 
-        WAR war = (WAR)new DefaultDeployableFactory().createDeployable(
+        WAR war = (WAR)deployableFactory.createDeployable(
             container.getId(), archive.getAbsolutePath(), DeployableType.WAR);
 
         war.setContext(contextPath);

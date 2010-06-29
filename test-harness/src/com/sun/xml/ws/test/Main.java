@@ -210,6 +210,10 @@ public class Main {
             "Launch Glassfish from the harness and test with it")
     File localGlassfish = null;
 
+    @Option(name="-glassfishv3-local",metaVar="GLASSFISH_HOME",
+            usage="Launch Glassfish v3 from the harness and test with it")
+    File localGlassfishV3 = null;
+
     @Option(name="-legacy-local",usage="Emergency! I need to use the legacy local transport!")
     boolean legacyLocalTransport = false;
 
@@ -227,7 +231,7 @@ public class Main {
     )
     WsGenMode wsGenMode = WsGenMode.ALWAYS;
 
-    public static File[] containerClasspathPrefix;
+    public static File[] containerClasspathPrefix = new File[0];
 
     public static void main(String[] args) throws Exception {
         // enable all assertions
@@ -606,6 +610,12 @@ public class Main {
                 wsimport, wsgen, "glassfish1x",localGlassfish,port,httpspi);
         }
 
+        if(localGlassfishV3!=null) {
+            System.err.println("Using local Glassfish v3 from "+localGlassfishV3);
+            return new InstalledCargoApplicationContainer(
+                wsimport, wsgen, "glassfish3x",localGlassfishV3,port,httpspi);
+        }
+        
         if(remoteGlassfish!=null) {
             // [USER:PASS@]HOST[:PORT][-HTTPURL]
             System.err.println("Using remote Glassfish at "+remoteGlassfish);

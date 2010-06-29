@@ -37,18 +37,15 @@
 package com.sun.xml.ws.test.container.cargo;
 
 import com.sun.xml.ws.test.container.ApplicationContainer;
-import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalContainer;
-import com.sun.xml.ws.test.container.cargo.gf.GlassfishInstalledLocalDeployer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
-import com.sun.xml.ws.test.container.cargo.gf.GlassfishStandaloneLocalConfiguration;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.FileUtil;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
-import org.codehaus.cargo.container.deployer.DeployerType;
 import org.codehaus.cargo.container.property.ServletPropertySet;
+import org.codehaus.cargo.generic.AbstractFactoryRegistry;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
@@ -80,11 +77,12 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         super(wsimport,wsgen,port,httpspi);
 
         // needed until glassfish becomes a part of Cargo
-        ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
-        configurationFactory.registerConfiguration("glassfish1x", ContainerType.INSTALLED, ConfigurationType.STANDALONE, GlassfishStandaloneLocalConfiguration.class);
-        DefaultContainerFactory containerFactory = new DefaultContainerFactory();
-        containerFactory.registerContainer("glassfish1x", ContainerType.INSTALLED, GlassfishInstalledLocalContainer.class);
-        deployerFactory.registerDeployer("glassfish1x", DeployerType.INSTALLED, GlassfishInstalledLocalDeployer.class);
+
+        ConfigurationFactory configurationFactory = new DefaultConfigurationFactory(AbstractFactoryRegistry.class.getClassLoader());
+        // For tomcat local, cargo doesn't copy shared/lib jars to working dir
+        // configurationFactory.registerConfiguration("tomcat5x", ContainerType.INSTALLED, ConfigurationType.STANDALONE, Tomcat5xMetroStandaloneLocalConfiguration.class);
+
+        DefaultContainerFactory containerFactory = new DefaultContainerFactory(AbstractFactoryRegistry.class.getClassLoader());
 
         File containerWorkDir = FileUtil.createTmpDir(true);
         containerWorkDir.mkdirs();
@@ -115,6 +113,19 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
             containerId, ContainerType.INSTALLED, configuration);
         container.setHome(homeDir.getAbsolutePath());
     }
+
+    /**
+     * For tomcat local, since cargo doesn't support copying of shared/lib jars,
+     * the war can be created with the jars in the WEB-INF/lib. Other option is
+     * to subclass Tomcat5xStandaloneLocalConfiguration and do the copying of
+     * jars from Tomcat installation to local working dir in doConfigure()
+     *
+     * Copy JAX-WS runtime code?
+     *
+    protected boolean copyRuntimeLibraries() {
+        return false;
+    }
+     */
 
     public String toString() {
         return "CargoLocalContainer:"+container.getId();

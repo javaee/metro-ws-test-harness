@@ -44,6 +44,7 @@ import org.codehaus.cargo.container.EmbeddedLocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
 import org.codehaus.cargo.container.property.ServletPropertySet;
+import org.codehaus.cargo.generic.AbstractFactoryRegistry;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
@@ -63,7 +64,7 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
         super(wsimport,wsgen,port,httpspi);
 
         ConfigurationFactory configurationFactory =
-            new DefaultConfigurationFactory();
+            new DefaultConfigurationFactory(AbstractFactoryRegistry.class.getClassLoader());
         LocalConfiguration configuration =
             (LocalConfiguration) configurationFactory.createConfiguration(
                 containerId, ContainerType.EMBEDDED, ConfigurationType.STANDALONE );
@@ -73,7 +74,7 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
         // TODO: we should provide a mode to launch the container with debugger
 
 
-        container = (EmbeddedLocalContainer) new DefaultContainerFactory().createContainer(
+        container = (EmbeddedLocalContainer) new DefaultContainerFactory(AbstractFactoryRegistry.class.getClassLoader()).createContainer(
             containerId, ContainerType.EMBEDDED, configuration);
         container.setClassLoader(World.runtime.getClassLoader());
     }
