@@ -92,7 +92,12 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         if(!isSkipMode()) {
             List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
-            war.generateWebXml(endpoints, httpspi);
+            File configuredWebXml = service.service.getConfiguredWebXml();
+            if( configuredWebXml == null) {
+                war.generateWebXml(endpoints, httpspi);
+            } else {
+                war.copyWebXml(configuredWebXml);
+            }
 
             // we only need this for Glassfish, but it's harmless to generate for other containers.
             // TODO: figure out how not to do this for other containers

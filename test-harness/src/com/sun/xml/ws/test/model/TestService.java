@@ -283,5 +283,18 @@ public class TestService {
         return baseDir.listFiles(new HandlersFilter());
     }
 
+    /**
+     * This filter gives all web.xml files in the directory.
+     * i.e files with name web.xml
+     */
+    class WebXmlFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            return (name.equals("web.xml"));
+        }
+    }
 
+    public File getConfiguredWebXml() {
+        File[] webxmls = baseDir.listFiles(new WebXmlFilter());
+        return webxmls == null || webxmls.length == 0 ? null: webxmls[0];
+    }
 }

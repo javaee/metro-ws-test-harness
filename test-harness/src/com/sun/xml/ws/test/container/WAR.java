@@ -161,6 +161,14 @@ public final class WAR {
     }
 
     /**
+     * Copies web.xml to WEB-INF/
+     */
+    public void copyWebXml(File webXml) {
+        FileUtil.copyFile(webXml, new File(webInfDir, webXml.getName()));
+
+    }
+
+    /**
      * Copies resources under the directory in to <tt>WEB-INF/classes</tt>
      */
     public void copyResources(File resourcesDir) {
