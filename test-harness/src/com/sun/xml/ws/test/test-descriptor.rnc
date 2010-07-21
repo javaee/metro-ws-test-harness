@@ -29,7 +29,7 @@ start = element descriptor {
     # See also 'client' element's 'transport' description.
     attribute transport {"http"|"local"}? &
 
-    attribute uses { list { ("servlet"|"ri"|"multi-endpoint"|"skip-lwhs")+ } }? &
+    attribute uses { list { ("servlet30"|"servlet"|"ri"|"multi-endpoint"|"skip-lwhs")+ } }? &
 
     # optional flag to force test to be skipped
     # to be used only in cases such as when the harness itself

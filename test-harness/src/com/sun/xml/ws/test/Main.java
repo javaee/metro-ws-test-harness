@@ -569,20 +569,24 @@ public class Main {
      * @param wsimport
      */
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
+        ApplicationContainer appContainer = null;
         if(tomcat!=null) {
             System.err.println("Using Tomcat from "+tomcat);
-            return new InstalledCargoApplicationContainer(
+            appContainer = new InstalledCargoApplicationContainer(
                 wsimport, wsgen, "tomcat5x",tomcat,port,httpspi);
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if(embeddedTomcat!=null) {
-            return new EmbeddedCargoApplicationContainer(
+            appContainer = new EmbeddedCargoApplicationContainer(
                 wsimport, wsgen, "tomcat5x",port,httpspi);
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if(embeddedJetty!=null) {
-            return new EmbeddedCargoApplicationContainer(
+            appContainer = new EmbeddedCargoApplicationContainer(
                 wsimport, wsgen, "jetty6x",port,httpspi);
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if(remoteTomcat!=null) {
@@ -592,7 +596,7 @@ public class Main {
             if(!matcher.matches())
                 throw new CmdLineException("Unable to parse "+remoteTomcat);
 
-            return new RemoteCargoApplicationContainer(
+            appContainer = new RemoteCargoApplicationContainer(
                 wsimport, wsgen,
                 "tomcat5x",
                 new URL("http",matcher.group(4),
@@ -602,17 +606,19 @@ public class Main {
                 defaultsTo(matcher.group(3),"admin"),
                 httpspi
                 );
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if(localGlassfish!=null) {
             System.err.println("Using local Glassfish from "+localGlassfish);
-            return new InstalledCargoApplicationContainer(
+            appContainer = new InstalledCargoApplicationContainer(
                 wsimport, wsgen, "glassfish1x",localGlassfish,port,httpspi);
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if(localGlassfishV3!=null) {
             System.err.println("Using local Glassfish v3 from "+localGlassfishV3);
-            return new InstalledCargoApplicationContainer(
+            appContainer = new InstalledCargoApplicationContainer(
                 wsimport, wsgen, "glassfish3x",localGlassfishV3,port,httpspi);
         }
         
@@ -635,30 +641,36 @@ public class Main {
                 httpUrl = "http://"+remoteHost+":8080/";
             }
 
-            return new GlassfishContainer(
+            appContainer = new GlassfishContainer(
                 wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password, httpspi
             );
+            appContainer.getUnsupportedUses().add("servlet30");
         }
 
         if (lwhs) {
             System.err.println("Using the built-in Java SE lightweight HTTP server");
             Set<String> unsupportedUses = new HashSet<String>();
             unsupportedUses.add("servlet");
+            unsupportedUses.add("servlet30");
             unsupportedUses.add("multi-endpoint");
             unsupportedUses.add("skip-lwhs");
             if (jaxwsInJDK) {
                 unsupportedUses.add("ri");
             }
-            return new JavaSeContainer(wsimport,wsgen,port,unsupportedUses);
+            appContainer = new JavaSeContainer(wsimport,wsgen,port,unsupportedUses);
         }
 
         if(legacyLocalTransport) {
             System.err.println("Using the legacy local transport. This will be removed in a near future");
-            return new LocalApplicationContainer(wsimport,wsgen);
+            appContainer = new LocalApplicationContainer(wsimport,wsgen);
+            appContainer.getUnsupportedUses().add("servlet30");
         }
-
-        System.err.println("Testing with the in-vm transport");
-        return new InVmContainer(wsimport,wsgen);
+        if(appContainer == null) {
+            System.err.println("Testing with the in-vm transport");
+            appContainer = new InVmContainer(wsimport,wsgen);
+            appContainer.getUnsupportedUses().add("servlet30");
+        }
+        return appContainer;
     }
 
     private static String defaultsTo( String value, String defaultValue ) {

@@ -132,7 +132,7 @@
 
 
 <h1>JAX-WS/Tango Test Harness User Guide</h1>
-<div align=right>$Id: index.html,v 1.45 2009-04-17 07:14:16 ramapulavarthi Exp $</div>
+<div align=right>$Id: index.html,v 1.46 2010-07-21 18:21:59 ramapulavarthi Exp $</div>
 
 <l:document>
 
@@ -414,7 +414,27 @@ testdir/
 </descriptor>
 </xmp></pre>
     </l:section>
-    <l:section title="Specifying verbatim wsimport options">
+      <l:section title="Specifying test requirements from the Container">
+          <p>
+              If your test relies on a certain capability from the container, Specify such requirements in "uses"
+              attribute. Harness checks the capabilities of the container to continue with running the test or skipping
+              it.
+              Supported values are "servlet30", "servlet","ri","multi-endpoint","skip-lwhs".
+
+          </p>
+
+          <p>
+              Please use this option with caution, so that tests can retain its generality.
+          </p>
+      <pre><xmp>
+<descriptor uses="servlet30">
+    <description>this test runs only on servlet 3.0 based container</description>
+    ....
+</despcriptor>
+      </xmp></pre>
+      </l:section>
+
+      <l:section title="Specifying verbatim wsimport options">
       <p>
         If your test requires a certain wsimport command line options, you can specify verbatim by
         using the nested <tt>wsimport-client</tt> and <tt>wsimport-server</tt> elements.
