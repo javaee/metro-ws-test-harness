@@ -173,11 +173,11 @@
     -->
 
     <!-- ws need some JAX-WS to test, so let's just use the latest JAX-WS RI -->
-    <get src="http://hudson.sfbay.sun.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/build/jaxws-ri.zip"
+    <get src="http://hudson-sca.us.oracle.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/build/jaxws-ri.zip"
          dest="build/jaxws-ri.zip" />
     <unzip src="build/jaxws-ri.zip" dest="build" />
 
-    <get src="http://hudson.sfbay.sun.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/transports/local/build/jaxws-local-transport.jar"
+    <get src="http://hudson-sca.us.oracle.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/transports/local/build/jaxws-local-transport.jar"
          dest="build/jaxws-local-transport.jar" />
 
     <delete dir="build/test-logs" />
