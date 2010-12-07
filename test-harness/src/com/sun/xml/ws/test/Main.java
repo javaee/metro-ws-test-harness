@@ -420,6 +420,7 @@ public class Main {
         } else
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
+            runtime.addClassFolder( new File(jaxwsWs,"rt-ha/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
             runtime.addClassFolder( new File(jaxwsWs,"servlet/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"servlet/src"));
