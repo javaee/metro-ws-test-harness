@@ -432,6 +432,7 @@ public class Main {
             runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
+            runtime.addJarFolder(new File(jaxwsWs, "rt-ha/lib"));
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
             File jreHome = new File(System.getProperty("java.home"));
