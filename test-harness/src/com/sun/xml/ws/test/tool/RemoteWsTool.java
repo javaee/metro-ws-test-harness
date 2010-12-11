@@ -63,6 +63,21 @@ final class RemoteWsTool extends WsTool {
     public void invoke(String... args) throws Exception {
         List<String> params = new ArrayList<String>();
         params.add(executable.getPath());
+
+        // add http proxy properties as CLI arguments
+        String proxyHost = System.getProperty("http.proxyHost");
+        if (proxyHost != null) {
+            params.add("-J-Dhttp.proxyHost="+proxyHost);
+        }
+        String proxyPort = System.getProperty("http.proxyPort");
+        if (proxyPort != null) {
+            params.add("-J-Dhttp.proxyPort="+proxyPort);
+        }
+        String nonProxyHosts = System.getProperty("http.nonProxyHosts");
+        if (nonProxyHosts != null) {
+            params.add("-J-Dhttp.nonProxyHosts="+nonProxyHosts);
+        }
+
         params.addAll(Arrays.asList(args));
 
         ProcessBuilder b = new ProcessBuilder(params);
