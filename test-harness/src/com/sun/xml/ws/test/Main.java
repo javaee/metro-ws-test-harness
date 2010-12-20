@@ -420,7 +420,10 @@ public class Main {
         } else
         if(jaxwsWs!=null) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
-            runtime.addClassFolder( new File(jaxwsWs,"rt-ha/build/classes"));
+            File file = new File(jaxwsWs,"rt-ha/build/classes");
+            if (file.exists()) {            // rt-ha module may not be there
+                runtime.addClassFolder(file);
+            }
             runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
             runtime.addClassFolder( new File(jaxwsWs,"servlet/build/classes"));
             runtime.addClassFolder( new File(jaxwsWs,"servlet/src"));
@@ -432,7 +435,10 @@ public class Main {
             runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
             tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
             runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
-            runtime.addJarFolder(new File(jaxwsWs, "rt-ha/lib"));
+            file = new File(jaxwsWs, "rt-ha/lib");
+            if (file.exists()) {            // rt-ha module may not be there
+                runtime.addJarFolder(file);
+            }
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
             File jreHome = new File(System.getProperty("java.home"));
