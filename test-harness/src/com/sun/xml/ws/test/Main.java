@@ -156,6 +156,10 @@ public class Main {
     @Option(name="-version",usage="Specify the target JAX-WS version being tested. This determines test exclusions",handler=VersionNumberHandler.class)
     VersionNumber version = null;
 
+    @Option(name="-targetVersion",usage="Specify the target JAX-WS runtime version. This determines target option for the WS Tools to generate code compliant with the runtime version",handler=VersionNumberHandler.class)
+    VersionNumber targetVersion = null;
+
+
     @Option(name="-client",usage="Just run a single client script, instead of all")
     String clientScriptName = null;
 
@@ -723,6 +727,21 @@ public class Main {
                 if (version != null && !td[0].applicableVersions.isApplicable(version)) {
                     System.err.println("Skipping "+dir);
                 } else {
+                    if(targetVersion !=null) {
+                        td[0].wsimportClientOptions.add("-target");
+                        td[0].wsimportClientOptions.add(targetVersion.toString());
+                        td[0].wsimportServerOptions.add("-target");
+                        td[0].wsimportServerOptions.add(targetVersion.toString());
+
+                        if(td[1] != null) {
+                            td[1].wsimportClientOptions.add("-target");
+                            td[1].wsimportClientOptions.add(targetVersion.toString());
+                            td[1].wsimportServerOptions.add("-target");
+                            td[1].wsimportServerOptions.add(targetVersion.toString());
+
+
+                        }
+                    }
                     suite.addTest(td[0].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
                     if (td[1] != null)
                         suite.addTest(td[1].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
