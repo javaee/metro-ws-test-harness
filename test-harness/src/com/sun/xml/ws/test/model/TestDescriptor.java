@@ -580,6 +580,7 @@ public class TestDescriptor {
                 FileSet schemaSet = new FileSet();
                 schemaSet.setDir(serviceBaseDir);
                 schemaSet.setIncludes("**/*.xsd");
+                schemaSet.setExcludes("work/**");
                 List<File> schemaFiles = new ArrayList<File>();
                 for( String relPath : schemaSet.getDirectoryScanner(World.project).getIncludedFiles() ) {
                     schemaFiles.add(new File(serviceBaseDir, relPath));
@@ -588,7 +589,7 @@ public class TestDescriptor {
                 FileSet wsdlSet = new FileSet();
                 wsdlSet.setDir(serviceBaseDir);
                 wsdlSet.setIncludes("**/*.wsdl");
-                wsdlSet.setExcludes(wsdlAttribute);
+                wsdlSet.setExcludes("wsdlAttribute, work/**");
 
                 List<File> importedWsdls = new ArrayList<File>();
                 for( String relPath : wsdlSet.getDirectoryScanner(World.project).getIncludedFiles() ) {
