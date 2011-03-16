@@ -59,6 +59,7 @@ import com.sun.xml.ws.test.model.TransportSet.Singleton;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
+import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -575,10 +576,28 @@ public class TestDescriptor {
             if (service.element("wsdl") != null) {
                 String wsdlAttribute = service.element("wsdl").attributeValue("href", "test.wsdl");
                 wsdl = parseFile(serviceBaseDir, wsdlAttribute);
-                File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
-                File[] wsdls = serviceBaseDir.listFiles(new WSDLFilter(wsdlAttribute));
-                List<File> importedWsdls = Arrays.asList(wsdls);
-                List<File> schemaFiles = Arrays.asList(schemas);
+
+                FileSet schemaSet = new FileSet();
+                schemaSet.setDir(serviceBaseDir);
+                schemaSet.setIncludes("**/*.xsd");
+                List<File> schemaFiles = new ArrayList<File>();
+                for( String relPath : schemaSet.getDirectoryScanner(World.project).getIncludedFiles() ) {
+                    schemaFiles.add(new File(serviceBaseDir, relPath));
+                }
+
+                FileSet wsdlSet = new FileSet();
+                wsdlSet.setDir(serviceBaseDir);
+                wsdlSet.setIncludes("**/*.wsdl");
+                wsdlSet.setExcludes(wsdlAttribute);
+
+                List<File> importedWsdls = new ArrayList<File>();
+                for( String relPath : wsdlSet.getDirectoryScanner(World.project).getIncludedFiles() ) {
+                    importedWsdls.add(new File(serviceBaseDir, relPath));
+                }
+//                File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
+//                File[] wsdls = serviceBaseDir.listFiles(new WSDLFilter(wsdlAttribute));
+//                List<File> importedWsdls = Arrays.asList(wsdls);
+//                List<File> schemaFiles = Arrays.asList(schemas);
                 wsdlInfo = new WSDL(wsdl, importedWsdls, schemaFiles);
 
             }

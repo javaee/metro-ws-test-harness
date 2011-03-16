@@ -291,10 +291,12 @@ public final class WAR {
 
         FileUtil.copyFile(src,wsdlFile);
         for (File importedWsdl :service.service.wsdl.importedWsdls){
-            FileUtil.copyFile(importedWsdl,new File(wsdlDir,importedWsdl.getName()));
+            String importedPath = importedWsdl.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length()+1);
+            FileUtil.copyFile(importedWsdl,new File(wsdlDir,importedPath));
         }
         for (File schema :service.service.wsdl.schemas){
-            FileUtil.copyFile(schema,new File(wsdlDir,schema.getName()));
+            String importedPath = schema.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length()+1);
+            FileUtil.copyFile(schema,new File(wsdlDir,importedPath));
         }
     }
 
