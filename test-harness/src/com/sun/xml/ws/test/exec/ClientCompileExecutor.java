@@ -58,7 +58,8 @@ public class ClientCompileExecutor extends Executor {
         File classDir = makeWorkDir("client-classes");
 
         // compile the generated source files to javac
-        JavacTask javac = new JavacTask();
+        JavacTask javac = new JavacTask(context.descriptor.javacOptions);
+
         javac.setSourceDir(
             context.descriptor.common,
             new File(context.descriptor.home,"client")

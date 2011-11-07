@@ -304,7 +304,7 @@ public final class WAR {
      * Compiles Java source files into <tt>WEB-INF/classes</tt>.
      */
     final void compileJavac() throws Exception {
-        JavacTask javac = new JavacTask();
+        JavacTask javac = new JavacTask(service.parent.descriptor.javacOptions);
         if(service.parent.descriptor.common != null)
             javac.setSourceDir(service.service.baseDir, srcDir,
                     service.parent.descriptor.common );

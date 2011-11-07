@@ -397,7 +397,7 @@ testdir/
    <service>
      <wsdl href="AddNumbers.wsdl"/>
    </service>
-</despcriptor>
+</descriptor>
 </xmp></pre>
     <p>
       The structure of the test descriptor is defined in <a href="test-descriptor.rnc">a schema</a>, and the harness performs an XML validation to make sure the data is in the expected format.
@@ -431,7 +431,7 @@ testdir/
 <descriptor uses="servlet30">
     <description>this test runs only on servlet 3.0 based container</description>
     ....
-</despcriptor>
+</descriptor>
       </xmp></pre>
       </l:section>
 
@@ -448,7 +448,7 @@ testdir/
 <descriptor>
    <description>this is a very useful test that tests stuff</description>
    <wsimport-client>-abc -def -ghi</wsimport-client>
-</despcriptor>
+</descriptor>
 </xmp></pre>
     </l:section>
     <l:section title="Specifying test specific options">
@@ -460,7 +460,20 @@ testdir/
 <descriptor>
    <description>this is a very useful test that tests stuff</description>
    <test-options>-noPackage</test-options>
-</despcriptor>
+</descriptor>
+</xmp></pre>
+    </l:section>
+    <l:section title="Specifying javac options">
+      <p>
+        If your test sources require special options to be compiled, <tt>javac-options</tt> is the place to specify those.
+        Supported are any javac options.
+
+          <pre>example: to enable using com.sun.*.internal classes in test implementation(s), use following option</pre>
+<pre><xmp>
+<descriptor>
+   <description>this is a very useful test that tests stuff</description>
+   <javac-options>-XDignore.symbol.file=true</javac-options>
+</descriptor>
 </xmp></pre>
     </l:section>
   </l:section>

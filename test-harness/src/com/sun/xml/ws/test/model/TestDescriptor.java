@@ -59,7 +59,6 @@ import com.sun.xml.ws.test.model.TransportSet.Singleton;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.thaiopensource.relaxng.jarv.RelaxNgCompactSyntaxVerifierFactory;
 import junit.framework.TestSuite;
-import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -221,6 +220,10 @@ public class TestDescriptor {
      */
     public final List<String> wsgenOptions = new ArrayList<String>();
 
+   /**
+     * Additional command-line arguments to javac
+     */
+    public final List<String> javacOptions = new ArrayList<String>();
 
     public static final Schema descriptorSchema;
 
@@ -310,6 +313,7 @@ public class TestDescriptor {
         parseArguments(root.elementText("wsimport-client"),wsimportClientOptions);
         parseArguments(root.elementText("wsimport-server"),wsimportServerOptions);
         parseArguments(root.elementText("wsgen-options"),wsgenOptions);
+        parseArguments(root.elementText("javac-options"), javacOptions);
 
         String transport = root.attributeValue("transport");
         if(transport==null)

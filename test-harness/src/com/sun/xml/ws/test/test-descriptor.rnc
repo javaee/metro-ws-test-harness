@@ -67,6 +67,8 @@ start = element descriptor {
     # list of options passed to wsgen for generating artifacts
     element wsgen-options {text}? &
 
+    # list of options passed to javac
+    element javac-options {text}? &
 
     # 'client' element holds the information necessary for a given
     #   test client to run. In particular it points to the beanshell

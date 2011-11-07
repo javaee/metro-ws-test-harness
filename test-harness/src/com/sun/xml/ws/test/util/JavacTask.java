@@ -36,14 +36,22 @@
 
 package com.sun.xml.ws.test.util;
 
+import java.util.List;
+
 /**
  * Ant task that invokes {@code Javac} loaded in a separate classloader.
  *
  * @author Kohsuke Kawaguchi
  */
 public final class JavacTask extends AbstractJavacTask {
+
     public JavacTask() {
         super("javac", JavacAdapter.class);
+    }
+
+    public JavacTask(List<String> javacArguments) {
+        this();
+        addArguments(javacArguments);
     }
 
     public static final class JavacAdapter extends JDKToolAdapter {
