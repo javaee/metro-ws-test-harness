@@ -70,6 +70,9 @@ start = element descriptor {
     # list of options passed to javac
     element javac-options {text}? &
 
+    # list of properties passed to system
+    element system-properties {text}? &
+
     # 'client' element holds the information necessary for a given
     #   test client to run. In particular it points to the beanshell
     #   source code for a given test client.

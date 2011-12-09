@@ -55,7 +55,7 @@ public class PrepareExecutor extends Executor {
         this.clean = clean;
     }
 
-    public void runBare() throws Throwable {
+    public void runTest() throws Throwable {
         context.prepare(clean);
     }
 }

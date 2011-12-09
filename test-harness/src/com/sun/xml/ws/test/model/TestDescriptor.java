@@ -224,6 +224,10 @@ public class TestDescriptor {
      * Additional command-line arguments to javac
      */
     public final List<String> javacOptions = new ArrayList<String>();
+   /**
+     * Additional command-line arguments to javac
+     */
+    public final List<String> systemProperties = new ArrayList<String>();
 
     public static final Schema descriptorSchema;
 
@@ -314,6 +318,7 @@ public class TestDescriptor {
         parseArguments(root.elementText("wsimport-server"),wsimportServerOptions);
         parseArguments(root.elementText("wsgen-options"),wsgenOptions);
         parseArguments(root.elementText("javac-options"), javacOptions);
+        parseArguments(root.elementText("system-properties"), systemProperties);
 
         String transport = root.attributeValue("transport");
         if(transport==null)

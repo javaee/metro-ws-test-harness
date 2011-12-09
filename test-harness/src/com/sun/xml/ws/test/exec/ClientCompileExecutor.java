@@ -54,7 +54,7 @@ public class ClientCompileExecutor extends Executor {
         super("Compile clients "+context.descriptor.name, context);
     }
 
-    public void runBare() throws Throwable {
+    public void runTest() throws Throwable {
         File classDir = makeWorkDir("client-classes");
 
         // compile the generated source files to javac

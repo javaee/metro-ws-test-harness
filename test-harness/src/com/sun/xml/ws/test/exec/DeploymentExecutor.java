@@ -71,7 +71,7 @@ public class DeploymentExecutor extends Executor {
         this.context = context;
     }
 
-    public void runBare() throws Throwable {
+    public void runTest() throws Throwable {
         // deploy the service
         context.app = context.parent.container.deploy(context);
         //For STS we do not want to generate client artifacts
@@ -230,7 +230,7 @@ public class DeploymentExecutor extends Executor {
      */
     public Executor createUndeployer() {
         return new Executor("Undeploy "+context.service.name,context.parent) {
-            public void runBare() throws Throwable {
+            public void runTest() throws Throwable {
                 if(DeploymentExecutor.this.context.app!=null)
                     DeploymentExecutor.this.context.app.undeploy();
             }

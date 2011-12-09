@@ -167,7 +167,7 @@ public class JavaClientExecutor extends Executor {
         }
     }
 
-    public void runBare() throws Throwable {
+    public void runTest() throws Throwable {
         // should never be here
         throw new AssertionError();
     }
