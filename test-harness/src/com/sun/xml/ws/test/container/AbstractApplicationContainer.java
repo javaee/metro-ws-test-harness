@@ -37,6 +37,7 @@
 package com.sun.xml.ws.test.container;
 
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
+import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.World;
 import com.sun.istack.NotNull;
@@ -44,9 +45,7 @@ import com.sun.istack.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
@@ -83,37 +82,75 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         boolean fromJava = (service.service.wsdl==null);
 
-        if(!fromJava)
+        if (!fromJava) {
             war.compileWSDL(wsimport);
-        if(!isSkipMode())
+        }
+
+        if (!isSkipMode()) {
             war.compileJavac();
-        if(fromJava)
+        }
+
+        if (fromJava) {
+            // copy external metadata files, if any ....
+            File[] filesToBeCopied = findExternalMetadataFiles(service.service);
+            if (filesToBeCopied != null) {
+                war.copyToClasses(filesToBeCopied);
+            }
+
             war.generateWSDL(wsgen);
+        }
 
         if(!isSkipMode()) {
             List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
-            File configuredWebXml = service.service.getConfiguredWebXml();
+            File configuredWebXml = service.service.getConfiguredFile("web.xml");
             if( configuredWebXml == null) {
                 war.generateWebXml(endpoints, httpspi);
             } else {
-                war.copyWebXml(configuredWebXml);
+                war.copyToWEBINF(configuredWebXml);
             }
 
             // we only need this for Glassfish, but it's harmless to generate for other containers.
             // TODO: figure out how not to do this for other containers
-            war.generateSunWebXml();
-
+            // TODO: external WSDL customization ...
+            File configuredSunWebXml = service.service.getConfiguredFile("sun-jaxws.xml");
+            if(configuredSunWebXml == null) {
+                war.generateSunWebXml();
+            } else {
+                war.copyToWEBINF(configuredSunWebXml);
+            }
 
             PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
             w.println("<html><body>Deployed by the JAX-WS test harness</body></html>");
             w.close();
         }
         //Package Handler Configuration files
-        war.copyHandlerChainFiles(service.service.getHandlerConfiguration());
+        war.copyToClasses(service.service.getHandlerConfiguration());
 
         //copy resources to amke it available on classpath.
         war.copyResources(service.service.parent.resources);
         return war;
+    }
+
+    private File[] findExternalMetadataFiles(TestService service) {
+        List<String> wsgenOptions = service.parent.wsgenOptions;
+        List<File> files = null;
+        Iterator<String> it = wsgenOptions.iterator();
+        while(it.hasNext()) {
+            String opt = it.next();
+            // TODO: introduce constant for final option ...
+            if ("-x".equals(opt)) {
+                if (it.hasNext()) {
+                    if (files == null) {
+                        files = new ArrayList<File>();
+                    }
+                    String next = service.baseDir.getAbsolutePath() + File.separator + it.next();
+                    files.add(new File(next));
+                } else {
+                    // nothing to do ... error in params will be discovered later ...
+                }
+            }
+        }
+        return files == null ? null : files.toArray(new File[files.size()]);
     }
 
     /**

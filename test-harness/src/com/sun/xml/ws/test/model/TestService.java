@@ -287,14 +287,21 @@ public class TestService {
      * This filter gives all web.xml files in the directory.
      * i.e files with name web.xml
      */
-    class WebXmlFilter implements FilenameFilter {
+    class NameFilter implements FilenameFilter {
+        String filename;
+        NameFilter(String filename) {
+            this.filename = filename;
+        }
         public boolean accept(File dir, String name) {
-            return (name.equals("web.xml"));
+            return (name.equals(filename));
         }
     }
 
-    public File getConfiguredWebXml() {
-        File[] webxmls = baseDir.listFiles(new WebXmlFilter());
-        return webxmls == null || webxmls.length == 0 ? null: webxmls[0];
+    public File getConfiguredFile(String filename) {
+        return first(baseDir.listFiles(new NameFilter(filename)));
+    }
+
+    private File first(File[] files) {
+        return files == null || files.length == 0 ? null: files[0];
     }
 }

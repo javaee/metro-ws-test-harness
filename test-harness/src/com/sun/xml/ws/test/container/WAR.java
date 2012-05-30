@@ -154,7 +154,7 @@ public final class WAR {
     /**
      * Copies handler files in to WEB-INF/classes
      */
-    public void copyHandlerChainFiles(File[] handlerConfigs) {
+    public void copyToClasses(File ... handlerConfigs) {
         for (File config : handlerConfigs) {
             FileUtil.copyFile(config, new File(classDir, config.getName()));
         }
@@ -163,9 +163,8 @@ public final class WAR {
     /**
      * Copies web.xml to WEB-INF/
      */
-    public void copyWebXml(File webXml) {
-        FileUtil.copyFile(webXml, new File(webInfDir, webXml.getName()));
-
+    public void copyToWEBINF(File file) {
+        FileUtil.copyFile(file, new File(webInfDir, file.getName()));
     }
 
     /**

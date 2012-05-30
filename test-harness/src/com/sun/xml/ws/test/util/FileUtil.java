@@ -121,6 +121,7 @@ public class FileUtil {
      */
     public static void copyFile(File src, File dest) {
         Copy cp = new Copy();
+        cp.setOverwrite(true);
         cp.setProject(World.project);
         cp.setFile(src);
         cp.setTofile(dest);
