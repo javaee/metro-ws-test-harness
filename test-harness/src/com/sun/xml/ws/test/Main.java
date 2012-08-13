@@ -539,13 +539,7 @@ public class Main {
     private void guessWorkspace() {
         // JAX-WS RI teams often set this variable
         String jaxwsHome = System.getenv("JAXWS_HOME");
-        System.out.println("got: " + jaxwsHome);
         if(jaxwsHome!=null) {
-            if (true) {
-                System.out.println("Found JAX-WS RI workspace at "+jaxwsHome);
-                        jaxwsWs = new File(jaxwsHome);
-                        return;
-            }
             File f = new File(jaxwsHome);
             if(f.isDirectory()) {
                 if(f.getName().equals("build")) {
