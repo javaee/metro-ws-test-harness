@@ -423,6 +423,7 @@ public class Main {
             runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
         } else
         if(jaxwsWs!=null) {
+            if (new File(jaxwsWs,"rt/build/classes").exists()) {
             runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
             File file = new File(jaxwsWs,"rt-ha/build/classes");
             if (file.exists()) {            // rt-ha module may not be there
@@ -442,6 +443,21 @@ public class Main {
             file = new File(jaxwsWs, "rt-ha/lib");
             if (file.exists()) {            // rt-ha module may not be there
                 runtime.addJarFolder(file);
+            }
+            } else if (new File(jaxwsWs,"pom.xml").exists()) {
+                //maven build
+                runtime.addClassFolder(new File(jaxwsWs, "rt/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "servlet/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/target/classes"));
+
+                runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
+
+                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
+
+                tool.addJar(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib/jaxb-xjc.jar"));
+
+                runtime.addJarFolder(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib"), "jaxb-xjc.jar");
             }
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
@@ -523,7 +539,13 @@ public class Main {
     private void guessWorkspace() {
         // JAX-WS RI teams often set this variable
         String jaxwsHome = System.getenv("JAXWS_HOME");
+        System.out.println("got: " + jaxwsHome);
         if(jaxwsHome!=null) {
+            if (true) {
+                System.out.println("Found JAX-WS RI workspace at "+jaxwsHome);
+                        jaxwsWs = new File(jaxwsHome);
+                        return;
+            }
             File f = new File(jaxwsHome);
             if(f.isDirectory()) {
                 if(f.getName().equals("build")) {
