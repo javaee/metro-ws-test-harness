@@ -346,10 +346,10 @@ public final class WAR {
             File report = new File(wsdlDir,"wsgen.report");
             options.add("-XwsgenReport").add(report);
 
-            options.add(endpt.className);
-
             // additional wsgen options from test descriptor
             options.addAll(service.service.parent.wsgenOptions);
+
+            options.add(endpt.className);
 
             System.out.println("Generating WSDL");
             if(World.debug)
