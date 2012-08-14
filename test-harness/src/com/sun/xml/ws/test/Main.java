@@ -450,6 +450,7 @@ public class Main {
                 runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
                 runtime.addClassFolder(new File(jaxwsWs, "servlet/target/classes"));
                 runtime.addClassFolder(new File(jaxwsWs, "rt-fi/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "httpspi-servlet/target/classes"));
 
                 runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
 
@@ -457,7 +458,7 @@ public class Main {
 
                 tool.addJar(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib/jaxb-xjc.jar"));
 
-                runtime.addJarFolder(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib"), "jaxb-xjc.jar");
+                runtime.addJarFolder(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib"), "jaxb-xjc.jar", "jaxws-rt.jar", "jaxws-tools.jar");
             }
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
