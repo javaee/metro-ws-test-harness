@@ -457,7 +457,9 @@ public class Main {
                 tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
 
                 tool.addJar(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib/jaxb-xjc.jar"));
-
+                
+                // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
+                runtime.addClassFolder(new File(jaxwsWs,"tools/wscompile/src/main/resources"));
                 runtime.addJarFolder(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib"), "jaxb-xjc.jar", "jaxws-rt.jar", "jaxws-tools.jar");
             }
         } else if (jaxwsInJDK) {
