@@ -423,28 +423,29 @@ public class Main {
             runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
         } else
         if(jaxwsWs!=null) {
-            if (new File(jaxwsWs,"rt/build/classes").exists()) {
-            runtime.addClassFolder( new File(jaxwsWs,"rt/build/classes"));
-            File file = new File(jaxwsWs,"rt-ha/build/classes");
-            if (file.exists()) {            // rt-ha module may not be there
-                runtime.addClassFolder(file);
-            }
-            runtime.addClassFolder( new File(jaxwsWs,"rt/src"));
-            runtime.addClassFolder( new File(jaxwsWs,"servlet/build/classes"));
-            runtime.addClassFolder( new File(jaxwsWs,"servlet/src"));
-            runtime.addClassFolder( new File(jaxwsWs,"rt-fi/build/classes"));
-            runtime.addClassFolder( new File(jaxwsWs,"transports/local/build/classes"));
-            runtime.addClassFolder( new File(jaxwsWs,"transports/local/src"));
-            tool.addClassFolder(    new File(jaxwsWs,"tools/wscompile/build/classes"));
-            // this is needed for Localizer (which lives in runtime) to find message resources of wsimport
-            runtime.addClassFolder(    new File(jaxwsWs,"tools/wscompile/src"));
-            tool.addJar(            new File(jaxwsWs,"lib/jaxb-xjc.jar"));
-            runtime.addJarFolder(   new File(jaxwsWs,"lib"),    "jaxb-xjc.jar");
-            file = new File(jaxwsWs, "rt-ha/lib");
-            if (file.exists()) {            // rt-ha module may not be there
-                runtime.addJarFolder(file);
-            }
-            } else if (new File(jaxwsWs,"pom.xml").exists()) {
+            if (new File(jaxwsWs, "rt/build/classes").exists()) {
+                runtime.addClassFolder(new File(jaxwsWs, "rt/build/classes"));
+                File file = new File(jaxwsWs, "rt-ha/build/classes");
+                if (file.exists()) {            // rt-ha module may not be there
+                    runtime.addClassFolder(file);
+                }
+                runtime.addClassFolder(new File(jaxwsWs, "rt/src"));
+                runtime.addClassFolder(new File(jaxwsWs, "servlet/build/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "servlet/src"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/build/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "transports/local/build/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "transports/local/src"));
+                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/build/classes"));
+                // this is needed for Localizer (which lives in runtime) to find message resources of wsimport
+                runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src"));
+                tool.addJar(new File(jaxwsWs, "lib/jaxb-xjc.jar"));
+                runtime.addJarFolder(new File(jaxwsWs, "lib"), "jaxb-xjc.jar");
+                file = new File(jaxwsWs, "rt-ha/lib");
+                if (file.exists()) {            // rt-ha module may not be there
+                    runtime.addJarFolder(file);
+                }
+            } else
+            if (new File(jaxwsWs, "pom.xml").exists()) {
                 //maven build
                 runtime.addClassFolder(new File(jaxwsWs, "rt/target/classes"));
                 runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
@@ -454,13 +455,26 @@ public class Main {
 
                 runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
 
+                // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
+                runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src/main/resources"));
+
                 tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
 
-                tool.addJar(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib/jaxb-xjc.jar"));
-                
-                // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
-                runtime.addClassFolder(new File(jaxwsWs,"tools/wscompile/src/main/resources"));
-                runtime.addJarFolder(new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib"), "jaxb-xjc.jar", "jaxws-rt.jar", "jaxws-tools.jar");
+                //now find libraries
+                File libDir = System.getProperty("libraries.dir") != null
+                        ? new File(System.getProperty("libraries.dir"))
+                        : new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib");
+                for (File lib: libDir.listFiles()) {
+                    String name = lib.getName();
+                    if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
+                        continue;
+                    }
+                    if (name.contains("jaxb-xjc")) {
+                        tool.addJar(lib);
+                    } else {
+                        runtime.addJar(lib);
+                    }
+                }
             }
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
