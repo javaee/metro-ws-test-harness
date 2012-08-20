@@ -40,7 +40,6 @@ import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.Realm;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
-import com.sun.xml.ws.test.container.jelly.SunJaxwsInfoBean;
 import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
@@ -54,9 +53,19 @@ import org.apache.tools.ant.types.Path;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
+import javax.jws.WebService;
+import javax.xml.namespace.QName;
+import javax.xml.ws.WebEndpoint;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceProvider;
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Represents an exploded WAR file on a file system.
@@ -114,6 +123,137 @@ public final class WAR {
         libDir.mkdir();
         srcDir = new File(service.workDir,"gen-src");
         srcDir.mkdir();
+    }
+
+    /**
+     * This method collects info about endpoints; it's being used for generating
+     * server side descriptors.
+     *
+     * @return
+     * @throws Exception
+     */
+    public List<EndpointInfoBean> getEndpointsInfos() throws Exception {
+
+        Set<TestEndpoint> endpoints = service.service.endpoints;
+        ArrayList<EndpointInfoBean> beans = new ArrayList<EndpointInfoBean>();
+
+        // fromJava:
+        if (service.service.wsdl == null) {
+
+            for (TestEndpoint endpoint : endpoints) {
+                EndpointInfoBean bean = EndpointInfoBean.create(
+                        endpoint.name,
+                        endpoint.className,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "/" + endpoint.name);
+                beans.add(bean);
+            }
+        } else { // fromWSDL:
+
+            ArrayList<String> portNames = new ArrayList<String>();
+
+            // if we find multiple implClass, use the port local name to match them
+            HashMap<String, String> portNameToImpl = new HashMap<String, String>();
+            // port name to service name
+            HashMap<String, QName> portNameToServiceName = new HashMap<String, QName>();
+
+            String implClass = null;
+
+            ClassLoader loader = new URLClassLoader(
+                    new URL[]{classDir.toURL()},
+                    World.runtime.getClassLoader()
+            );
+
+            WebServiceClient wsca = null;
+            for (String className : FileUtil.getClassFileNames(classDir)) {
+
+                Class clazz = loader.loadClass(className);
+
+                // prevent setting null ...
+                if (clazz.getAnnotation(WebServiceClient.class) != null) {
+                    wsca = (WebServiceClient) clazz.getAnnotation(WebServiceClient.class);
+                    for (Method method : clazz.getMethods()) {
+                        WebEndpoint a = method.getAnnotation(WebEndpoint.class);
+                        if (a != null && method.getParameterTypes().length == 0) {
+                            String name = a.name();
+                            if (!name.equals("")) {
+                                portNames.add(name);
+                                portNameToServiceName.put(name, new QName(wsca.targetNamespace(), wsca.name()));
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                WebService ws = (WebService) clazz.getAnnotation(WebService.class);
+                if (ws != null) {
+                    String endpointInterface = ws.endpointInterface();
+                    if (!endpointInterface.equals(""))
+                        implClass = clazz.getName();
+                    if (!"".equals(ws.portName()))
+                        portNameToImpl.put(ws.portName(), implClass);
+
+                } else {
+                    WebServiceProvider wsp = (WebServiceProvider) clazz.getAnnotation(WebServiceProvider.class);
+                    if (wsp != null) {
+                        implClass = clazz.getName();
+                        if (!"".equals(wsp.portName()))
+                            portNameToImpl.put(wsp.portName(), implClass);
+                    }
+                }
+            }
+
+            // create endpoint info beans
+            String tns = null;
+            String wsdlLocation = null;
+
+            if (wsca != null) {
+                tns = wsca.targetNamespace();
+
+                // hacky
+                wsdlLocation = wsca.wsdlLocation();
+                wsdlLocation = wsdlLocation.replace('\\', '/');
+                wsdlLocation = "WEB-INF/wsdl/" +
+                        wsdlLocation.substring(
+                                wsdlLocation.lastIndexOf("/") + 1,
+                                wsdlLocation.length());
+            }
+
+            int i = 0;
+            for (String portName : portNames) {
+                String impl = portNameToImpl.get(portName);
+                portNameToImpl.remove(portName);
+                if (impl == null) {
+                    if (portNames.size() > 1) {
+                        continue;   // OK to have a portname without a deployed endpoint
+                    }
+                    impl = implClass; // default
+                }
+
+                // call EndpointInfoBean.create thanks to static import.
+                // this allows us to create an instance of class that's not visible to this classloader.
+                EndpointInfoBean bean = EndpointInfoBean.create(
+                        "endpoint" + (i++),
+                        impl,
+                        wsdlLocation,
+                        portNameToServiceName.get(portName),
+                        new QName(tns, portName),
+                        "binding",
+                        "/" + service.service.getEndpointByImpl(impl).name);
+                beans.add(bean);
+            }
+
+            // error check
+            if (!portNameToImpl.isEmpty())
+                throw new Exception("Implementations " + new ArrayList(portNameToImpl.values()) + " don't have corresponding ports in WSDL." +
+                        " Their declared ports are " + new ArrayList(portNameToImpl.keySet()) +
+                        " but actual ports are " + portNames
+                );
+        }
+        return beans;
     }
 
     /**
@@ -193,26 +333,15 @@ public final class WAR {
 
     /**
      * This method uses Jelly to write the sun-jaxws.xml file. The
-     * template file is sun-jaxws.jelly. The real work happens
-     * in the SunJaxwsInfoBean object which supplies information
-     * to the Jelly processor through accessor methods.
-     *
-     * @see SunJaxwsInfoBean
+     * template file is sun-jaxws.jelly.
      *
      * @return
      *      list of endpoints that were discovered.
      */
-    final List<EndpointInfoBean> generateSunJaxWsXml() throws Exception {
+    final void generateSunJaxWsXml(List<EndpointInfoBean> endpointInfoBeans) throws Exception {
         Jelly jelly = new Jelly(getClass(),"jelly/sun-jaxws.jelly");
-        SunJaxwsInfoBean infoBean = new SunJaxwsInfoBean(this);
-        jelly.set("data", infoBean);
+        jelly.set("endpointInfoBeans", endpointInfoBeans);
         jelly.run(new File(webInfDir, "sun-jaxws.xml"));
-
-        return infoBean.getEndpointInfoBeans();
-    }
-
-    public final List<EndpointInfoBean> getEndpointInfoBeans() throws Exception {
-        return new SunJaxwsInfoBean(this).getEndpointInfoBeans();
     }
 
     /**

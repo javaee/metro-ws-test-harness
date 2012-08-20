@@ -36,11 +36,11 @@
 
 package com.sun.xml.ws.test.container;
 
+import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.tool.WsTool;
-import com.sun.xml.ws.test.World;
-import com.sun.istack.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -49,7 +49,7 @@ import java.util.*;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
- *
+ * <p/>
  * This implementation provides code for common tasks, such as assembling files
  * into a war, etc.
  *
@@ -80,7 +80,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
     protected final WAR assembleWar(DeployedService service) throws Exception {
         WAR war = new WAR(service);
 
-        boolean fromJava = (service.service.wsdl==null);
+        boolean fromJava = (service.service.wsdl == null);
 
         if (!fromJava) {
             war.compileWSDL(wsimport);
@@ -90,33 +90,34 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
             war.compileJavac();
         }
 
-        if (fromJava) {
-            // copy external metadata files, if any ....
-            File[] filesToBeCopied = findExternalMetadataFiles(service.service);
-            if (filesToBeCopied != null) {
-                war.copyToClasses(filesToBeCopied);
-            }
+        // copy external metadata files, if any ....
+        File[] filesToBeCopied = findExternalMetadataFiles(service.service);
+        if (filesToBeCopied != null) {
+            war.copyToClasses(filesToBeCopied);
+        }
 
+        if (fromJava) {
             war.generateWSDL(wsgen);
         }
 
-        if(!isSkipMode()) {
-            List<EndpointInfoBean> endpoints = war.generateSunJaxWsXml();
-            File configuredWebXml = service.service.getConfiguredFile("web.xml");
-            if( configuredWebXml == null) {
-                war.generateWebXml(endpoints, httpspi);
-            } else {
-                war.copyToWEBINF(configuredWebXml);
-            }
+        if (!isSkipMode()) {
+
+            List<EndpointInfoBean> endpoints = war.getEndpointsInfos();
 
             // we only need this for Glassfish, but it's harmless to generate for other containers.
             // TODO: figure out how not to do this for other containers
-            // TODO: external WSDL customization ...
-            File configuredSunWebXml = service.service.getConfiguredFile("sun-jaxws.xml");
-            if(configuredSunWebXml == null) {
-                war.generateSunWebXml();
+            File configuredSunJaxwsXml = service.service.getConfiguredFile("sun-jaxws.xml");
+            if (configuredSunJaxwsXml == null) {
+                war.generateSunJaxWsXml(endpoints);
             } else {
-                war.copyToWEBINF(configuredSunWebXml);
+                war.copyToWEBINF(configuredSunJaxwsXml);
+            }
+
+            File configuredWebXml = service.service.getConfiguredFile("web.xml");
+            if (configuredWebXml == null) {
+                war.generateWebXml(endpoints, httpspi);
+            } else {
+                war.copyToWEBINF(configuredWebXml);
             }
 
             PrintWriter w = new PrintWriter(new FileWriter(new File(war.root, "index.html")));
@@ -135,9 +136,8 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         List<String> wsgenOptions = service.parent.wsgenOptions;
         List<File> files = null;
         Iterator<String> it = wsgenOptions.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             String opt = it.next();
-            // TODO: introduce constant for final option ...
             if ("-x".equals(opt)) {
                 if (it.hasNext()) {
                     if (files == null) {
@@ -169,7 +169,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         // copy runtime classes into the classpath. this is slow.
         // isn't there a better way to do this?
-        if(copyRuntimeLibraries()) {
+        if (copyRuntimeLibraries()) {
             System.out.println("Copying runtime libraries");
             assembly.copyClasspath(World.runtime);
         }

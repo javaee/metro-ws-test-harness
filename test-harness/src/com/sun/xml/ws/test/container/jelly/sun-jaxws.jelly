@@ -40,7 +40,7 @@
     xmlns:x="jelly:xml"
     xmlns:html="jelly:html"><endpoints xmlns='http://java.sun.com/xml/ns/jax-ws/ri/runtime' version='2.0'>
 
-<j:forEach items="${data.endpointInfoBeans}" var="endpoint">
+<j:forEach items="${endpointInfoBeans}" var="endpoint">
   <endpoint
       name="${endpoint.name}"
       implementation="${endpoint.implementation}"
