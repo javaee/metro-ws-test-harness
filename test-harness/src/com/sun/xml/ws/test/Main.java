@@ -92,10 +92,10 @@ public class Main {
     @Argument
     final List<String> tests = new ArrayList<String>();
 
-    @Option(name="-r",usage="find test directories recursively")
+    @Option(name = "-r", usage = "find test directories recursively")
     boolean recursive = false;
 
-    @Option(name="-p",usage="run multiple tests in parallel")
+    @Option(name = "-p", usage = "run multiple tests in parallel")
     int parallel = 1;
 
     /*
@@ -108,59 +108,59 @@ public class Main {
       Harness defines a few 'profiles' of the jar file layout, and allow users
       to choose them.
     */
-    @Option(name="-cp:wsit-image",usage="classpath option\npath to the WSIT dist image",metaVar="WSIT_HOME")
+    @Option(name = "-cp:wsit-image", usage = "classpath option\npath to the WSIT dist image", metaVar = "WSIT_HOME")
     File wsitImage = null;
 
-    @Option(name="-cp:wsit",usage="classpath option\npath to WSIT workspace",metaVar="WSIT_HOME")
+    @Option(name = "-cp:wsit", usage = "classpath option\npath to WSIT workspace", metaVar = "WSIT_HOME")
     File wsitWs = null;
 
-    @Option(name="-cp:jaxws-image",usage="classpath option\npath to JAX-WS RI dist image",metaVar="JAXWS_HOME")
+    @Option(name = "-cp:jaxws-image", usage = "classpath option\npath to JAX-WS RI dist image", metaVar = "JAXWS_HOME")
     File jaxwsImage = null;
 
-    @Option(name="-cp:jaxws",usage="classpath option\npath to JAX-WS RI workspace",metaVar="JAXWS_HOME")
+    @Option(name = "-cp:jaxws", usage = "classpath option\npath to JAX-WS RI workspace", metaVar = "JAXWS_HOME")
     File jaxwsWs = null;
 
-    @Option(name="-external-wsimport",usage="use external tool.sh/.bat")
+    @Option(name = "-external-wsimport", usage = "use external tool.sh/.bat")
     File externalWsImport = null;
 
-    @Option(name="-external-wsgen",usage="use external wsgen.sh/.bat")
+    @Option(name = "-external-wsgen", usage = "use external wsgen.sh/.bat")
     File externalWsGen = null;
 
-    @Option(name="-skip",usage="skip all code generation and reuse the artifacts generated during the last run")
+    @Option(name = "-skip", usage = "skip all code generation and reuse the artifacts generated during the last run")
     boolean skipCompilation;
 
-    @Option(name="-transport",usage="specify the pluggable transport jar")
+    @Option(name = "-transport", usage = "specify the pluggable transport jar")
     File transportJar;
 
-    @Option(name="-cp:override",usage="these jars and folders are placed in front of other -cp:*** options. Useful for overriding some jars")
+    @Option(name = "-cp:override", usage = "these jars and folders are placed in front of other -cp:*** options. Useful for overriding some jars")
     String classPathOverride;
 
     /**
      * This is copied to {@link World#debug}.
      */
-    @Option(name="-debug",usage="Generate output for debugging harness")
+    @Option(name = "-debug", usage = "Generate output for debugging harness")
     boolean debug;
 
-    @Option(name="-dump",usage="Enable all transport dumps")
+    @Option(name = "-dump", usage = "Enable all transport dumps")
     boolean dump;
 
-    @Option(name="-report",usage="Generate JUnit test report XMLs",metaVar="DIR")
+    @Option(name = "-report", usage = "Generate JUnit test report XMLs", metaVar = "DIR")
     File reportDir = null;
 
-    @Option(name="-concurrent-side-effect-free",usage="Run all side-effect free tests as concurrent")
+    @Option(name = "-concurrent-side-effect-free", usage = "Run all side-effect free tests as concurrent")
     boolean concurrentSideEffectFree = false;
 
-    @Option(name="-emma",usage="Generate emma coverage report")
+    @Option(name = "-emma", usage = "Generate emma coverage report")
     File emma = null;
 
-    @Option(name="-version",usage="Specify the target JAX-WS version being tested. This determines test exclusions",handler=VersionNumberHandler.class)
+    @Option(name = "-version", usage = "Specify the target JAX-WS version being tested. This determines test exclusions", handler = VersionNumberHandler.class)
     VersionNumber version = null;
 
-    @Option(name="-targetVersion",usage="Specify the target JAX-WS runtime version. This determines target option for the WS Tools to generate code compliant with the runtime version",handler=VersionNumberHandler.class)
+    @Option(name = "-targetVersion", usage = "Specify the target JAX-WS runtime version. This determines target option for the WS Tools to generate code compliant with the runtime version", handler = VersionNumberHandler.class)
     VersionNumber targetVersion = null;
 
 
-    @Option(name="-client",usage="Just run a single client script, instead of all")
+    @Option(name = "-client", usage = "Just run a single client script, instead of all")
     String clientScriptName = null;
 
     /*
@@ -173,65 +173,65 @@ public class Main {
 
       If none is given we test in the local mode.
     */
-    @Option(name="-tomcat-local",usage="Launch Tomcat from the harness and test with it",metaVar="TOMCAT_HOME")
+    @Option(name = "-tomcat-local", usage = "Launch Tomcat from the harness and test with it", metaVar = "TOMCAT_HOME")
     File tomcat = null;
 
-    @Option(name="-tomcat-remote",metaVar="CONFIG",
-        usage="Test with remote Tomcat.\n" +
-            "CONFIG=[USER:PASS@]HOST[:PORT].\n" +
-            "Defaults: USER=admin, PASS=admin, PORT=8080")
+    @Option(name = "-tomcat-remote", metaVar = "CONFIG",
+            usage = "Test with remote Tomcat.\n" +
+                    "CONFIG=[USER:PASS@]HOST[:PORT].\n" +
+                    "Defaults: USER=admin, PASS=admin, PORT=8080")
     String remoteTomcat = null;
 
-    @Option(name="-tomcat-embedded",metaVar="TOMCAT_HOME",
-        usage="loads Tomcat into the harness VM and test with it.")
+    @Option(name = "-tomcat-embedded", metaVar = "TOMCAT_HOME",
+            usage = "loads Tomcat into the harness VM and test with it.")
     File embeddedTomcat = null;
 
 
-    @Option(name="-jetty-embedded",metaVar="JETTY_HOME",
-        usage="loads Jetty into the harness VM and test with it.")
+    @Option(name = "-jetty-embedded", metaVar = "JETTY_HOME",
+            usage = "loads Jetty into the harness VM and test with it.")
     File embeddedJetty;
 
-    @Option(name="-lwhs",usage="tests using the Java lightweight HTTP server")
+    @Option(name = "-lwhs", usage = "tests using the Java lightweight HTTP server")
     boolean lwhs = false;
 
-    @Option(name="-jaxwsInJDK",usage="tests using JAX-WS impl in JDK")
+    @Option(name = "-jaxwsInJDK", usage = "tests using JAX-WS impl in JDK")
     boolean jaxwsInJDK = false;
 
-    @Option(name="-httpspi",usage="use JAX-WS 2.2 httpspi API deployment for servlet containers")
+    @Option(name = "-httpspi", usage = "use JAX-WS 2.2 httpspi API deployment for servlet containers")
     boolean httpspi = false;
 
-    
-    @Option(name="-glassfish-remote",metaVar="CONFIG",
-        usage=
-            "Test with remote Glassfish. Needs both JMX connection info and HTTP URL.\n"+
-            "CONFIG=[USER:PASS@]HOST[:PORT][-HTTPURL]\n"+
-            "e.g., admin:adminadmin@localhost:4848-http://localhost:8080/\n"+
-            "Defaults: USER=admin, PASS=adminadmin, PORT=4848, HTTPURL=http://HOST/")
+
+    @Option(name = "-glassfish-remote", metaVar = "CONFIG",
+            usage =
+                    "Test with remote Glassfish. Needs both JMX connection info and HTTP URL.\n" +
+                            "CONFIG=[USER:PASS@]HOST[:PORT][-HTTPURL]\n" +
+                            "e.g., admin:adminadmin@localhost:4848-http://localhost:8080/\n" +
+                            "Defaults: USER=admin, PASS=adminadmin, PORT=4848, HTTPURL=http://HOST/")
     String remoteGlassfish = null;
 
-    @Option(name="-glassfish-local",metaVar="GLASSFISH_HOME",
-        usage=
-            "Launch Glassfish from the harness and test with it")
+    @Option(name = "-glassfish-local", metaVar = "GLASSFISH_HOME",
+            usage =
+                    "Launch Glassfish from the harness and test with it")
     File localGlassfish = null;
 
-    @Option(name="-glassfishv3-local",metaVar="GLASSFISH_HOME",
-            usage="Launch Glassfish v3 from the harness and test with it")
+    @Option(name = "-glassfishv3-local", metaVar = "GLASSFISH_HOME",
+            usage = "Launch Glassfish v3 from the harness and test with it")
     File localGlassfishV3 = null;
 
-    @Option(name="-legacy-local",usage="Emergency! I need to use the legacy local transport!")
+    @Option(name = "-legacy-local", usage = "Emergency! I need to use the legacy local transport!")
     boolean legacyLocalTransport = false;
 
-    @Option(name="-leave",usage="leave the container running after all the tests are completed. Often useful for debugging problems.")
+    @Option(name = "-leave", usage = "leave the container running after all the tests are completed. Often useful for debugging problems.")
     boolean leave = false;
 
-    @Option(name="-port",usage="Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
+    @Option(name = "-port", usage = "Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = 18080;
 
-    @Option(name="-wsgen",usage=
-            "Control the packaging of Wrapper and Exception beans.\n"+
-            "always - Beans are packaged.\n"+
-            "both - Test case is executed twice, with and without packaging beans.\n"+
-            "ignore - Beans are NOT packaged.", metaVar="[always|both|ignore]"
+    @Option(name = "-wsgen", usage =
+            "Control the packaging of Wrapper and Exception beans.\n" +
+                    "always - Beans are packaged.\n" +
+                    "both - Test case is executed twice, with and without packaging beans.\n" +
+                    "ignore - Beans are NOT packaged.", metaVar = "[always|both|ignore]"
     )
     WsGenMode wsGenMode = WsGenMode.ALWAYS;
 
@@ -244,11 +244,11 @@ public class Main {
         // use the platform default proxy if available.
         // see sun.net.spi.DefaultProxySelector for details.
         try {
-            System.setProperty("java.net.useSystemProxies","true");
+            System.setProperty("java.net.useSystemProxies", "true");
         } catch (SecurityException e) {
             // failing to set this property isn't fatal
         }
-        
+
         System.exit(doMain(args));
     }
 
@@ -258,7 +258,7 @@ public class Main {
         try {
             parser.parseArgument(args);
 
-            if(main.tests.isEmpty())
+            if (main.tests.isEmpty())
                 throw new CmdLineException("No test is given");
 
             return main.run();
@@ -275,35 +275,35 @@ public class Main {
     public int run() throws Exception {
         fillWorld();
 
-        if(dump) {
-            System.setProperty("com.sun.xml.ws.transport.local.LocalTransportTube.dump","true");
-            System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
-            System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump","true");
+        if (dump) {
+            System.setProperty("com.sun.xml.ws.transport.local.LocalTransportTube.dump", "true");
+            System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+            System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
         }
 
 
-        if(port==-1) {
+        if (port == -1) {
             // set TCP port to somewhere between 20000-60000
             port = new Random().nextInt(40000) + 20000;
         }
 
         // set up objects that represent test environment.
-        WsTool wsimport,wsgen;
-        if(skipCompilation) {
+        WsTool wsimport, wsgen;
+        if (skipCompilation) {
             System.err.println("Skipping compilation");
             wsimport = wsgen = WsTool.NOOP;
         } else {
             wsimport = WsTool.createWsImport(externalWsImport);
             wsgen = WsTool.createWsGen(externalWsGen);
         }
-        ApplicationContainer container = createContainer(wsimport,wsgen);
+        ApplicationContainer container = createContainer(wsimport, wsgen);
 
         // build up test plan
         TestSuite suite = createTestSuite();
         for (String dir : tests)
             build(new File(dir), container, wsimport, suite);
 
-        if(suite.countTestCases()==0) {
+        if (suite.countTestCases() == 0) {
             System.err.println("No test to run");
             return -1;
         }
@@ -320,7 +320,7 @@ public class Main {
                 protected TestResult createTestResult() {
                     TestResult result = super.createTestResult();
 
-                    if(reportDir!=null) {
+                    if (reportDir != null) {
                         reportDir.mkdirs();
                         formatter = new AntXmlFormatter(XMLJUnitResultFormatter.class, reportDir);
                         result.addListener(formatter);
@@ -333,7 +333,7 @@ public class Main {
                     try {
                         return super.doRun(test);
                     } finally {
-                        if(formatter!=null)
+                        if (formatter != null)
                             formatter.close();
                     }
                 }
@@ -341,11 +341,11 @@ public class Main {
 
             TestResult r = testRunner.doRun(suite);
 
-            return r.errorCount()+r.failureCount();
+            return r.errorCount() + r.failureCount();
         } finally {
-            if(!leave)
+            if (!leave)
                 container.shutdown();
-            if(World.emma!=null)
+            if (World.emma != null)
                 World.emma.write(emma);
         }
     }
@@ -355,51 +355,51 @@ public class Main {
      */
     private void fillWorld() throws Exception {
         World.debug = this.debug;
-        World.emma = emma!=null ? new Emma() : null;
+        World.emma = emma != null ? new Emma() : null;
 
         Realm runtime = World.runtime;
         Realm tool = World.tool;
 
-        if(classPathOverride!=null) {
-            StringTokenizer tokens = new StringTokenizer(classPathOverride,File.pathSeparator);
-            while(tokens.hasMoreTokens()) {
+        if (classPathOverride != null) {
+            StringTokenizer tokens = new StringTokenizer(classPathOverride, File.pathSeparator);
+            while (tokens.hasMoreTokens()) {
                 runtime.addJar(new File(tokens.nextToken()));
             }
         }
 
-        if(transportJar!=null)
+        if (transportJar != null)
             runtime.addJar(transportJar);
 
         // fill in container realm.
-        if(embeddedTomcat!=null) {
-            runtime.addJarFolder(new File(embeddedTomcat,"bin"));
-            runtime.addJarFolder(new File(embeddedTomcat,"common/lib"));
-            runtime.addJarFolder(new File(embeddedTomcat,"server/lib"));
+        if (embeddedTomcat != null) {
+            runtime.addJarFolder(new File(embeddedTomcat, "bin"));
+            runtime.addJarFolder(new File(embeddedTomcat, "common/lib"));
+            runtime.addJarFolder(new File(embeddedTomcat, "server/lib"));
         }
 
-        if(embeddedJetty!=null) {
+        if (embeddedJetty != null) {
             runtime.addJarFolder(embeddedJetty);
-            runtime.addJarFolder(new File(embeddedJetty,"lib"));
+            runtime.addJarFolder(new File(embeddedJetty, "lib"));
         }
 
-        if(wsitImage==null && wsitWs==null && jaxwsImage==null && jaxwsWs==null && !jaxwsInJDK)
+        if (wsitImage == null && wsitWs == null && jaxwsImage == null && jaxwsWs == null && !jaxwsInJDK)
             guessWorkspace();
 
         // fill in runtime and tool realms
-        if(wsitImage!=null) {
-            File rtJar = new File(wsitImage,"lib/webservices-rt.jar");
+        if (wsitImage != null) {
+            File rtJar = new File(wsitImage, "lib/webservices-rt.jar");
             runtime.addJar(rtJar);
-            
-            File toolJar = new File(wsitImage,"lib/webservices-tools.jar");
+
+            File toolJar = new File(wsitImage, "lib/webservices-tools.jar");
             tool.addJar(toolJar);
-            
-            File apiJar = new File(wsitImage,"lib/webservices-api.jar");
+
+            File apiJar = new File(wsitImage, "lib/webservices-api.jar");
             runtime.addJar(apiJar);
 
-            File extraJar = new File(wsitImage,"lib/webservices-extra.jar");
+            File extraJar = new File(wsitImage, "lib/webservices-extra.jar");
             runtime.addJar(extraJar);
 
-            File extraApiJar = new File(wsitImage,"lib/webservices-extra-api.jar");
+            File extraApiJar = new File(wsitImage, "lib/webservices-extra-api.jar");
             runtime.addJar(extraApiJar);
 
             containerClasspathPrefix = new File[5];
@@ -408,22 +408,53 @@ public class Main {
             containerClasspathPrefix[2] = apiJar;
             containerClasspathPrefix[3] = extraJar;
             containerClasspathPrefix[4] = extraApiJar;
-        } else
-        if(wsitWs!=null) {
-            runtime.addClassFolder( new File(wsitWs,"rt/build/classes"));
-            runtime.addJarFolder(   new File(wsitWs,"lib/runtime"));
+
+        } else if (wsitWs != null) {
+            runtime.addClassFolder(new File(wsitWs, "rt/build/classes"));
+            runtime.addJarFolder(new File(wsitWs, "lib/runtime"));
             /*runtime.addClassFolder(    new File(wsitWs,"tools/build/classes"));
             runtime.addJarFolder(      new File(wsitWs,"lib/tooltime"));*/
-            tool.addClassFolder(    new File(wsitWs,"tools/build/classes"));
-            tool.addJarFolder(      new File(wsitWs,"lib/tooltime"));
-        } else
-        if(jaxwsImage!=null) {
-            tool.addJar(            new File(jaxwsImage,"lib/jaxws-tools.jar"));
-            tool.addJar(            new File(jaxwsImage,"lib/jaxb-xjc.jar"));
-            runtime.addJarFolder(   new File(jaxwsImage,"lib"), "jaxws-tools.jar","jaxb-xjc.jar");
-        } else
-        if(jaxwsWs!=null) {
-            if (new File(jaxwsWs, "rt/build/classes").exists()) {
+            tool.addClassFolder(new File(wsitWs, "tools/build/classes"));
+            tool.addJarFolder(new File(wsitWs, "lib/tooltime"));
+
+        } else if (jaxwsImage != null) {
+            tool.addJar(new File(jaxwsImage, "lib/jaxws-tools.jar"));
+            tool.addJar(new File(jaxwsImage, "lib/jaxb-xjc.jar"));
+            runtime.addJarFolder(new File(jaxwsImage, "lib"), "jaxws-tools.jar", "jaxb-xjc.jar");
+
+        } else if (jaxwsWs != null) {
+
+            if (new File(jaxwsWs, "pom.xml").exists()) {
+                //maven build
+                runtime.addClassFolder(new File(jaxwsWs, "rt/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "servlet/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "httpspi-servlet/target/classes"));
+
+                runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
+
+                // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
+                runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src/main/resources"));
+
+                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
+
+                //now find libraries
+                File libDir = System.getProperty("libraries.dir") != null
+                        ? new File(System.getProperty("libraries.dir"))
+                        : new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib");
+                for (File lib : libDir.listFiles()) {
+                    String name = lib.getName();
+                    if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
+                        continue;
+                    }
+                    if (name.contains("jaxb-xjc")) {
+                        tool.addJar(lib);
+                    } else {
+                        runtime.addJar(lib);
+                    }
+                }
+            } else if (new File(jaxwsWs, "rt/build/classes").exists()) {
                 runtime.addClassFolder(new File(jaxwsWs, "rt/build/classes"));
                 File file = new File(jaxwsWs, "rt-ha/build/classes");
                 if (file.exists()) {            // rt-ha module may not be there
@@ -444,54 +475,24 @@ public class Main {
                 if (file.exists()) {            // rt-ha module may not be there
                     runtime.addJarFolder(file);
                 }
-            } else
-            if (new File(jaxwsWs, "pom.xml").exists()) {
-                //maven build
-                runtime.addClassFolder(new File(jaxwsWs, "rt/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "servlet/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "httpspi-servlet/target/classes"));
-
-                runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
-
-                // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
-                runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src/main/resources"));
-
-                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
-
-                //now find libraries
-                File libDir = System.getProperty("libraries.dir") != null
-                        ? new File(System.getProperty("libraries.dir"))
-                        : new File(jaxwsWs, "bundles/jaxws-ri/target/stage/jaxws-ri/lib");
-                for (File lib: libDir.listFiles()) {
-                    String name = lib.getName();
-                    if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
-                        continue;
-                    }
-                    if (name.contains("jaxb-xjc")) {
-                        tool.addJar(lib);
-                    } else {
-                        runtime.addJar(lib);
-                    }
-                }
             }
+
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
             File jreHome = new File(System.getProperty("java.home"));
-            externalWsGen = new File( jreHome.getParent(), "bin/wsgen" );
+            externalWsGen = new File(jreHome.getParent(), "bin/wsgen");
             if (!externalWsGen.exists()) {
-                externalWsGen = new File( jreHome.getParent(), "bin/wsgen.exe" );
+                externalWsGen = new File(jreHome.getParent(), "bin/wsgen.exe");
             }
-            externalWsImport = new File( jreHome.getParent(), "bin/wsimport" );
+            externalWsImport = new File(jreHome.getParent(), "bin/wsimport");
             if (!externalWsImport.exists()) {
-                externalWsImport = new File( jreHome.getParent(), "bin/wsimport.exe" );
+                externalWsImport = new File(jreHome.getParent(), "bin/wsimport.exe");
             }
             if (!externalWsGen.exists() || !externalWsImport.exists()) {
                 throw new CmdLineException("wsgen or wsimport command line tools are not found in jdk");
             }
-            System.out.println("Using wsgen from "+externalWsGen);
-            System.out.println("Using wsimport from "+externalWsImport);
+            System.out.println("Using wsgen from " + externalWsGen);
+            System.out.println("Using wsimport from " + externalWsImport);
             lwhs = true;
             if (version == null) {
                 version = new VersionNumber("2.1.6");
@@ -503,17 +504,17 @@ public class Main {
 
         // pick up ${HARNESS_HOME}/ext jars
         String harnessHome = System.getProperty("HARNESS_HOME");
-        if(harnessHome!=null) {
-            File extDir = new File(new File(harnessHome),"ext");
-            if(debug)
-                System.err.println("Searching extensions in "+extDir);
-            if(extDir.exists()) {
-                for( File f : extDir.listFiles(new FileFilter() {
+        if (harnessHome != null) {
+            File extDir = new File(new File(harnessHome), "ext");
+            if (debug)
+                System.err.println("Searching extensions in " + extDir);
+            if (extDir.exists()) {
+                for (File f : extDir.listFiles(new FileFilter() {
                     public boolean accept(File f) {
                         return f.getName().endsWith(".jar");
                     }
                 })) {
-                    System.err.println("Picking up extension: "+f);
+                    System.err.println("Picking up extension: " + f);
                     runtime.addJar(f);
                 }
             }
@@ -524,16 +525,16 @@ public class Main {
 
         // put tools.jar in the tools classpath
         File jreHome = new File(System.getProperty("java.home"));
-        File toolsJar = new File( jreHome.getParent(), "lib/tools.jar" );
+        File toolsJar = new File(jreHome.getParent(), "lib/tools.jar");
         if (toolsJar.exists())
             tool.addJar(toolsJar);
         // For Mac OS X
-        File classesJar = new File( jreHome.getParent(), "Classes/classes.jar" );
+        File classesJar = new File(jreHome.getParent(), "Classes/classes.jar");
         if (classesJar.exists())
             tool.addJar(classesJar);
 
 
-        if(debug) {
+        if (debug) {
             Interpreter.DEBUG = true;
             System.err.println("runtime realm");
             runtime.dump(System.err);
@@ -553,32 +554,33 @@ public class Main {
     /**
      * Guess which workspace we want to test against, in case no "-cp" is given.
      */
+
     private void guessWorkspace() {
         // JAX-WS RI teams often set this variable
         String jaxwsHome = System.getenv("JAXWS_HOME");
-        if(jaxwsHome!=null) {
+        if (jaxwsHome != null) {
             File f = new File(jaxwsHome);
-            if(f.isDirectory()) {
-                if(f.getName().equals("build")) {
+            if (f.isDirectory()) {
+                if (f.getName().equals("build")) {
                     // probably being set to jaxws-ri/build. Let's verify.
                     File home = f.getParentFile();
-                    if(new File(home,".jaxws-ri").exists()) {
-                        System.out.println("Found JAX-WS RI workspace at "+home);
+                    if (new File(home, ".jaxws-ri").exists()) {
+                        System.out.println("Found JAX-WS RI workspace at " + home);
                         jaxwsWs = home;
                         return;
                     }
                 }
 
                 // is this really JAX-WS home?
-                if(new File(f,".jaxws-ri").exists()) {
-                    System.out.println("Found JAX-WS RI workspace at "+f);
+                if (new File(f, ".jaxws-ri").exists()) {
+                    System.out.println("Found JAX-WS RI workspace at " + f);
                     jaxwsWs = f;
                     return;
                 }
 
                 // the other possibility is it's pointing to the JAX-WS RI distribution image
-                if(new File(f,"lib/jaxws-rt.jar").exists() && new File(f,"bin/wsgen.bat").exists()) {
-                    System.out.println("Found JAX-WS RI distribution image at "+f);
+                if (new File(f, "lib/jaxws-rt.jar").exists() && new File(f, "bin/wsgen.bat").exists()) {
+                    System.out.println("Found JAX-WS RI distribution image at " + f);
                     jaxwsImage = f;
                     return;
                 }
@@ -587,11 +589,11 @@ public class Main {
 
         // let's go up the directory hierarchy a bit to find a match
         File harnessJar = getHarnessJarDirectory();
-        File jaxwsUnit = getParentWithName(harnessJar,"jaxws-unit");
-        if(jaxwsUnit!=null) {
-            for( File other : jaxwsUnit.getParentFile().listFiles(DIRECTORY_FILTER)) {
-                if(new File(other,".jaxws-ri").exists()) {
-                    System.out.println("Found JAX-WS RI workspace at "+other);
+        File jaxwsUnit = getParentWithName(harnessJar, "jaxws-unit");
+        if (jaxwsUnit != null) {
+            for (File other : jaxwsUnit.getParentFile().listFiles(DIRECTORY_FILTER)) {
+                if (new File(other, ".jaxws-ri").exists()) {
+                    System.out.println("Found JAX-WS RI workspace at " + other);
                     jaxwsWs = other;
                     return;
                 }
@@ -599,9 +601,9 @@ public class Main {
         }
 
         // are we in WSIT?
-        File wsitHome = getParentWithFile(harnessJar,".wsit");
-        if(wsitHome!=null) {
-            System.out.println("Found WSIT workspace at "+wsitHome);
+        File wsitHome = getParentWithFile(harnessJar, ".wsit");
+        if (wsitHome != null) {
+            System.out.println("Found WSIT workspace at " + wsitHome);
             this.wsitWs = wsitHome;
             return;
         }
@@ -611,83 +613,84 @@ public class Main {
 
     /**
      * Determines the container to be used for tests.
+     *
      * @param wsimport
      */
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         ApplicationContainer appContainer = null;
-        if(tomcat!=null) {
-            System.err.println("Using Tomcat from "+tomcat);
+        if (tomcat != null) {
+            System.err.println("Using Tomcat from " + tomcat);
             appContainer = new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x",tomcat,port,httpspi);
+                    wsimport, wsgen, "tomcat5x", tomcat, port, httpspi);
             appContainer.getUnsupportedUses().add("servlet30");
         }
 
-        if(embeddedTomcat!=null) {
+        if (embeddedTomcat != null) {
             appContainer = new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "tomcat5x",port,httpspi);
+                    wsimport, wsgen, "tomcat5x", port, httpspi);
             appContainer.getUnsupportedUses().add("servlet30");
         }
 
-        if(embeddedJetty!=null) {
+        if (embeddedJetty != null) {
             appContainer = new EmbeddedCargoApplicationContainer(
-                wsimport, wsgen, "jetty6x",port,httpspi);
+                    wsimport, wsgen, "jetty6x", port, httpspi);
             appContainer.getUnsupportedUses().add("servlet30");
         }
 
-        if(remoteTomcat!=null) {
-            System.err.println("Using remote Tomcat at "+remoteTomcat);
+        if (remoteTomcat != null) {
+            System.err.println("Using remote Tomcat at " + remoteTomcat);
             //  group capture number  :        12    3      4      5 6
             Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:]+)(:([0-9]+))?").matcher(remoteTomcat);
-            if(!matcher.matches())
-                throw new CmdLineException("Unable to parse "+remoteTomcat);
+            if (!matcher.matches())
+                throw new CmdLineException("Unable to parse " + remoteTomcat);
 
             appContainer = new RemoteCargoApplicationContainer(
-                wsimport, wsgen,
-                "tomcat5x",
-                new URL("http",matcher.group(4),
-                    Integer.parseInt(defaultsTo(matcher.group(6),"8080")),
-                    "/"),
-                defaultsTo(matcher.group(2),"admin"),
-                defaultsTo(matcher.group(3),"admin"),
-                httpspi
-                );
+                    wsimport, wsgen,
+                    "tomcat5x",
+                    new URL("http", matcher.group(4),
+                            Integer.parseInt(defaultsTo(matcher.group(6), "8080")),
+                            "/"),
+                    defaultsTo(matcher.group(2), "admin"),
+                    defaultsTo(matcher.group(3), "admin"),
+                    httpspi
+            );
             appContainer.getUnsupportedUses().add("servlet30");
         }
 
-        if(localGlassfish!=null) {
-            System.err.println("Using local Glassfish from "+localGlassfish);
+        if (localGlassfish != null) {
+            System.err.println("Using local Glassfish from " + localGlassfish);
             appContainer = new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "glassfish1x",localGlassfish,port,httpspi);
+                    wsimport, wsgen, "glassfish1x", localGlassfish, port, httpspi);
             appContainer.getUnsupportedUses().add("servlet30");
         }
 
-        if(localGlassfishV3!=null) {
-            System.err.println("Using local Glassfish v3 from "+localGlassfishV3);
+        if (localGlassfishV3 != null) {
+            System.err.println("Using local Glassfish v3 from " + localGlassfishV3);
             appContainer = new InstalledCargoApplicationContainer(
-                wsimport, wsgen, "glassfish3x",localGlassfishV3,port,httpspi);
+                    wsimport, wsgen, "glassfish3x", localGlassfishV3, port, httpspi);
         }
-        
-        if(remoteGlassfish!=null) {
+
+        if (remoteGlassfish != null) {
             // [USER:PASS@]HOST[:PORT][-HTTPURL]
-            System.err.println("Using remote Glassfish at "+remoteGlassfish);
+            System.err.println("Using remote Glassfish at " + remoteGlassfish);
             //  group capture number  :        12    3      4         5 6         7   8
             Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:\\-]+)(:([0-9]+))?(\\-(.+))?").matcher(remoteGlassfish);
-            if(!matcher.matches())
-                throw new CmdLineException("Unable to parse "+remoteGlassfish);
+            if (!matcher.matches())
+                throw new CmdLineException("Unable to parse " + remoteGlassfish);
 
-            String userName = defaultsTo(matcher.group(2),"admin");
-            String password = defaultsTo(matcher.group(3),"adminadmin");
+            String userName = defaultsTo(matcher.group(2), "admin");
+            String password = defaultsTo(matcher.group(3), "adminadmin");
             String remoteHost = matcher.group(4);
-            String remotePort = defaultsTo(matcher.group(6),"4848");
+            String remotePort = defaultsTo(matcher.group(6), "4848");
             String httpUrl = matcher.group(8);
 
-            if(httpUrl==null) {
+            if (httpUrl == null) {
                 // defaulted
-                httpUrl = "http://"+remoteHost+":8080/";
+                httpUrl = "http://" + remoteHost + ":8080/";
             }
 
             appContainer = new GlassfishContainer(
-                wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password, httpspi
+                    wsimport, wsgen, new URL(httpUrl), remoteHost, Integer.parseInt(remotePort), userName, password, httpspi
             );
             appContainer.getUnsupportedUses().add("servlet30");
         }
@@ -702,25 +705,25 @@ public class Main {
             if (jaxwsInJDK) {
                 unsupportedUses.add("ri");
             }
-            appContainer = new JavaSeContainer(wsimport,wsgen,port,unsupportedUses);
+            appContainer = new JavaSeContainer(wsimport, wsgen, port, unsupportedUses);
         }
 
-        if(legacyLocalTransport) {
+        if (legacyLocalTransport) {
             System.err.println("Using the legacy local transport. This will be removed in a near future");
-            appContainer = new LocalApplicationContainer(wsimport,wsgen);
+            appContainer = new LocalApplicationContainer(wsimport, wsgen);
             appContainer.getUnsupportedUses().add("servlet30");
         }
-        if(appContainer == null) {
+        if (appContainer == null) {
             System.err.println("Testing with the in-vm transport");
-            appContainer = new InVmContainer(wsimport,wsgen);
+            appContainer = new InVmContainer(wsimport, wsgen);
             appContainer.getUnsupportedUses().add("servlet30");
         }
         return appContainer;
     }
 
-    private static String defaultsTo( String value, String defaultValue ) {
-        if(value==null)     return defaultValue;
-        else                return value;
+    private static String defaultsTo(String value, String defaultValue) {
+        if (value == null) return defaultValue;
+        else return value;
     }
 
     /**
@@ -728,8 +731,8 @@ public class Main {
      * of tests.
      */
     private TestSuite createTestSuite() {
-        if (parallel>1) {
-            System.err.println("Running tests in "+parallel+" threads");
+        if (parallel > 1) {
+            System.err.println("Running tests in " + parallel + " threads");
             return new ParallelTestSuite();
         } else {
             return new TestSuite();
@@ -742,31 +745,31 @@ public class Main {
      */
     private void build(File dir, ApplicationContainer container, WsTool wsimport, TestSuite suite) throws IOException, DocumentException, ParserConfigurationException,
             SAXException {
-        File descriptor = new File(dir,"test-descriptor.xml");
+        File descriptor = new File(dir, "test-descriptor.xml");
 
-        if(descriptor.exists()) {
+        if (descriptor.exists()) {
             try {
                 TestDescriptor td[] = new TestDescriptor[2];
                 if (wsGenMode == WsGenMode.ALWAYS) {
                     td[0] = new TestDescriptor(descriptor, false, jaxwsInJDK);
-                } else if (wsGenMode == WsGenMode.BOTH ) {
+                } else if (wsGenMode == WsGenMode.BOTH) {
                     td[0] = new TestDescriptor(descriptor, false, jaxwsInJDK);
                     td[1] = new TestDescriptor(descriptor, true, jaxwsInJDK);
                 } else if (wsGenMode == WsGenMode.IGNORE) {
                     td[0] = new TestDescriptor(descriptor, true, jaxwsInJDK);
                 } else {
-                    throw new RuntimeException("Shouldn't happen. WsGenMode="+wsGenMode);
+                    throw new RuntimeException("Shouldn't happen. WsGenMode=" + wsGenMode);
                 }
                 if (version != null && !td[0].applicableVersions.isApplicable(version)) {
-                    System.err.println("Skipping "+dir);
+                    System.err.println("Skipping " + dir);
                 } else {
-                    if(targetVersion !=null) {
+                    if (targetVersion != null) {
                         td[0].wsimportClientOptions.add("-target");
                         td[0].wsimportClientOptions.add(targetVersion.toString());
                         td[0].wsimportServerOptions.add("-target");
                         td[0].wsimportServerOptions.add(targetVersion.toString());
 
-                        if(td[1] != null) {
+                        if (td[1] != null) {
                             td[1].wsimportClientOptions.add("-target");
                             td[1].wsimportClientOptions.add(targetVersion.toString());
                             td[1].wsimportServerOptions.add("-target");
@@ -775,25 +778,25 @@ public class Main {
 
                         }
                     }
-                    suite.addTest(td[0].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
+                    suite.addTest(td[0].build(container, wsimport, clientScriptName, concurrentSideEffectFree, version));
                     if (td[1] != null)
-                        suite.addTest(td[1].build(container,wsimport,clientScriptName,concurrentSideEffectFree,version));
+                        suite.addTest(td[1].build(container, wsimport, clientScriptName, concurrentSideEffectFree, version));
                 }
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
                 // just report that failure as a test failure.
-                suite.addTest(new FailedTest("invalid descriptor",e));
+                suite.addTest(new FailedTest("invalid descriptor", e));
             } catch (DocumentException e) {
-                suite.addTest(new FailedTest("invalid descriptor",e));
+                suite.addTest(new FailedTest("invalid descriptor", e));
             } catch (ParserConfigurationException e) {
-                suite.addTest(new FailedTest("invalid descriptor",e));
+                suite.addTest(new FailedTest("invalid descriptor", e));
             } catch (SAXException e) {
-                suite.addTest(new FailedTest("invalid descriptor",e));
+                suite.addTest(new FailedTest("invalid descriptor", e));
             }
             return;
         }
 
-        if(recursive && dir.isDirectory()) {
+        if (recursive && dir.isDirectory()) {
             // find test data recursively
             File[] subdirs = dir.listFiles(new FileFilter() {
                 public boolean accept(File f) {
@@ -802,7 +805,7 @@ public class Main {
             });
 
             for (File subdir : subdirs)
-                build(subdir,container, wsimport, suite);
+                build(subdir, container, wsimport, suite);
         }
     }
 
@@ -813,8 +816,8 @@ public class Main {
     private static File getHarnessJarDirectory() {
         try {
             String res = Main.class.getClassLoader().getResource("com/sun/xml/ws/test/Main.class").toExternalForm();
-            if(res.startsWith("jar:")) {
-                res = res.substring(4,res.lastIndexOf('!'));
+            if (res.startsWith("jar:")) {
+                res = res.substring(4, res.lastIndexOf('!'));
                 return new File(new URL(res).getFile()).getParentFile();
             }
             return new File(".").getAbsoluteFile();
@@ -828,8 +831,8 @@ public class Main {
      * Otherwise null.
      */
     private File getParentWithName(File file, String name) {
-        while(file!=null) {
-            if(file.getName().equals(name))
+        while (file != null) {
+            if (file.getName().equals(name))
                 return file;
             file = file.getParentFile();
         }
@@ -841,8 +844,8 @@ public class Main {
      * Otherwise null.
      */
     private File getParentWithFile(File file, String markerFile) {
-        while(file!=null) {
-            if(new File(file,markerFile).exists())
+        while (file != null) {
+            if (new File(file, markerFile).exists())
                 return file;
             file = file.getParentFile();
         }
