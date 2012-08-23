@@ -102,12 +102,14 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
         if (!isSkipMode()) {
 
-            List<EndpointInfoBean> endpoints = war.getEndpointsInfos();
+            // search for endpoints only in case we need to generate any descriptor ...
+            List<EndpointInfoBean> endpoints = null;
 
             // we only need this for Glassfish, but it's harmless to generate for other containers.
             // TODO: figure out how not to do this for other containers
             File configuredSunJaxwsXml = service.service.getConfiguredFile("sun-jaxws.xml");
             if (configuredSunJaxwsXml == null) {
+                endpoints = war.getEndpointsInfos();
                 war.generateSunJaxWsXml(endpoints);
             } else {
                 war.copyToWEBINF(configuredSunJaxwsXml);
@@ -115,6 +117,9 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
 
             File configuredWebXml = service.service.getConfiguredFile("web.xml");
             if (configuredWebXml == null) {
+                if (endpoints == null) {
+                    endpoints = war.getEndpointsInfos();
+                }
                 war.generateWebXml(endpoints, httpspi);
             } else {
                 war.copyToWEBINF(configuredWebXml);
