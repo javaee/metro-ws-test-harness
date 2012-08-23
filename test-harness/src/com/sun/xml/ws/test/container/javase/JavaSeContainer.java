@@ -95,7 +95,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     public Application deploy(DeployedService service) throws Exception {
         final String id = service.service.getGlobalUniqueName();
         final WAR war = assembleWar(service);
-        List<EndpointInfoBean> beans = war.getEndpointInfoBeans();
+        List<EndpointInfoBean> beans = war.getEndpointsInfos();
 
         // Using a free port rather than a standard port since starting and
         // stopping multiple times has BindingException with light weight http server
