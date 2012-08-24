@@ -148,11 +148,18 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
                     if (files == null) {
                         files = new ArrayList<File>();
                     }
-                    String next = service.baseDir.getAbsolutePath() + File.separator + it.next();
-                    files.add(new File(next));
+                    files.add(new File(service.getAbsolutePath(it.next())));
                 } else {
                     // nothing to do ... error in params will be discovered later ...
                 }
+            }
+        }
+        if (service.parent.metadatafiles != null) {
+            for(String path : service.parent.metadatafiles) {
+                if (files == null) {
+                    files = new ArrayList<File>();
+                }
+                files.add(new File(service.getAbsolutePath(path)));
             }
         }
         return files == null ? null : files.toArray(new File[files.size()]);

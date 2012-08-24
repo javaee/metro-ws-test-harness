@@ -192,8 +192,20 @@ start = element descriptor {
             attribute href {text}
 
         }?
-    
-    }?
+
+    }? &
+
+    # 'external-metadata' is optional and points to the location
+    #  of a external-metadata file, if any. This file must be copied into
+    # war file during deployment.
+    #
+    element external-metadata {
+
+        # 'file' points the WSDL document
+        #
+        attribute file {text}
+
+    }*
 }
 
 # 'versionAttributes' pattern is set of attributes that control

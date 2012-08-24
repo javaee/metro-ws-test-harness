@@ -138,6 +138,10 @@ public class TestService {
         }
     }
 
+    public String getAbsolutePath(String relativePath) {
+        return baseDir.getAbsolutePath() + File.separator + relativePath;
+    }
+
     /**
      * Gets the {@link TestEndpoint} that has the specified implementation class.
      */
