@@ -15,19 +15,19 @@
   
   <path id="runtime.classpath">
     <path refid="javac.classpath"/>
-    <pathelement location="build/classes"/>
+    <pathelement location="target/classes"/>
     <pathelement location="${java.home}/../lib/tools.jar"/>
   </path>
 
   <target name="compile">
-    <mkdir dir="build/classes"/>
-    <javac srcdir="src"
-           destdir="build/classes"
+    <mkdir dir="target/classes"/>
+    <javac srcdir="src/main/java"
+           destdir="target/classes"
            source="1.5" target="1.5" debug="on">
       <classpath refid="javac.classpath"/>
     </javac>
-    <copy todir="build/classes">
-      <fileset dir="src">
+    <copy todir="target/classes">
+      <fileset dir="src/main/resources">
         <include name="**/*.jelly"/>
         <include name="**/*.bsh"/>
         <include name="**/*.rnc"/>
@@ -36,56 +36,57 @@
   </target>
 
   <target name="jar" depends="compile">
-    <jar jarfile="build/${name}.jar">
+    <jar jarfile="target/${name}.jar">
       <manifest>
         <attribute name="Build-Id" value="${build.id}"/>
       </manifest>
-      <fileset dir="build/classes"/>
+      <fileset dir="target/classes"/>
     </jar>
   </target>
 
   <target name="src-zip">
-    <jar jarfile="build/${name}-src.zip">
-      <fileset dir="src"/>
+    <jar jarfile="target/${name}-src.zip">
+      <fileset dir="src/main/java"/>
+      <fileset dir="src/main/resources"/>
     </jar>
   </target>
 
   <target name="clean" description="Delete all build artifacts">
     <ant dir="bootstrap" target="clean" inheritall="false"/>
     <ant dir="docs" target="clean" inheritall="false"/>
-    <delete dir="build"/>
+    <delete dir="target"/>
   </target>
 
   <target name="dist-jar" depends="jar"
           description="Build all JAR files for this project">
     <ant dir="bootstrap" target="dist" inheritall="false"/>
-    <mkdir dir="build/dist" />
-    <copy tofile="build/dist/harness.jar" file="bootstrap/target/bootstrap.jar" />
+    <mkdir dir="target/dist" />
+    <copy tofile="target/dist/harness.jar" file="bootstrap/target/bootstrap.jar" />
     <!-- create library uberjar -->
-    <delete file="build/dist/harness-lib.jar" quiet="true"/>
-    <zip file="build/dist/harness-lib.jar">
+    <delete file="target/dist/harness-lib.jar" quiet="true"/>
+    <zip file="target/dist/harness-lib.jar">
       <zipgroupfileset dir="lib" includes="**/*.jar" />
-      <zipfileset src="build/test-harness-core.jar" />
+      <zipfileset src="target/test-harness-core.jar" />
       <zipfileset dir="lib/licenses" prefix="META-INF/licenses" />
     </zip>
   </target>
 
   <target name="dist" depends="dist-jar, src-zip">
     <ant dir="docs" target="doc" inheritall="false"/>
-    <mkdir dir="build/dist" />
-    <copy tofile="build/dist/harness-src.zip" file="bootstrap/target/bootstrap-src.zip" />
+    <mkdir dir="target/dist" />
+    <copy tofile="target/dist/harness-src.zip" file="bootstrap/target/bootstrap-src.zip" />
     <!-- library uber source zip -->
-    <zip file="build/dist/harness-lib.src.zip">
+    <zip file="target/dist/harness-lib.src.zip">
       <zipgroupfileset dir="lib" includes="**/*.zip" />
-      <zipfileset src="build/test-harness-core-src.zip" />
+      <zipfileset src="target/test-harness-core-src.zip" />
       <zipfileset dir="lib/licenses" prefix="licenses" />
     </zip>
-    <copy todir="build/dist">
+    <copy todir="target/dist">
       <fileset dir="docs/build" />
     </copy>
 
-    <zip file="build/test-harness.zip">
-      <zipfileset dir="build/dist" prefix="test-harness"/>
+    <zip file="target/test-harness.zip">
+      <zipfileset dir="target/dist" prefix="test-harness"/>
     </zip>
   </target>
 
@@ -127,7 +128,8 @@
   <property name="test.args" value="-debug -cp:jaxws ${basedir}/../../jax-ws-sources/jaxws-ri ${basedir}/test/testcases/jaxws/mtom"/>
   
   <path id="debug.sourcepath">
-    <pathelement location="src"/>
+    <pathelement location="src/main/java"/>
+    <pathelement location="src/main/resources"/>
   </path>
   
   <target name="debug-harness" if="netbeans.home"
@@ -142,7 +144,7 @@
       <sourcepath refid="debug.sourcepath"/>
     </nbjpdastart>
 
-    <java fork="true" jar="build/dist/harness.jar">
+    <java fork="true" jar="target/dist/harness.jar">
       <arg line="${test.args}"/>
       <jvmarg value="-Xdebug"/>
       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
@@ -155,7 +157,7 @@
           
     <echo message="starting harness with arguments: ${test.args}"/>
     
-    <java fork="true" jar="build/dist/harness.jar">
+    <java fork="true" jar="target/dist/harness.jar">
       <arg line="${test.args}"/>
     </java>
   </target>
@@ -174,23 +176,23 @@
 
     <!-- ws need some JAX-WS to test, so let's just use the latest JAX-WS RI -->
     <get src="http://hudson-sca.us.oracle.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/build/jaxws-ri.zip"
-         dest="build/jaxws-ri.zip" />
-    <unzip src="build/jaxws-ri.zip" dest="build" />
+         dest="target/jaxws-ri.zip" />
+    <unzip src="target/jaxws-ri.zip" dest="target" />
 
     <get src="http://hudson-sca.us.oracle.com/job/jaxws-ri-2.1.5/lastSuccessfulBuild/artifact/jax-ws-sources/jaxws-ri/transports/local/build/jaxws-local-transport.jar"
-         dest="build/jaxws-local-transport.jar" />
+         dest="target/jaxws-local-transport.jar" />
 
-    <delete dir="build/test-logs" />
+    <delete dir="target/test-logs" />
 
-    <java jar="build/dist/harness.jar" fork="true">
+    <java jar="target/dist/harness.jar" fork="true">
       <arg value="-cp:jaxws-image" />
-      <arg path="build/jaxws-ri" />
+      <arg path="target/jaxws-ri" />
 
       <arg value="-report" />
-      <arg path="build/test-logs" />
+      <arg path="target/test-logs" />
 
       <arg value="-transport" />
-      <arg path="build/jaxws-local-transport.jar" />
+      <arg path="target/jaxws-local-transport.jar" />
 
       <!-- test data -->
       <arg value="-r" />
@@ -199,10 +201,10 @@
       <arg line="${test.options}"/>
     </java>
 
-    <mkdir dir="build/junit-reports" />
-    <junitreport todir="build/junit-reports">
-      <fileset dir="build/test-logs" />
-      <report format="frames" todir="build/junit-reports"/>
+    <mkdir dir="target/junit-reports" />
+    <junitreport todir="target/junit-reports">
+      <fileset dir="target/test-logs" />
+      <report format="frames" todir="target/junit-reports"/>
     </junitreport>
   </target>
 
