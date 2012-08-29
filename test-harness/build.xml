@@ -60,7 +60,7 @@
           description="Build all JAR files for this project">
     <ant dir="bootstrap" target="dist" inheritall="false"/>
     <mkdir dir="build/dist" />
-    <copy tofile="build/dist/harness.jar" file="bootstrap/build/bootstrap.jar" />
+    <copy tofile="build/dist/harness.jar" file="bootstrap/target/bootstrap.jar" />
     <!-- create library uberjar -->
     <delete file="build/dist/harness-lib.jar" quiet="true"/>
     <zip file="build/dist/harness-lib.jar">
@@ -73,7 +73,7 @@
   <target name="dist" depends="dist-jar, src-zip">
     <ant dir="docs" target="doc" inheritall="false"/>
     <mkdir dir="build/dist" />
-    <copy tofile="build/dist/harness-src.zip" file="bootstrap/build/bootstrap-src.zip" />
+    <copy tofile="build/dist/harness-src.zip" file="bootstrap/target/bootstrap-src.zip" />
     <!-- library uber source zip -->
     <zip file="build/dist/harness-lib.src.zip">
       <zipgroupfileset dir="lib" includes="**/*.zip" />
