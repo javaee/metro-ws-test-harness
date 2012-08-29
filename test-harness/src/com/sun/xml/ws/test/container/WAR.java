@@ -62,9 +62,9 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -138,7 +138,7 @@ public final class WAR {
         ArrayList<EndpointInfoBean> beans = new ArrayList<EndpointInfoBean>();
 
         // fromJava:
-        if (service.service.wsdl == null) {
+        if (service.service.wsdl == null || service.service.parent.metadatafiles.size() > 0) {
 
             for (TestEndpoint endpoint : endpoints) {
                 EndpointInfoBean bean = EndpointInfoBean.create(

@@ -45,7 +45,10 @@ import com.sun.xml.ws.test.tool.WsTool;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
@@ -91,9 +94,10 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         }
 
         // copy external metadata files, if any ....
-        File[] filesToBeCopied = findExternalMetadataFiles(service.service);
-        if (filesToBeCopied != null) {
-            war.copyToClasses(filesToBeCopied);
+        File[] externalMetadataFiles = getExternalMetadataFiles(service.service);
+        if (externalMetadataFiles != null) {
+            war.copyToClasses(externalMetadataFiles);
+            updateWsgenOpts(service.service);
         }
 
         if (fromJava) {
@@ -137,25 +141,20 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         return war;
     }
 
-    private File[] findExternalMetadataFiles(TestService service) {
-        List<String> wsgenOptions = service.parent.wsgenOptions;
-        List<File> files = null;
-        Iterator<String> it = wsgenOptions.iterator();
-        while (it.hasNext()) {
-            String opt = it.next();
-            if ("-x".equals(opt)) {
-                if (it.hasNext()) {
-                    if (files == null) {
-                        files = new ArrayList<File>();
-                    }
-                    files.add(new File(service.getAbsolutePath(it.next())));
-                } else {
-                    // nothing to do ... error in params will be discovered later ...
-                }
+    protected void updateWsgenOpts(TestService service) {
+
+        if (service.parent.metadatafiles != null) {
+            for (String path : service.parent.metadatafiles) {
+                service.parent.wsgenOptions.add("-x");
+                service.parent.wsgenOptions.add(path);
             }
         }
+    }
+
+    private File[] getExternalMetadataFiles(TestService service) {
+        List<File> files = null;
         if (service.parent.metadatafiles != null) {
-            for(String path : service.parent.metadatafiles) {
+            for (String path : service.parent.metadatafiles) {
                 if (files == null) {
                     files = new ArrayList<File>();
                 }

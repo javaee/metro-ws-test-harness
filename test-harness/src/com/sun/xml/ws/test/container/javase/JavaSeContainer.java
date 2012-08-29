@@ -36,6 +36,7 @@
 
 package com.sun.xml.ws.test.container.javase;
 
+import bsh.EvalError;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InterpreterEx;
@@ -53,9 +54,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.ServerSocket;
 import java.util.*;
 
 /**
@@ -179,15 +180,35 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             interpreter.set("metadata", metadata);
             interpreter.set("properties", props);
 
-            // TODO handlers
+            //MetadataReader metadatareader =//
+            Object feature = createMetadataFeature(service, interpreter);
+            interpreter.set("feature", feature);
+
             servers[i++] = interpreter.eval(
-                    "endpoint = javax.xml.ws.Endpoint.create(endpointImpl);" +
+                    "endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
+                            (feature != null? ", feature);" : ");") +
                     "endpoint.setMetadata(metadata);" +
                     "endpoint.setProperties(properties);" +
                     "endpoint.publish(endpointAddress);" +
                     "return endpoint;");
         }
         return new JavaSeApplication(servers, baseAddress, service);
+    }
+
+    private Object createMetadataFeature(DeployedService service, InterpreterEx interpreter) throws EvalError {
+
+        if (service.service.parent.metadatafiles == null || service.service.parent.metadatafiles.size() == 0) {
+            return null;
+        }
+
+        String script = "org.jvnet.ws.databinding.ExternalMetadataFeature.builder().addFiles( metadataFiles ).build()";
+        File [] files = new File[service.service.parent.metadatafiles.size()];
+        int i = 0;
+        for(String path : service.service.parent.metadatafiles) {
+            files[i++] = new File(service.service.baseDir + File.separator +  path);
+        }
+        interpreter.set("metadataFiles", files);
+        return interpreter.eval(script);
     }
 
     private Set<String> getResourcePaths(String root, String path) {
