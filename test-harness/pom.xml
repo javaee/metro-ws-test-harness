@@ -57,6 +57,9 @@
 
     <name>WS Test Harness</name>
 
+    <properties>
+        <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -153,11 +156,6 @@
             <artifactId>commons-jelly</artifactId>
             <version>1.1-hudson-20100305</version>
         </dependency>
-<!--        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb1-impl</artifactId>
-            <version>2.2.4-1</version>
-        </dependency>-->
         <dependency>
             <groupId>thaiopensource</groupId>
             <artifactId>jing</artifactId>
