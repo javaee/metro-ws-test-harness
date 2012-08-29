@@ -1,8 +1,0 @@
-<descriptor>
-  <description>This is a simple JAX-WS MTOM example</description>
-  <client href ="test.bsh"/>
-  <service>
-    <wsdl href="hello.wsdl"/>
-  </service>
-</descriptor>
-
