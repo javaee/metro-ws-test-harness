@@ -82,7 +82,7 @@
       <zipfileset dir="lib/licenses" prefix="licenses" />
     </zip>
     <copy todir="target/dist">
-      <fileset dir="docs/build" />
+      <fileset dir="docs/target" />
     </copy>
 
     <zip file="target/test-harness.zip">
@@ -125,7 +125,7 @@
   <!-- ********** Target added for debugging in NetBeans ********** -->
 
   <!-- Override in build.properties if necessary -->
-  <property name="test.args" value="-debug -cp:jaxws ${basedir}/../../jax-ws-sources/jaxws-ri ${basedir}/test/testcases/jaxws/mtom"/>
+  <property name="test.args" value="-debug -cp:jaxws ${basedir}/../../jax-ws-sources/jaxws-ri ${basedir}/src/test/testcases/jaxws/mtom"/>
   
   <path id="debug.sourcepath">
     <pathelement location="src/main/java"/>
@@ -196,7 +196,7 @@
 
       <!-- test data -->
       <arg value="-r" />
-      <arg path="test/testcases" />
+      <arg path="src/test/testcases" />
 
       <arg line="${test.options}"/>
     </java>
