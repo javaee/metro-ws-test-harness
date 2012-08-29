@@ -49,7 +49,7 @@
         <artifactId>jvnet-parent</artifactId>
         <version>3</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.xml.ws.test</groupId>
     <artifactId>harness-lib</artifactId>
@@ -60,6 +60,7 @@
     <properties>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
     </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -72,11 +73,12 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
         </dependency>
         <dependency>
             <groupId>args4j</groupId>
@@ -89,32 +91,34 @@
             <version>2.0b1</version>
         </dependency>
         <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-optional</artifactId>
-            <version>1.5.3-1</version>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-core-uberjar</artifactId>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
+            <groupId>classworlds</groupId>
+            <artifactId>classworlds</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.istack</groupId>
-            <artifactId>istack-commons-test</artifactId>
-            <version>2.13</version>
-            <type>jar</type>
+            <groupId>org.jvnet.hudson</groupId>
+            <artifactId>commons-jelly</artifactId>
+            <version>1.1-hudson-20100305</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-classworlds</artifactId>
-            <version>2.4</version>
-            <type>jar</type>
+            <groupId>emma</groupId>
+            <artifactId>emma</artifactId>
+            <version>2.0.5312</version>
         </dependency>
         <dependency>
             <groupId>com.sun.istack</groupId>
             <artifactId>istack-commons-runtime</artifactId>
-            <version>2.13</version>
-            <type>jar</type>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.istack</groupId>
+            <artifactId>istack-commons-test</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -132,19 +136,22 @@
             </exclusions>
         </dependency>
         <dependency>
+            <!-- this should be in jdk6
+                 but be aware of class conflick issue on Mac -->
+            <groupId>thaiopensource</groupId>
+            <artifactId>jing</artifactId>
+            <!-- should be 20081028-->
+            <version>20030619</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.kohsuke</groupId>
             <artifactId>parallel-junit</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-core-uberjar</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>emma</groupId>
-            <artifactId>emma</artifactId>
-            <version>2.0.5312</version>
         </dependency>
         <dependency>
             <groupId>javax.enterprise.deploy</groupId>
@@ -152,22 +159,11 @@
             <version>1.2-rev-1</version>
         </dependency>
         <dependency>
-            <groupId>org.jvnet.hudson</groupId>
-            <artifactId>commons-jelly</artifactId>
-            <version>1.1-hudson-20100305</version>
-        </dependency>
-        <dependency>
-            <groupId>thaiopensource</groupId>
-            <artifactId>jing</artifactId>
-            <version>20030619</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
+            <!-- to get isorelax -->
             <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-libs</artifactId>
-            <version>1.0.6</version>
+            <artifactId>jaxb1-impl</artifactId>
+            <version>2.2.5-2</version>
         </dependency>
     </dependencies>
-    
-    
+
 </project>
