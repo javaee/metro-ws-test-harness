@@ -36,7 +36,7 @@
 
 package com.sun.xml.ws.test.container.gf;
 
-import com.sun.enterprise.deployapi.SunDeploymentFactory;
+//import com.sun.enterprise.deployapi.SunDeploymentFactory;
 import com.sun.istack.NotNull;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
@@ -94,7 +94,9 @@ public final class GlassfishContainer extends AbstractApplicationContainer {
         String connectionUri = "deployer:Sun:AppServer::"+host+":"+port;
         // to be more correct, we should load this from manifest.
         // but that requires a local glassfish installation
-        dm = new SunDeploymentFactory().getDeploymentManager(connectionUri,userName,password);
+        dm = null; //new SunDeploymentFactory().getDeploymentManager(connectionUri,userName,password);
+        if (dm == null)
+        throw new UnsupportedOperationException("TODO: FIX ME!!!");
 
         targets = dm.getTargets();
         if (targets.length == 0)

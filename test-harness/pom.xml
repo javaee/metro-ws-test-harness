@@ -134,13 +134,6 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>thaiopensource</groupId>
-            <artifactId>jing</artifactId>
-            <version>20030619</version>
-            <!--<version>20091111</version>-->
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-core-uberjar</artifactId>
             <version>1.0.2</version>
@@ -159,6 +152,22 @@
             <groupId>org.jvnet.hudson</groupId>
             <artifactId>commons-jelly</artifactId>
             <version>1.1-hudson-20100305</version>
+        </dependency>
+<!--        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb1-impl</artifactId>
+            <version>2.2.4-1</version>
+        </dependency>-->
+        <dependency>
+            <groupId>thaiopensource</groupId>
+            <artifactId>jing</artifactId>
+            <version>20030619</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+            <version>1.0.6</version>
         </dependency>
     </dependencies>
     

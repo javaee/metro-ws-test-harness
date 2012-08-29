@@ -540,7 +540,7 @@ public class TestDescriptor {
     private Document parse(File descriptor) throws DocumentException, SAXException, ParserConfigurationException {
         SAXParserFactory factory;
         if (descriptorSchema != null) {
-            factory = new ValidatingSAXParserFactory(descriptorSchema);
+            factory = ValidatingSAXParserFactory.newInstance(descriptorSchema);
         } else {
             factory = SAXParserFactory.newInstance();
         }
