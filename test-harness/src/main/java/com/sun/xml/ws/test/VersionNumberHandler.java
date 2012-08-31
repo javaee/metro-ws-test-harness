@@ -42,7 +42,7 @@ import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.OptionDef;
 
 /**
  * {@link OptionHandler} to process version number.
@@ -50,7 +50,7 @@ import org.kohsuke.args4j.Option;
  * @author Kohsuke Kawaguchi
  */
 public class VersionNumberHandler extends OptionHandler<VersionNumber> {
-    public VersionNumberHandler(CmdLineParser parser, Option option, Setter<? super VersionNumber> setter) {
+    public VersionNumberHandler(CmdLineParser parser, OptionDef option, Setter<? super VersionNumber> setter) {
         super(parser, option, setter);
     }
 
