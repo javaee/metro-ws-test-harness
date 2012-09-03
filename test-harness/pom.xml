@@ -61,19 +61,6 @@
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.2</version>
-                <configuration>
-                    <foo>bar</foo>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>ant</groupId>
