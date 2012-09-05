@@ -63,6 +63,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.sun.xml.ws.test</groupId>
+            <artifactId>harness</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.8.0</version>
