@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2012 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -448,6 +448,13 @@ public class Main {
                     if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
                         continue;
                     }
+                                    if (name.contains("jaxb-api")
+                        || name.contains("jaxws-api")
+                        || name.contains("saaj-api")) {
+                    System.out.println("MAIN: Skipping: " + name);
+                    continue;
+                                    }
+
                     if (name.contains("jaxb-xjc")) {
                         tool.addJar(lib);
                     } else {
@@ -502,12 +509,17 @@ public class Main {
             throw new CmdLineException("No -cp option is specified, nor were we able to guess the -cp option");
         }
 
-        // pick up ${HARNESS_HOME}/ext jars
-        String harnessHome = System.getProperty("HARNESS_HOME");
-        if (harnessHome != null) {
-            File extDir = new File(new File(harnessHome), "ext");
-            if (debug)
+        // pick up ${HARNESS_HOME}/ext jars or ${HARNESS_EXT} jars
+        File extDir = null;
+        if (System.getProperty("HARNESS_HOME") != null) {
+                extDir = new File(System.getProperty("HARNESS_HOME"), "ext");
+        } else if (System.getProperty("HARNESS_EXT") != null) {
+                extDir = new File(System.getProperty("HARNESS_EXT"));
+        }
+        if (extDir != null && extDir.isDirectory()) {
+            if (debug) {
                 System.err.println("Searching extensions in " + extDir);
+            }
             if (extDir.exists()) {
                 for (File f : extDir.listFiles(new FileFilter() {
                     public boolean accept(File f) {
