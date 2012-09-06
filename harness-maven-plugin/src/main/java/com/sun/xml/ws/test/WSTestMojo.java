@@ -122,7 +122,7 @@ public class WSTestMojo extends AbstractMojo {
      */
     private List<String> vmArgs;
     /**
-     * @parameter default-value=${project.basedir}/lib/ext
+     * @parameter default-value="${project.basedir}/lib/ext"
      */
     private File extDir;
     /**
