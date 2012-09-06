@@ -448,12 +448,14 @@ public class Main {
                     if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
                         continue;
                     }
-                                    if (name.contains("jaxb-api")
-                        || name.contains("jaxws-api")
-                        || name.contains("saaj-api")) {
-                    System.out.println("MAIN: Skipping: " + name);
-                    continue;
-                                    }
+                    //API jars should be already on cp (either in java.endorsed.dirs
+                    //or using -Xbootclasspath/p:) so not add them again
+                    if (name.contains("jaxb-api")
+                            || name.contains("jaxws-api")
+                            || name.contains("saaj-api")) {
+                        System.out.println("Ommitting: " + lib.getAbsolutePath());
+                        continue;
+                    }
 
                     if (name.contains("jaxb-xjc")) {
                         tool.addJar(lib);
