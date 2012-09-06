@@ -118,6 +118,14 @@ public class WSTestMojo extends AbstractMojo {
      */
     private List<String> args;
     /**
+     * @parameter
+     */
+    private List<String> vmArgs;
+    /**
+     * @parameter default-value=${project.basedir}/lib/ext
+     */
+    private File extDir;
+    /**
      * @component
      */
     private ArtifactFactory artifactFactory;
@@ -147,6 +155,16 @@ public class WSTestMojo extends AbstractMojo {
             //set up
             //cmd.createArg().setLine("-Xbootclasspath/p:");
         }
+        if (extDir != null && extDir.exists() && extDir.isDirectory()) {
+            cmd.createArg().setValue("-DHARNESS_EXT=" + extDir.getAbsolutePath());
+        } else {
+            getLog().info("'ext' directory not found");
+        }
+        if (vmArgs != null) {
+            for (String arg : vmArgs) {
+                cmd.createArg().setLine(arg);
+            }
+        }
         cmd.createArg().setLine("-cp " + getHarnessClassPath());
         cmd.createArg().setValue("com.sun.xml.ws.test.Main");
         cmd.createArg().setLine("-report " + resultsDirectory.getAbsolutePath());
@@ -162,8 +180,10 @@ public class WSTestMojo extends AbstractMojo {
         if (version != null && version.trim().length() > 0) {
             cmd.createArg().setLine("-version " + version);
         }
-        for (String arg : args) {
-            cmd.createArg().setLine(arg);
+        if (args != null) {
+            for (String arg : args) {
+                cmd.createArg().setLine(arg);
+            }
         }
         cmd.createArg().setValue(tests.getAbsolutePath());
 
