@@ -457,7 +457,7 @@ public class Main {
                         continue;
                     }
 
-                    if (name.contains("jaxb-xjc")) {
+                    if (name.contains("jaxb-jxc") || name.contains("jaxb-xjc")) {
                         tool.addJar(lib);
                     } else {
                         runtime.addJar(lib);
