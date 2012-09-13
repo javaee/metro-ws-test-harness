@@ -50,7 +50,7 @@
         <version>3</version>
     </parent>
 
-    <groupId>com.sun.xml.ws.test</groupId>
+    <groupId>org.glassfish.metro</groupId>
     <artifactId>harness-maven-plugin</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>

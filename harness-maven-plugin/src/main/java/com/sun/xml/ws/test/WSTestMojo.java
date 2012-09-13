@@ -67,7 +67,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  */
 public class WSTestMojo extends AbstractMojo {
 
-    private static final String HARNESS_GID = "com.sun.xml.ws.test";
+    private static final String HARNESS_GID = "org.glassfish.metro";
     private static final String HARNESS_AID = "harness-lib";
     /**
      * @parameter default-value="0.1-SNAPSHOT"

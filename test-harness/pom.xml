@@ -51,20 +51,21 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.xml.ws.test</groupId>
+    <groupId>org.glassfish.metro</groupId>
     <artifactId>harness-lib</artifactId>
     <version>0.1-SNAPSHOT</version>
 
     <name>WS Test Harness</name>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.sun.xml.ws.test</groupId>
-            <artifactId>harness</artifactId>
+            <artifactId>harness-bootstrap</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
