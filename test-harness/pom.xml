@@ -64,7 +64,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sun.xml.ws.test</groupId>
+            <groupId>org.glassfish.metro</groupId>
             <artifactId>harness-bootstrap</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
