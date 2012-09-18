@@ -448,7 +448,7 @@ public class Main {
                     if (name.contains("jaxws-rt") || name.contains("jaxws-tools")) {
                         continue;
                     }
-                    if (name.contains("jaxb-xjc")) {
+                    if (name.contains("jaxb-jxc") || name.contains("jaxb-xjc")) {
                         tool.addJar(lib);
                     } else {
                         runtime.addJar(lib);
