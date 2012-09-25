@@ -40,9 +40,14 @@
 package com.sun.xml.ws.test;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -53,6 +58,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -126,6 +136,14 @@ public class WSTestMojo extends AbstractMojo {
      */
     private File extDir;
     /**
+     * @parameter expression="${ws.image}"
+     */
+    private URL image;
+    /**
+     * @parameter expression="${ws.transport}"
+     */
+    private URL transport;
+    /**
      * @component
      */
     private ArtifactFactory artifactFactory;
@@ -142,18 +160,88 @@ public class WSTestMojo extends AbstractMojo {
      */
     private List remoteRepos;
     /**
+     * @parameter property="project"
+     * @readonly
+     */
+    private MavenProject project;
+    /**
+     * To look up Archiver/UnArchiver implementations
+     *
+     * @component
+     */
+    protected ArchiverManager archiverManager;
+    /**
      * @component
      */
     private ArtifactMetadataSource mdataSource;
+    private File imageFolder = null;
+    private File transportFile = null;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (image != null) {
+            try {
+                getLog().info("Downloading: " + image);
+                imageFolder = new File(project.getBuild().getDirectory(), "tested-image");
+                if (imageFolder.mkdirs()) {
+                    File imageFile = new File(imageFolder, new File(image.getFile()).getName());
+                    if (imageFile.createNewFile()) {
+                        getLog().info("to: " + imageFile.getAbsolutePath());
+                        IOUtil.copy(image.openStream(), new FileOutputStream(imageFile));
+                        getLog().info("unpacking " + imageFile.getName() + "...");
+                        UnArchiver unArchiver = archiverManager.getUnArchiver(imageFile);
+                        unArchiver.setSourceFile(imageFile);
+                        unArchiver.setDestDirectory(imageFolder);
+                        unArchiver.extract();
+                    }
+                }
+            } catch (NoSuchArchiverException ex) {
+                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (transport != null) {
+            try {
+                getLog().info("Downloading: " + transport);
+                imageFolder = new File(project.getBuild().getDirectory(), "tested-image");
+                if (imageFolder.exists() || imageFolder.mkdirs()) {
+                    transportFile = new File(imageFolder, new File(transport.getFile()).getName());
+                    if (transportFile.createNewFile()) {
+                        getLog().info("to: " + transportFile.getAbsolutePath());
+                        IOUtil.copy(transport.openStream(), new FileOutputStream(transportFile));
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         Commandline cmd = new Commandline();
         cmd.setExecutable(new File(new File(System.getProperty("java.home"), "bin"), getJavaExec()).getAbsolutePath());
+        //APIs have to be first
         if (endorsedDir != null && endorsedDir.isDirectory()) {
             cmd.createArg().setValue("-Djava.endorsed.dirs=" + endorsedDir.getAbsolutePath());
         } else {
-            //set up
-            //cmd.createArg().setLine("-Xbootclasspath/p:");
+            //is it JAXWS-RI?
+            if (imageFolder != null) {
+            File img = new File(imageFolder, "jaxws-ri");
+            if (img.exists() && img.isDirectory()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(new File(img, "lib/saaj-api.jar"));
+                sb.append(File.pathSeparatorChar);
+                sb.append(new File(img, "lib/jaxb-api.jar"));
+                sb.append(File.pathSeparatorChar);
+                sb.append(new File(img, "lib/jaxws-api.jar"));
+                cmd.createArg().setLine("-Xbootclasspath/p:" + sb.toString());
+            } else {
+                //or Metro?
+                img = new File(imageFolder, "metro");
+                if (img.exists() && img.isDirectory()) {
+                    File wsApis = new File(img, "lib/webservices-api.jar");
+                    cmd.createArg().setLine("-Xbootclasspath/p:" + wsApis.getAbsolutePath());
+                }
+            }
+        }
         }
         if (extDir != null && extDir.exists() && extDir.isDirectory()) {
             cmd.createArg().setValue("-DHARNESS_EXT=" + extDir.getAbsolutePath());
@@ -180,9 +268,24 @@ public class WSTestMojo extends AbstractMojo {
         if (version != null && version.trim().length() > 0) {
             cmd.createArg().setLine("-version " + version);
         }
-        if (args != null) {
-            for (String arg : args) {
-                cmd.createArg().setLine(arg);
+        if (imageFolder != null) {
+            if (transportFile != null) {
+                cmd.createArg().setLine("-transport " + transportFile.getAbsolutePath());
+            }
+            File img = new File(imageFolder, "jaxws-ri");
+            if (img.exists() && img.isDirectory()) {
+                cmd.createArg().setLine("-cp:jaxws-image " + img.getAbsolutePath());
+            } else {
+                img = new File(imageFolder, "metro");
+                if (img.exists() && img.isDirectory()) {
+                    cmd.createArg().setLine("-cp:wsit-image " + img.getAbsolutePath());
+                }
+            }
+        } else {
+            if (args != null) {
+                for (String arg : args) {
+                    cmd.createArg().setLine(arg);
+                }
             }
         }
         cmd.createArg().setValue(tests.getAbsolutePath());
