@@ -419,9 +419,13 @@ public class Main {
 
         } else if (jaxwsImage != null) {
             tool.addJar(new File(jaxwsImage, "lib/jaxws-tools.jar"));
-            tool.addJar(new File(jaxwsImage, "lib/jaxb-jxc.jar"));
+            if (new File(jaxwsImage, "lib/jaxb-jxc.jar").exists()) {
+                tool.addJar(new File(jaxwsImage, "lib/jaxb-jxc.jar"));
+            }
             tool.addJar(new File(jaxwsImage, "lib/jaxb-xjc.jar"));
-            runtime.addJarFolder(new File(jaxwsImage, "lib"), "jaxws-tools.jar", "jaxb-jxc.jar", "jaxb-xjc.jar");
+            runtime.addJarFolder(new File(jaxwsImage, "lib"),
+                    "saaj-api.jar", "jaxb-api.jar", "jaxws-api.jar",
+                    "jaxws-tools.jar", "jaxb-jxc.jar", "jaxb-xjc.jar");
 
         } else if (jaxwsWs != null) {
 
