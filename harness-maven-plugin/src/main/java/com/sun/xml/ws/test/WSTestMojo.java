@@ -220,6 +220,7 @@ public class WSTestMojo extends AbstractMojo {
 
         Commandline cmd = new Commandline();
         cmd.setExecutable(new File(new File(System.getProperty("java.home"), "bin"), getJavaExec()).getAbsolutePath());
+        cmd.setWorkingDirectory(project.getBasedir());
         //APIs have to be first
         if (!isDistTest) {
             if (endorsedDir != null && endorsedDir.isDirectory()) {
