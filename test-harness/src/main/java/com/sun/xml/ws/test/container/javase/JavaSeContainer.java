@@ -186,7 +186,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
             servers[i++] = interpreter.eval(
                     "endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
-                            (feature != null? ", feature);" : ");") +
+                            (feature != null? ", new javax.xml.ws.WebServiceFeature[] {feature});" : ");") +
                     "endpoint.setMetadata(metadata);" +
                     "endpoint.setProperties(properties);" +
                     "endpoint.publish(endpointAddress);" +
