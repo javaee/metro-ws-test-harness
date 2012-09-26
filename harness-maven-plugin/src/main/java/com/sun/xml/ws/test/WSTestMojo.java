@@ -42,12 +42,13 @@ package com.sun.xml.ws.test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -79,6 +80,17 @@ public class WSTestMojo extends AbstractMojo {
 
     private static final String HARNESS_GID = "org.glassfish.metro";
     private static final String HARNESS_AID = "harness-lib";
+    private static final String TOPLINK_FACTORY = "com.sun.xml.ws.db.toplink.JAXBContextFactory";
+
+    public enum Databinding {
+
+        DEFAULT, TOPLINK;
+    }
+
+    public enum Container {
+
+        IN_VM, LWHS, TOMCAT;
+    }
     /**
      * @parameter default-value="0.1-SNAPSHOT"
      */
@@ -124,6 +136,10 @@ public class WSTestMojo extends AbstractMojo {
      */
     private File tests;
     /**
+     * @parameter default-value="DEFAULT"
+     */
+    private Databinding databinding;
+    /**
      * @parameter
      */
     private List<String> args;
@@ -136,13 +152,21 @@ public class WSTestMojo extends AbstractMojo {
      */
     private File extDir;
     /**
-     * @parameter expression="${ws.image}"
+     * @parameter property="ws.imageUrl"
      */
-    private URL image;
+    private String imageUrl;
     /**
-     * @parameter expression="${ws.transport}"
+     * @parameter property="ws.transport" default-value="IN_VM"
      */
-    private URL transport;
+    private Container transport;
+    /**
+     * @parameter property="ws.transportUrl"
+     */
+    private String transportUrl;
+    /**
+     * @parameter property="tomcat.home"
+     */
+    private File tomcatHome;
     /**
      * @component
      */
@@ -174,58 +198,40 @@ public class WSTestMojo extends AbstractMojo {
      * @component
      */
     private ArtifactMetadataSource mdataSource;
-    private File imageFolder = null;
-    private File transportFile = null;
+    private File imageRoot = null;
+    private boolean isDistTest = false;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (image != null) {
+        File imageFolder = new File(project.getBuild().getDirectory(), "tested-image");
+        try {
+            URL u = new URL(imageUrl);
             try {
-                getLog().info("Downloading: " + image);
-                imageFolder = new File(project.getBuild().getDirectory(), "tested-image");
-                if (imageFolder.mkdirs()) {
-                    File imageFile = new File(imageFolder, new File(image.getFile()).getName());
-                    if (imageFile.createNewFile()) {
-                        getLog().info("to: " + imageFile.getAbsolutePath());
-                        IOUtil.copy(image.openStream(), new FileOutputStream(imageFile));
-                        getLog().info("unpacking " + imageFile.getName() + "...");
-                        UnArchiver unArchiver = archiverManager.getUnArchiver(imageFile);
-                        unArchiver.setSourceFile(imageFile);
-                        unArchiver.setDestDirectory(imageFolder);
-                        unArchiver.extract();
-                    }
-                }
+                imageFolder.mkdirs();
+                prepareImage(u, imageFolder);
+                isDistTest = true;
             } catch (NoSuchArchiverException ex) {
-                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
+                throw new MojoExecutionException(ex.getMessage(), ex);
             } catch (IOException ex) {
-                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
+                throw new MojoFailureException(ex.getMessage(), ex);
             }
-        }
-        if (transport != null) {
-            try {
-                getLog().info("Downloading: " + transport);
-                imageFolder = new File(project.getBuild().getDirectory(), "tested-image");
-                if (imageFolder.exists() || imageFolder.mkdirs()) {
-                    transportFile = new File(imageFolder, new File(transport.getFile()).getName());
-                    if (transportFile.createNewFile()) {
-                        getLog().info("to: " + transportFile.getAbsolutePath());
-                        IOUtil.copy(transport.openStream(), new FileOutputStream(transportFile));
-                    }
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(WSTestMojo.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } catch (MalformedURLException muex) {
+            getLog().info("testing local workspace...");
         }
 
         Commandline cmd = new Commandline();
         cmd.setExecutable(new File(new File(System.getProperty("java.home"), "bin"), getJavaExec()).getAbsolutePath());
         //APIs have to be first
-        if (endorsedDir != null && endorsedDir.isDirectory()) {
-            cmd.createArg().setValue("-Djava.endorsed.dirs=" + endorsedDir.getAbsolutePath());
+        if (!isDistTest) {
+            if (endorsedDir != null && endorsedDir.isDirectory()) {
+                cmd.createArg().setValue("-Djava.endorsed.dirs=" + endorsedDir.getAbsolutePath());
+            } else {
+                getLog().warn("Endorsed not applied. Set 'endorsedDir' in plugin's configuration.");
+            }
         } else {
             //is it JAXWS-RI?
-            if (imageFolder != null) {
             File img = new File(imageFolder, "jaxws-ri");
             if (img.exists() && img.isDirectory()) {
+                imageRoot = img;
                 StringBuilder sb = new StringBuilder();
                 sb.append(new File(img, "lib/saaj-api.jar"));
                 sb.append(File.pathSeparatorChar);
@@ -237,20 +243,41 @@ public class WSTestMojo extends AbstractMojo {
                 //or Metro?
                 img = new File(imageFolder, "metro");
                 if (img.exists() && img.isDirectory()) {
+                    imageRoot = img;
                     File wsApis = new File(img, "lib/webservices-api.jar");
                     cmd.createArg().setLine("-Xbootclasspath/p:" + wsApis.getAbsolutePath());
                 }
             }
-        }
         }
         if (extDir != null && extDir.exists() && extDir.isDirectory()) {
             cmd.createArg().setValue("-DHARNESS_EXT=" + extDir.getAbsolutePath());
         } else {
             getLog().info("'ext' directory not found");
         }
+        if (isToplink()) {
+            cmd.createArg().setLine("-DBindingContextFactory=" + TOPLINK_FACTORY);
+        }
         if (vmArgs != null) {
             for (String arg : vmArgs) {
-                cmd.createArg().setLine(arg);
+                if (arg.contains("-DBindingContextFactory=") && isToplink()) {
+                    String[] opts = arg.split(" ");
+                    if (opts.length > 1) {
+                        StringBuilder sb = new StringBuilder();
+                        for (String opt : opts) {
+                            if (opt.trim().startsWith("-DBindingContextFactory=")) {
+                                getLog().info("removing '" + opt + "' from default configuration.");
+                                continue;
+                            }
+                            sb.append(opt);
+                            sb.append(" ");
+                        }
+                        cmd.createArg().setLine(sb.toString().trim());
+                    } else {
+                        getLog().info("removing '" + arg + "' from default configuration.");
+                    }
+                } else {
+                    cmd.createArg().setLine(arg);
+                }
             }
         }
         cmd.createArg().setLine("-cp " + getHarnessClassPath());
@@ -268,35 +295,95 @@ public class WSTestMojo extends AbstractMojo {
         if (version != null && version.trim().length() > 0) {
             cmd.createArg().setLine("-version " + version);
         }
-        if (imageFolder != null) {
-            if (transportFile != null) {
-                cmd.createArg().setLine("-transport " + transportFile.getAbsolutePath());
-            }
-            File img = new File(imageFolder, "jaxws-ri");
-            if (img.exists() && img.isDirectory()) {
-                cmd.createArg().setLine("-cp:jaxws-image " + img.getAbsolutePath());
-            } else {
-                img = new File(imageFolder, "metro");
-                if (img.exists() && img.isDirectory()) {
-                    cmd.createArg().setLine("-cp:wsit-image " + img.getAbsolutePath());
+        switch (transport) {
+            case IN_VM:
+                if (isDistTest) {
+                    File transportFile = null;
+                    try {
+                        imageFolder.mkdirs();
+                        transportFile = download(new URL(transportUrl), imageFolder);
+                    } catch (IOException ex) {
+                        throw new MojoExecutionException("Cannot find local transport jar.  Set 'transportUrl' in plugin's configuration.", ex);
+                    }
+                    cmd.createArg().setLine("-transport " + transportFile.getAbsolutePath());
                 }
+                break;
+            case LWHS:
+                cmd.createArg().setLine("-lwhs");
+                break;
+            case TOMCAT:
+                if (tomcatHome == null) {
+                    throw new MojoExecutionException("'tomcat.home' is not set.");
+                }
+                cmd.createArg().setLine("-tomcat-embedded " + tomcatHome.getAbsolutePath());
+                break;
+        }
+        List<String> filters = new ArrayList<String>();
+        if (imageRoot != null) {
+            if ("jaxws-ri".equals(imageRoot.getName())) {
+                cmd.createArg().setLine("-cp:jaxws-image " + imageRoot.getAbsolutePath());
+            } else if ("jaxws-ri".equals(imageRoot.getName())) {
+                cmd.createArg().setLine("-cp:wsit-image " + imageRoot.getAbsolutePath());
+            } else {
+                throw new MojoExecutionException("Unknown/Unsupported image.");
             }
-        } else {
-            if (args != null) {
-                for (String arg : args) {
+            if (isToplink()) {
+                cmd.createArg().setLine("-cp:override " + getToplinkCP(imageRoot));
+                filters.add("-cp:override");
+            }
+            filters.add("-cp:jaxws");
+            filters.add("-cp:wsit");
+        }
+        if (args != null) {
+            for (String arg : args) {
+                if (filters.isEmpty()) {
                     cmd.createArg().setLine(arg);
+                } else {
+                    boolean found = false;
+                    for (String filter : filters) {
+                        if (arg.contains(filter)) {
+                            getLog().info("removing '" + arg + "' from default configuration.");
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        cmd.createArg().setLine(arg);
+                    }
                 }
             }
         }
-        cmd.createArg().setValue(tests.getAbsolutePath());
+
+        cmd.createArg().setLine(tests.getAbsolutePath());
 
         StreamConsumer sc = new DefaultConsumer();
+        //TODO: move to debug level
         getLog().info(cmd.toString());
         try {
             CommandLineUtils.executeCommandLine(cmd, sc, sc);
         } catch (CommandLineException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
+    }
+
+    private File download(URL u, File destDir) throws IOException {
+        getLog().info("Downloading: " + u);
+        File imageZip = new File(destDir, new File(u.getFile()).getName());
+        if (imageZip.createNewFile()) {
+            getLog().info("to: " + imageZip.getAbsolutePath());
+            IOUtil.copy(u.openStream(), new FileOutputStream(imageZip));
+        }
+        return imageZip;
+    }
+
+    private void prepareImage(URL u, File destDir) throws IOException, NoSuchArchiverException {
+        File zip = download(u, destDir);
+        getLog().info("unpacking " + zip.getName() + "...");
+        UnArchiver unArchiver = archiverManager.getUnArchiver(zip);
+        unArchiver.setSourceFile(zip);
+        unArchiver.setDestDirectory(destDir);
+        unArchiver.extract();
+        ZipFile zf = new ZipFile(zip);
     }
 
     private String getJavaExec() {
@@ -327,5 +414,25 @@ public class WSTestMojo extends AbstractMojo {
             throw new MojoExecutionException("Couldn't download artifact: " + e.getMessage(), e);
         }
         return arr.getArtifacts();
+    }
+
+    private boolean isToplink() {
+        return Databinding.TOPLINK == databinding;
+    }
+
+    private String getToplinkCP(File root) throws MojoExecutionException {
+        StringBuilder sb = new StringBuilder();
+        if ("jaxws-ri".equals(root.getName())) {
+            sb.append(new File(root, "lib/plugins/jaxws-eclipselink-plugin.jar"));
+            sb.append(File.pathSeparatorChar);
+            sb.append(new File(root, "lib/plugins/eclipselink.jar"));
+            sb.append(File.pathSeparatorChar);
+            sb.append(new File(root, "lib/plugins/mail.jar"));
+        } else if ("metro".equals(root.getName())) {
+            sb.append(new File(root, "lib/databinding/jaxws-eclipselink-plugin.jar"));
+        } else {
+            throw new MojoExecutionException("Unknown/Unsupported image.");
+        }
+        return sb.toString();
     }
 }
