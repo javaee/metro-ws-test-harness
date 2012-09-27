@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipFile;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -168,6 +167,10 @@ public class WSTestMojo extends AbstractMojo {
      */
     private File tomcatHome;
     /**
+     * @parameter default-value="${project.basedir}/misc"
+     */
+    private File wsitConf;
+    /**
      * @component
      */
     private ArtifactFactory artifactFactory;
@@ -255,6 +258,9 @@ public class WSTestMojo extends AbstractMojo {
         } else {
             getLog().info("'ext' directory not found");
         }
+        if (wsitConf.exists() && wsitConf.isDirectory()) {
+            cmd.createArg().setValue("-DWSIT_HOME=" + wsitConf.getAbsolutePath());
+        }
         if (isToplink()) {
             cmd.createArg().setLine("-DBindingContextFactory=" + TOPLINK_FACTORY);
         }
@@ -323,7 +329,7 @@ public class WSTestMojo extends AbstractMojo {
         if (imageRoot != null) {
             if ("jaxws-ri".equals(imageRoot.getName())) {
                 cmd.createArg().setLine("-cp:jaxws-image " + imageRoot.getAbsolutePath());
-            } else if ("jaxws-ri".equals(imageRoot.getName())) {
+            } else if ("metro".equals(imageRoot.getName())) {
                 cmd.createArg().setLine("-cp:wsit-image " + imageRoot.getAbsolutePath());
             } else {
                 throw new MojoExecutionException("Unknown/Unsupported image.");
@@ -384,7 +390,6 @@ public class WSTestMojo extends AbstractMojo {
         unArchiver.setSourceFile(zip);
         unArchiver.setDestDirectory(destDir);
         unArchiver.extract();
-        ZipFile zf = new ZipFile(zip);
     }
 
     private String getJavaExec() {
