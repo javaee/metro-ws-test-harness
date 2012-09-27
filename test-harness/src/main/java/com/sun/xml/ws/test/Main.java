@@ -393,9 +393,6 @@ public class Main {
             File toolJar = new File(wsitImage, "lib/webservices-tools.jar");
             tool.addJar(toolJar);
 
-            File apiJar = new File(wsitImage, "lib/webservices-api.jar");
-            runtime.addJar(apiJar);
-
             File extraJar = new File(wsitImage, "lib/webservices-extra.jar");
             runtime.addJar(extraJar);
 
@@ -403,11 +400,12 @@ public class Main {
             runtime.addJar(extraApiJar);
 
             containerClasspathPrefix = new File[5];
-            containerClasspathPrefix[0] = rtJar;
-            containerClasspathPrefix[1] = toolJar;
-            containerClasspathPrefix[2] = apiJar;
-            containerClasspathPrefix[3] = extraJar;
-            containerClasspathPrefix[4] = extraApiJar;
+            //TODO: FIX ME!?
+//            containerClasspathPrefix[0] = rtJar;
+//            containerClasspathPrefix[1] = toolJar;
+//            containerClasspathPrefix[2] = apiJar;
+//            containerClasspathPrefix[3] = extraJar;
+//            containerClasspathPrefix[4] = extraApiJar;
 
         } else if (wsitWs != null) {
             runtime.addClassFolder(new File(wsitWs, "rt/build/classes"));
