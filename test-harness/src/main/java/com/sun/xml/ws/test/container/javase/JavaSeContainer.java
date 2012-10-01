@@ -51,6 +51,7 @@ import com.sun.xml.ws.test.tool.WsTool;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -58,6 +59,11 @@ import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 /**
  * Container to deploy Java SE endpoints using java.xml.ws.Endpoint API
@@ -122,6 +128,10 @@ public class JavaSeContainer extends AbstractApplicationContainer {
                     endpointInfoBean = ebean;
                     break;
                 }
+            }
+
+            if (service.service.isSTS) {
+                updateWsitClient(service,baseAddress+ testEndpoint.name);
             }
 
             final Class endpointClass = serviceClassLoader.loadClass(testEndpoint.className);
@@ -253,6 +263,31 @@ public class JavaSeContainer extends AbstractApplicationContainer {
                     metadata.add(new StreamSource(res.openStream(), res.toExternalForm()));
                 }
             }
+        }
+    }
+
+    public void updateWsitClient(DeployedService deployedService, String id) throws Exception {
+        File wsitClientFile = new File(deployedService.service.parent.resources, "wsit-client.xml");
+        if (wsitClientFile.exists()) {
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(wsitClientFile);
+            Element root = document.getRootElement();
+            Element policy = root.element("Policy");
+            Element sts = policy.element("ExactlyOne").element("All").element("PreconfiguredSTS");
+
+            Attribute endpoint = sts.attribute("endpoint");
+            endpoint.setValue(id);
+
+            Attribute wsdlLoc = sts.attribute("wsdlLocation");
+            wsdlLoc.setValue(deployedService.service.wsdl.wsdlFile.toURI().toString());
+
+            XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
+            writer.write(document);
+            writer.close();
+
+        } else {
+            throw new RuntimeException("wsit-client.xml is absent. It is required. \n"
+                    + "Please check " + deployedService.service.parent.resources);
         }
     }
 
