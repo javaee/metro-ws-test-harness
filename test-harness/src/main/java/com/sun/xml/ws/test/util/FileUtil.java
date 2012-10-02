@@ -42,6 +42,7 @@ import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.types.FileSet;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,18 @@ import java.util.Stack;
  * information about them.
  */
 public class FileUtil {
+
+    public static final FileFilter DIRECTORY_FILTER = new FileFilter() {
+        public boolean accept(File path) {
+            return path.isDirectory();
+        }
+    };
+
+    public static final FileFilter JAR_FILE_FILTER = new FileFilter() {
+        public boolean accept(File path) {
+            return path.getName().endsWith(".jar");
+        }
+    };
 
     /**
      * This method returns the fully qualified names of
@@ -97,7 +110,7 @@ public class FileUtil {
         if (dirs.empty()) {
             return className;
         }
-        StringBuffer fullName = new StringBuffer();
+        StringBuilder fullName = new StringBuilder();
         for (String dir : dirs) {
             fullName.append(dir);
             fullName.append(".");

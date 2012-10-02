@@ -50,6 +50,7 @@ import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
 import com.sun.xml.ws.test.emma.Emma;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
+import com.sun.xml.ws.test.util.FileUtil;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -68,7 +69,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -258,8 +258,9 @@ public class Main {
         try {
             parser.parseArgument(args);
 
-            if (main.tests.isEmpty())
+            if (main.tests.isEmpty()) {
                 throw new CmdLineException("No test is given");
+            }
 
             return main.run();
         } catch (CmdLineException e) {
@@ -300,8 +301,9 @@ public class Main {
 
         // build up test plan
         TestSuite suite = createTestSuite();
-        for (String dir : tests)
+        for (String dir : tests) {
             build(new File(dir), container, wsimport, suite);
+        }
 
         if (suite.countTestCases() == 0) {
             System.err.println("No test to run");
@@ -333,8 +335,9 @@ public class Main {
                     try {
                         return super.doRun(test);
                     } finally {
-                        if (formatter != null)
+                        if (formatter != null) {
                             formatter.close();
+                        }
                     }
                 }
             };
@@ -343,10 +346,12 @@ public class Main {
 
             return r.errorCount() + r.failureCount();
         } finally {
-            if (!leave)
+            if (!leave) {
                 container.shutdown();
-            if (World.emma != null)
+            }
+            if (World.emma != null) {
                 World.emma.write(emma);
+            }
         }
     }
 
@@ -367,8 +372,9 @@ public class Main {
             }
         }
 
-        if (transportJar != null)
+        if (transportJar != null) {
             runtime.addJar(transportJar);
+        }
 
         // fill in container realm.
         if (embeddedTomcat != null) {
@@ -382,8 +388,9 @@ public class Main {
             runtime.addJarFolder(new File(embeddedJetty, "lib"));
         }
 
-        if (wsitImage == null && wsitWs == null && jaxwsImage == null && jaxwsWs == null && !jaxwsInJDK)
+        if (wsitImage == null && wsitWs == null && jaxwsImage == null && jaxwsWs == null && !jaxwsInJDK) {
             guessWorkspace();
+        }
 
         // fill in runtime and tool realms
         if (wsitImage != null) {
@@ -526,11 +533,7 @@ public class Main {
                 System.err.println("Searching extensions in " + extDir);
             }
             if (extDir.exists()) {
-                for (File f : extDir.listFiles(new FileFilter() {
-                    public boolean accept(File f) {
-                        return f.getName().endsWith(".jar");
-                    }
-                })) {
+                for (File f : extDir.listFiles(FileUtil.JAR_FILE_FILTER)) {
                     System.err.println("Picking up extension: " + f);
                     runtime.addJar(f);
                 }
@@ -543,12 +546,14 @@ public class Main {
         // put tools.jar in the tools classpath
         File jreHome = new File(System.getProperty("java.home"));
         File toolsJar = new File(jreHome.getParent(), "lib/tools.jar");
-        if (toolsJar.exists())
+        if (toolsJar.exists()) {
             tool.addJar(toolsJar);
+        }
         // For Mac OS X
         File classesJar = new File(jreHome.getParent(), "Classes/classes.jar");
-        if (classesJar.exists())
+        if (classesJar.exists()) {
             tool.addJar(classesJar);
+        }
 
 
         if (debug) {
@@ -608,7 +613,7 @@ public class Main {
         File harnessJar = getHarnessJarDirectory();
         File jaxwsUnit = getParentWithName(harnessJar, "jaxws-unit");
         if (jaxwsUnit != null) {
-            for (File other : jaxwsUnit.getParentFile().listFiles(DIRECTORY_FILTER)) {
+            for (File other : jaxwsUnit.getParentFile().listFiles(FileUtil.DIRECTORY_FILTER)) {
                 if (new File(other, ".jaxws-ri").exists()) {
                     System.out.println("Found JAX-WS RI workspace at " + other);
                     jaxwsWs = other;
@@ -622,7 +627,6 @@ public class Main {
         if (wsitHome != null) {
             System.out.println("Found WSIT workspace at " + wsitHome);
             this.wsitWs = wsitHome;
-            return;
         }
 
         // couldn't make any guess
@@ -658,8 +662,9 @@ public class Main {
             System.err.println("Using remote Tomcat at " + remoteTomcat);
             //  group capture number  :        12    3      4      5 6
             Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:]+)(:([0-9]+))?").matcher(remoteTomcat);
-            if (!matcher.matches())
+            if (!matcher.matches()) {
                 throw new CmdLineException("Unable to parse " + remoteTomcat);
+            }
 
             appContainer = new RemoteCargoApplicationContainer(
                     wsimport, wsgen,
@@ -692,8 +697,9 @@ public class Main {
             System.err.println("Using remote Glassfish at " + remoteGlassfish);
             //  group capture number  :        12    3      4         5 6         7   8
             Matcher matcher = Pattern.compile("((.+):(.*)@)?([^:\\-]+)(:([0-9]+))?(\\-(.+))?").matcher(remoteGlassfish);
-            if (!matcher.matches())
+            if (!matcher.matches()) {
                 throw new CmdLineException("Unable to parse " + remoteGlassfish);
+            }
 
             String userName = defaultsTo(matcher.group(2), "admin");
             String password = defaultsTo(matcher.group(3), "adminadmin");
@@ -739,8 +745,11 @@ public class Main {
     }
 
     private static String defaultsTo(String value, String defaultValue) {
-        if (value == null) return defaultValue;
-        else return value;
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return value;
+        }
     }
 
     /**
@@ -796,8 +805,9 @@ public class Main {
                         }
                     }
                     suite.addTest(td[0].build(container, wsimport, clientScriptName, concurrentSideEffectFree, version));
-                    if (td[1] != null)
+                    if (td[1] != null) {
                         suite.addTest(td[1].build(container, wsimport, clientScriptName, concurrentSideEffectFree, version));
+                    }
                 }
             } catch (IOException e) {
                 // even if we fail to process this descriptor, don't let the whole thing fail.
@@ -815,14 +825,11 @@ public class Main {
 
         if (recursive && dir.isDirectory()) {
             // find test data recursively
-            File[] subdirs = dir.listFiles(new FileFilter() {
-                public boolean accept(File f) {
-                    return f.isDirectory();
-                }
-            });
+            File[] subdirs = dir.listFiles(FileUtil.DIRECTORY_FILTER);
 
-            for (File subdir : subdirs)
+            for (File subdir : subdirs) {
                 build(subdir, container, wsimport, suite);
+            }
         }
     }
 
@@ -849,8 +856,9 @@ public class Main {
      */
     private File getParentWithName(File file, String name) {
         while (file != null) {
-            if (file.getName().equals(name))
+            if (file.getName().equals(name)) {
                 return file;
+            }
             file = file.getParentFile();
         }
         return null;
@@ -862,16 +870,11 @@ public class Main {
      */
     private File getParentWithFile(File file, String markerFile) {
         while (file != null) {
-            if (new File(file, markerFile).exists())
+            if (new File(file, markerFile).exists()) {
                 return file;
+            }
             file = file.getParentFile();
         }
         return null;
     }
-
-    private static final FileFilter DIRECTORY_FILTER = new FileFilter() {
-        public boolean accept(File path) {
-            return path.isDirectory();
-        }
-    };
 }
