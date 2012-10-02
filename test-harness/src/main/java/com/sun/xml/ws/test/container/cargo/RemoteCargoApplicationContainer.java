@@ -43,7 +43,6 @@ import org.codehaus.cargo.container.RemoteContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.RuntimeConfiguration;
 import org.codehaus.cargo.container.property.RemotePropertySet;
-import org.codehaus.cargo.container.tomcat.TomcatPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
@@ -88,9 +87,10 @@ public class RemoteCargoApplicationContainer extends AbstractCargoContainer<Remo
 
         configuration.setProperty(RemotePropertySet.USERNAME, userName);
         configuration.setProperty(RemotePropertySet.PASSWORD, password);
-        if(containerId.startsWith("tomcat"))
-            configuration.setProperty(TomcatPropertySet.MANAGER_URL,
+        if(containerId.startsWith("tomcat")) {
+            configuration.setProperty(RemotePropertySet.URI,
                 new URL(server,"/manager").toExternalForm());
+        }
 
         // TODO: we should provide a mode to launch the container with debugger
 

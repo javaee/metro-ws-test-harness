@@ -92,7 +92,29 @@
         <dependency>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-core-uberjar</artifactId>
-            <version>1.0.2</version>
+            <version>1.2.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jaxb-api</artifactId>
+                    <groupId>javax.xml.bind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jaxb-impl</artifactId>
+                    <groupId>com.sun.xml.bind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>msv</artifactId>
+                    <groupId>msv</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>relaxngDatatype</artifactId>
+                    <groupId>relaxngDatatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>isorelax</artifactId>
+                    <groupId>isorelax</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -157,11 +179,6 @@
                     <groupId>junit</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise.deploy</groupId>
-            <artifactId>deployment-api</artifactId>
-            <version>1.2-rev-1</version>
         </dependency>
         <dependency>
             <!-- to get isorelax -->

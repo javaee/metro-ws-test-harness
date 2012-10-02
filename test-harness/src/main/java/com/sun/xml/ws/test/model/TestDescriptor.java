@@ -75,6 +75,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -537,7 +538,7 @@ public class TestDescriptor {
     /**
      * Parses a test descriptor.
      */
-    private Document parse(File descriptor) throws DocumentException, SAXException, ParserConfigurationException {
+    private Document parse(File descriptor) throws DocumentException, SAXException, ParserConfigurationException, MalformedURLException {
         SAXParserFactory factory;
         if (descriptorSchema != null) {
             factory = ValidatingSAXParserFactory.newInstance(descriptorSchema);

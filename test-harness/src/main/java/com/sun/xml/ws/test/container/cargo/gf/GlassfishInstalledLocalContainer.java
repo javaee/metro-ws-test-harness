@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.codehaus.cargo.container.spi.jvm.JvmLauncher;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -161,4 +162,14 @@ public class GlassfishInstalledLocalContainer extends AbstractInstalledLocalCont
     }
 
     private static final ContainerCapability CAPABILITY = new GlassfishContainerCapability();
+
+    @Override
+    protected void doStart(JvmLauncher jl) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void doStop(JvmLauncher jl) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
