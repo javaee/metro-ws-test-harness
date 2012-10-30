@@ -58,11 +58,15 @@ public class WSDL {
     @Nullable
     public final List<File> schemas;
 
+    //Optional relative location of the WSDL (under WEB-INF/wsdl tree)
+    @Nullable
+    public final String relativeLocation;
 
-    public WSDL(File wsdlFile ,List<File> importedWsdls,List<File> schemafiles) {
+    public WSDL(File wsdlFile, List<File> importedWsdls, List<File> schemafiles, String relativeLocation) {
         this.wsdlFile = wsdlFile;
         this.importedWsdls = importedWsdls;
         this.schemas = schemafiles;
+        this.relativeLocation = relativeLocation;
     }
 
 }

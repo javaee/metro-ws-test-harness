@@ -90,7 +90,7 @@ public class TestService {
      * Optional WSDL file that describes this service.
      */
     @Nullable
-    public final WSDL wsdl;
+    public final List<WSDL> wsdl;
 
     /**
      * Possibly empty list of JAXB/JAX-WS external binding customizations.
@@ -122,7 +122,7 @@ public class TestService {
      *      If this happens, we won't search for @WebService classes and just use this instead.
      *      Used for deploying inner classes and testing inheritance.
      */
-    public TestService(TestDescriptor parent, String name, File baseDir, WSDL wsdl, boolean sts, @Nullable String explicitServiceClassName) throws IOException {
+    public TestService(TestDescriptor parent, String name, File baseDir, List<WSDL> wsdl, boolean sts, @Nullable String explicitServiceClassName) throws IOException {
         this.parent = parent;
         this.name = name;
         this.wsdl = wsdl;

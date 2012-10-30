@@ -169,7 +169,7 @@ start = element descriptor {
             #
             attribute href {text}
 
-        }?
+        }*
     }* &
     
     # 'sts' element holds information for a  special handling of

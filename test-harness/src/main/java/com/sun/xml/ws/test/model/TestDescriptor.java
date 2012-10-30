@@ -595,35 +595,40 @@ public class TestDescriptor {
                 serviceBaseDir = testDir;
             }
 
-            File wsdl;
-            WSDL wsdlInfo = null;
-            if (service.element("wsdl") != null) {
-                String wsdlAttribute = service.element("wsdl").attributeValue("href", "test.wsdl");
-                wsdl = parseFile(serviceBaseDir, wsdlAttribute);
+            List<WSDL> wsdlInfo = new LinkedList<WSDL>();
+            for (Element el : (List<Element>) service.elements("wsdl")) {
+                File serviceTargetDir = serviceBaseDir;
+                String wsdlAttribute = el.attributeValue("href", "test.wsdl");
+                File wsdl = parseFile(serviceTargetDir, wsdlAttribute);
+                String relLoc = null;
 
                 FileSet schemaSet = new FileSet();
-                schemaSet.setDir(serviceBaseDir);
+                if (wsdlAttribute.contains("/")) {
+                    relLoc = wsdlAttribute.substring(0, wsdlAttribute.lastIndexOf("/"));
+                    serviceTargetDir = new File(serviceTargetDir, relLoc);
+                }
+                schemaSet.setDir(serviceTargetDir);
                 schemaSet.setIncludes("**/*.xsd");
                 schemaSet.setExcludes("work/**");
                 List<File> schemaFiles = new ArrayList<File>();
                 for (String relPath : schemaSet.getDirectoryScanner(World.project).getIncludedFiles()) {
-                    schemaFiles.add(new File(serviceBaseDir, relPath));
+                    schemaFiles.add(new File(serviceTargetDir, relPath));
                 }
 
                 FileSet wsdlSet = new FileSet();
-                wsdlSet.setDir(serviceBaseDir);
+                wsdlSet.setDir(serviceTargetDir);
                 wsdlSet.setIncludes("**/*.wsdl");
                 wsdlSet.setExcludes("wsdlAttribute, work/**");
 
                 List<File> importedWsdls = new ArrayList<File>();
                 for (String relPath : wsdlSet.getDirectoryScanner(World.project).getIncludedFiles()) {
-                    importedWsdls.add(new File(serviceBaseDir, relPath));
+                    importedWsdls.add(new File(serviceTargetDir, relPath));
                 }
 //                File[] schemas = serviceBaseDir.listFiles(new XSDFilter());
 //                File[] wsdls = serviceBaseDir.listFiles(new WSDLFilter(wsdlAttribute));
 //                List<File> importedWsdls = Arrays.asList(wsdls);
 //                List<File> schemaFiles = Arrays.asList(schemas);
-                wsdlInfo = new WSDL(wsdl, importedWsdls, schemaFiles);
+                wsdlInfo.add(new WSDL(wsdl, importedWsdls, schemaFiles, relLoc));
 
             }
 

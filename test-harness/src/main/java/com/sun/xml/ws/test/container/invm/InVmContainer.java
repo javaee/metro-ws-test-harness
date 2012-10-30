@@ -123,7 +123,7 @@ public class InVmContainer extends AbstractApplicationContainer {
             endpoint.setValue(newLocation);
 
             Attribute wsdlLoc = sts.attribute("wsdlLocation");
-            wsdlLoc.setValue(deployedService.service.wsdl.wsdlFile.toURI().toString());
+            wsdlLoc.setValue(deployedService.service.wsdl.get(0).wsdlFile.toURI().toString());
 
             XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
             writer.write( document );
@@ -150,6 +150,10 @@ public class InVmContainer extends AbstractApplicationContainer {
             //TODO: give some error message
             if (address == null)
                 continue;
+
+            if (!"wsdl".equalsIgnoreCase(wsdl.getParentFile().getName())) {
+                portName = wsdl.getParentFile().getName() + portName;
+            }
 
             Attribute locationAttr = address.attribute("location");
             String newLocation =

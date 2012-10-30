@@ -83,7 +83,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
     protected final WAR assembleWar(DeployedService service) throws Exception {
         WAR war = new WAR(service);
 
-        boolean fromJava = (service.service.wsdl == null);
+        boolean fromJava = service.service.wsdl.isEmpty();
 
         if (!fromJava) {
             war.compileWSDL(wsimport);

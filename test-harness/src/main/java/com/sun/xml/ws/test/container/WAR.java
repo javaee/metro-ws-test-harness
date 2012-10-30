@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2012 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.container.jelly.WebXmlInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
+import com.sun.xml.ws.test.model.WSDL;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
 import com.sun.xml.ws.test.util.FileUtil;
@@ -65,6 +66,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -138,7 +140,7 @@ public final class WAR {
         ArrayList<EndpointInfoBean> beans = new ArrayList<EndpointInfoBean>();
 
         // fromJava:
-        if (service.service.wsdl == null || service.service.parent.metadatafiles.size() > 0) {
+        if (service.service.wsdl.isEmpty() || service.service.parent.metadatafiles.size() > 0) {
 
             for (TestEndpoint endpoint : endpoints) {
                 EndpointInfoBean bean = EndpointInfoBean.create(
@@ -157,6 +159,7 @@ public final class WAR {
 
             // if we find multiple implClass, use the port local name to match them
             HashMap<String, String> portNameToImpl = new HashMap<String, String>();
+            HashMap<String, String> implToPort = new HashMap<String, String>();
             // port name to service name
             HashMap<String, QName> portNameToServiceName = new HashMap<String, QName>();
 
@@ -193,15 +196,18 @@ public final class WAR {
                     String endpointInterface = ws.endpointInterface();
                     if (!endpointInterface.equals(""))
                         implClass = clazz.getName();
-                    if (!"".equals(ws.portName()))
+                    if (!"".equals(ws.portName())) {
                         portNameToImpl.put(ws.portName(), implClass);
-
+                        implToPort.put(implClass, ws.portName());
+                    }
                 } else {
                     WebServiceProvider wsp = (WebServiceProvider) clazz.getAnnotation(WebServiceProvider.class);
                     if (wsp != null) {
                         implClass = clazz.getName();
-                        if (!"".equals(wsp.portName()))
+                        if (!"".equals(wsp.portName())) {
                             portNameToImpl.put(wsp.portName(), implClass);
+                            implToPort.put(implClass, wsp.portName());
+                        }
                     }
                 }
             }
@@ -244,8 +250,20 @@ public final class WAR {
                         "binding",
                         "/" + service.service.getEndpointByImpl(impl).name);
                 beans.add(bean);
+                implToPort.remove(impl);
             }
 
+            for (Entry<String, String> e : implToPort.entrySet()) {
+                EndpointInfoBean bean = EndpointInfoBean.create(
+                        "endpoint" + (i++),
+                        e.getKey(),
+                        wsdlLocation,
+                        portNameToServiceName.get(e.getValue()),
+                        new QName(tns, e.getValue()),
+                        "binding",
+                        "/" + service.service.getEndpointByImpl(e.getKey()).name);
+                beans.add(bean);
+            }
             // error check
             if (!portNameToImpl.isEmpty())
                 throw new Exception("Implementations " + new ArrayList(portNameToImpl.values()) + " don't have corresponding ports in WSDL." +
@@ -377,54 +395,59 @@ public final class WAR {
      * Generate server artifacts from WSDL.
      */
     final void compileWSDL(WsTool wsimport) throws Exception {
-        assert service.service.wsdl!=null;
-
-        ArgumentListBuilder options = new ArgumentListBuilder();
-        //Add customization files
-        for (File custFile: service.service.customizations) {
-            options.add("-b").add(custFile);
-        }
-        options.add("-extension");
-
-        //Don't add the default package option if -noPackage is specified
-        // this will be helpful in testing default/customization behavior.
-        if (!service.service.parent.testOptions.contains("-noPackage")) {
-
-            // set package name if not specified in wsimport-server options
-            if (!service.service.parent.wsimportServerOptions.contains("-p")) {
-                options.add("-p").add(service.service.getGlobalUniqueName());
-            }
-        }
-        //Other options
-        if(World.debug)
-            options.add("-verbose");
-        options.add("-s").add(srcDir);
-        options.add("-d").add(classDir);
-        options.add("-Xnocompile");
-        options.add(service.service.wsdl.wsdlFile);
-        options.addAll(service.service.parent.wsimportServerOptions);
-        if(!wsimport.isNoop()) {
-            System.out.println("Generating server artifacts from " + service.service.wsdl.wsdlFile);
-            options.invoke(wsimport);
-        }
-
-        // copy WSDL into a war file
-        File wsdlDir = new File(webInfDir,"wsdl");
-        wsdlDir.mkdirs();
-
-        File src = service.service.wsdl.wsdlFile;
+        assert !service.service.wsdl.isEmpty();
         assert this.wsdl.isEmpty();
-        File wsdlFile = new File(wsdlDir, src.getName());
-        this.wsdl.add(wsdlFile);
 
-        FileUtil.copyFile(src,wsdlFile);
-        for (File importedWsdl :service.service.wsdl.importedWsdls){
-            String importedPath = importedWsdl.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length()+1);
-            FileUtil.copyFile(importedWsdl,new File(wsdlDir,importedPath));
-        }
-        for (File schema :service.service.wsdl.schemas){
-            String importedPath = schema.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length()+1);
-            FileUtil.copyFile(schema,new File(wsdlDir,importedPath));
+        for (WSDL dl : service.service.wsdl) {
+            ArgumentListBuilder options = new ArgumentListBuilder();
+            //Add customization files
+            for (File custFile : service.service.customizations) {
+                options.add("-b").add(custFile);
+            }
+            options.add("-extension");
+            //Don't add the default package option if -noPackage is specified
+            // this will be helpful in testing default/customization behavior.
+            if (!service.service.parent.testOptions.contains("-noPackage")) {
+
+                // set package name if not specified in wsimport-server options
+                if (!service.service.parent.wsimportServerOptions.contains("-p")) {
+                    options.add("-p").add(service.service.getGlobalUniqueName());
+                }
+            }
+            //Other options
+            if (World.debug) {
+                options.add("-verbose");
+            }
+            options.add("-s").add(srcDir);
+            options.add("-d").add(classDir);
+            options.add("-Xnocompile");
+            options.add(dl.wsdlFile);
+            options.addAll(service.service.parent.wsimportServerOptions);
+            if (!wsimport.isNoop()) {
+                System.out.println("Generating server artifacts from " + dl.wsdlFile);
+                options.invoke(wsimport);
+            }
+
+            // copy WSDL into a war file
+            File wsdlDir = new File(webInfDir, "wsdl");
+            if (dl.relativeLocation != null) {
+                wsdlDir = new File(wsdlDir, dl.relativeLocation);
+            }
+            wsdlDir.mkdirs();
+
+            File src = dl.wsdlFile;
+            File wsdlFile = new File(wsdlDir, src.getName());
+            this.wsdl.add(wsdlFile);
+
+            FileUtil.copyFile(src, wsdlFile);
+            for (File importedWsdl : dl.importedWsdls) {
+                String importedPath = importedWsdl.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length() + 1);
+                FileUtil.copyFile(importedWsdl, new File(wsdlDir, importedPath));
+            }
+            for (File schema : dl.schemas) {
+                String importedPath = schema.getCanonicalPath().substring(src.getParentFile().getCanonicalPath().length() + 1);
+                FileUtil.copyFile(schema, new File(wsdlDir, importedPath));
+            }
         }
     }
 
@@ -448,7 +471,7 @@ public final class WAR {
      * Generates a WSDL into a war file if this is "fromjava" service.
      */
     final void generateWSDL(WsTool wsgen) throws Exception {
-        assert service.service.wsdl==null;
+        assert service.service.wsdl.isEmpty();
 
         // Use wsgen to generate the artifacts
         File wsdlDir = new File(webInfDir, "wsdl");

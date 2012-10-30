@@ -110,7 +110,7 @@ public class LocalApplicationContainer extends AbstractApplicationContainer {
             endpoint.setValue(newLocation);
 
             Attribute wsdlLoc = sts.attribute("wsdlLocation");
-            wsdlLoc.setValue(deployedService.service.wsdl.wsdlFile.toURI().toString());
+            wsdlLoc.setValue(deployedService.service.wsdl.get(0).wsdlFile.toURI().toString());
 
             XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
             writer.write( document );

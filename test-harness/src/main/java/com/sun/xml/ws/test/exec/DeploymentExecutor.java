@@ -134,7 +134,8 @@ public class DeploymentExecutor extends Executor {
         File gensrcDir = makeWorkDir("client-source");
         File classDir = makeWorkDir("client-classes");
 
-        for (URL wsdl : context.app.getWSDL()) {
+        for (int i = 0; i < context.app.getWSDL().size(); i++) {
+            URL wsdl = context.app.getWSDL().get(i);
             ArgumentListBuilder options = new ArgumentListBuilder();
             // Generate cusomization file & add as wsimport option
 
@@ -149,7 +150,11 @@ public class DeploymentExecutor extends Executor {
 
                 // set package name. use 'client' to avoid collision between server artifacts
                 if (!context.service.parent.wsimportClientOptions.contains("-p")) {
-                    options.add("-p").add(context.parent.descriptor.name + ".client");
+                    if (i > 0) {
+                        options.add("-p").add(context.parent.descriptor.name + ".client" + (i + 1));
+                    } else {
+                        options.add("-p").add(context.parent.descriptor.name + ".client");
+                    }
                 }
             }
             options.add("-extension");
