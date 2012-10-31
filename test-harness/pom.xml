@@ -63,6 +63,8 @@
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
         <metro.version>2.3-SNAPSHOT</metro.version>
         <jaxws-ri.version>2.2.8-SNAPSHOT</jaxws-ri.version>
+        <!-- to pass extra JVM args to harness -->
+        <harness.extra.jvm.arg></harness.extra.jvm.arg>
     </properties>
 
     <dependencies>
@@ -277,7 +279,7 @@
                         <delete dir="target/surefire-reports" />
 
                         <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
-                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed"/>
+                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed ${harness.extra.jvm.arg}"/>
                             <arg line="${image}" />
 
                             <arg value="-report" />
