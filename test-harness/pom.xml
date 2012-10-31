@@ -61,6 +61,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
+        <metro.version>2.3-SNAPSHOT</metro.version>
+        <jaxws-ri.version>2.2.8-SNAPSHOT</jaxws-ri.version>
     </properties>
 
     <dependencies>
@@ -192,49 +194,129 @@
             <version>0.4</version>
         </dependency>
     </dependencies>
-    
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.5.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                </fileset>
+                                <fileset>
+                                    <directory>src/test/testcases</directory>
+                                    <includes>
+                                        <include>**/work/**</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-transport</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/transport</outputDirectory>
+                            <silent>false</silent>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.sun.xml.ws</groupId>
+                                    <artifactId>jaxws-local-transport</artifactId>
+                                    <version>${jaxws-ri.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                    <target>
+                        <delete dir="target/surefire-reports" />
+
+                        <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
+                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed"/>
+                            <arg line="${image}" />
+
+                            <arg value="-report" />
+                            <arg path="target/surefire-reports" />
+
+                            <arg value="-transport" />
+                            <arg path="target/transport/jaxws-local-transport.jar" />
+
+                            <!-- test data -->
+                            <arg value="-r" />
+                            <arg path="src/test/${testcases}" />
+
+                            <arg line="${test.options}"/>
+                        </java>
+                    </target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
     <profiles>
         <profile>
             <id>jaxws-ri</id>
             <activation>
                 <property>
-                    <!-- points to local jaxws-ri dist dir -->
+                    <!-- run tests using jaxws-ri -->
                     <name>jaxws-image</name>
                 </property>
             </activation>
+            <properties>
+                <image>-cp:jaxws-image target/jaxws-ri-image/jaxws-ri</image>
+                <testcases>testcases/jaxws</testcases>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>2.5</version>
-                        <executions>
-                            <execution>
-                                <id>default-clean</id>
-                                <goals>
-                                    <goal>clean</goal>
-                                </goals>
-                                <configuration>
-                                    <filesets>
-                                        <fileset>
-                                            <directory>${project.build.directory}</directory>
-                                        </fileset>
-                                        <fileset>
-                                            <directory>src/test/testcases</directory>
-                                            <includes>
-                                                <include>**/work/**</include>
-                                            </includes>
-                                            <followSymlinks>false</followSymlinks>
-                                        </fileset>
-                                    </filesets>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.5.1</version>
                         <executions>
                             <execution>
                                 <id>copy</id>
@@ -268,23 +350,22 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-transport</id>
+                                <id>unpack-image</id>
                                 <phase>validate</phase>
                                 <goals>
-                                    <goal>copy</goal>
+                                    <goal>unpack</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>target/transport</outputDirectory>
+                                    <outputDirectory>target/jaxws-ri-image</outputDirectory>
                                     <silent>false</silent>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>com.sun.xml.ws</groupId>
-                                            <artifactId>jaxws-local-transport</artifactId>
-                                            <version>2.2.8-SNAPSHOT</version>
-                                            <type>jar</type>
+                                            <artifactId>jaxws-ri</artifactId>
+                                            <version>${jaxws-ri.version}</version>
+                                            <type>zip</type>
                                         </artifactItem>
                                     </artifactItems>
-                                    <stripVersion>true</stripVersion>
                                 </configuration>
                             </execution>
                         </executions>
@@ -292,7 +373,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -300,29 +380,81 @@
                                 </goals>
                                 <phase>test</phase>
                                 <id>run-tests</id>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>metro</id>
+            <activation>
+                <property>
+                    <!-- run tests using metro -->
+                    <name>!jaxws-image</name>
+                </property>
+            </activation>
+            <properties>
+                <image>-cp:wsit-image target/metro-image/metro</image>
+                <testcases>testcases</testcases>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
                                 <configuration>
-                                    <target>
-                                        <delete dir="target/surefire-reports" />
-
-                                        <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
-                                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed"/>
-                                            <arg value="-cp:jaxws-image" />
-                                            <arg path="${jaxws-image}" />
-
-                                            <arg value="-report" />
-                                            <arg path="target/surefire-reports" />
-                                            
-                                            <arg value="-transport" />
-                                            <arg path="target/transport/jaxws-local-transport.jar" />
-                                            
-                                            <!-- test data -->
-                                            <arg value="-r" />
-                                            <arg path="src/test/testcases/jaxws" />
-
-                                            <arg line="${test.options}"/>
-                                        </java>
-                                    </target>
+                                    <outputDirectory>target/endorsed</outputDirectory>
+                                    <silent>false</silent>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.glassfish.metro</groupId>
+                                            <artifactId>webservices-api</artifactId>
+                                            <version>${metro.version}</version>
+                                            <type>jar</type>
+                                        </artifactItem>
+                                    </artifactItems>
                                 </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-image</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/metro-image</outputDirectory>
+                                    <silent>false</silent>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.glassfish.metro</groupId>
+                                            <artifactId>metro-standalone</artifactId>
+                                            <version>${metro.version}</version>
+                                            <type>zip</type>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <id>run-tests</id>
                             </execution>
                         </executions>
                     </plugin>
