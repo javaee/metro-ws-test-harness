@@ -173,9 +173,9 @@
     -->
 
     <!-- ws need some JAX-WS to test, so let's just use the latest JAX-WS RI -->
-    <get src="http://sysifos-sol.cz.oracle.com/hudson/job/jaxws-ri-22x-snapshot/lastSuccessfulBuild/artifact/jaxws-ri/bundles/jaxws-ri/target/jaxws-ri.zip"
-         dest="build/jaxws-ri.zip" />
-    <unzip src="build/jaxws-ri.zip" dest="build" />
+    <get src="http://sysifos-sol.cz.oracle.com/hudson/job/metro-trunk/lastSuccessfulBuild/artifact/wsit/bundles/metro-standalone/target/metro.zip"
+         dest="build/metro.zip" />
+    <unzip src="build/metro.zip" dest="build" />
 
     <get src="http://sysifos-sol.cz.oracle.com/hudson/job/jaxws-ri-22x-snapshot/lastSuccessfulBuild/artifact/jaxws-ri/transports/local/target/jaxws-local-transport.jar"
          dest="build/jaxws-local-transport.jar" />
@@ -183,8 +183,11 @@
     <delete dir="build/test-logs" />
 
     <java jar="build/dist/harness.jar" fork="true">
-      <arg value="-cp:jaxws-image" />
-      <arg path="build/jaxws-ri" />
+      <jvmarg line="-Xbootclasspath/p:build/metro/lib/webservices-api.jar"/>
+      <jvmarg line="-DWSIT_HOME=build/misc" />
+
+      <arg value="-cp:wsit-image" />
+      <arg path="build/metro" />
 
       <arg value="-report" />
       <arg path="build/test-logs" />
