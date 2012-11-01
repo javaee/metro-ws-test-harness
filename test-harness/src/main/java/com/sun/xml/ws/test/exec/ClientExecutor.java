@@ -78,8 +78,8 @@ public class ClientExecutor extends Executor {
 
     public void runTest() throws Throwable {
         if(context.clientClassLoader==null) {
-            context.clientClassLoader = context.descriptor.resources != null
-                    ? new URLClassLoader(new URL[]{context.descriptor.resources.toURL()}, World.runtime.getClassLoader())
+            context.clientClassLoader = context.getResources() != null
+                    ? new URLClassLoader(new URL[]{context.getResources().toURL()}, World.runtime.getClassLoader())
                     : World.runtime.getClassLoader();
         }
 

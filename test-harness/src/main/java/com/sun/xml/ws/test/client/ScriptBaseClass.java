@@ -111,7 +111,7 @@ public class ScriptBaseClass extends Assert {
      * @see TestDescriptor#resources
      */
     public File resource(@NotNull String name) {
-        return new File(context.descriptor.resources,name);
+        return new File(context.getResources(),name);
     }
 
     public Source makeSaxSource(String msg) {

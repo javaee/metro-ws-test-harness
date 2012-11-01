@@ -71,9 +71,9 @@ public class ClientCompileExecutor extends Executor {
             javac.execute();
 
         // load the generated classes and resources
-        URL[] url = (context.descriptor.resources == null)
+        URL[] url = (context.getResources() == null)
                 ? new URL[] {classDir.toURL()}
-                : new URL[] {classDir.toURL(),context.descriptor.resources.toURL()};
+                : new URL[] {classDir.toURL(),context.getResources().toURL()};
         ClassLoader cl = new URLClassLoader( url, World.runtime.getClassLoader() );
 
         context.clientClassLoader = cl;

@@ -144,11 +144,14 @@ public class FileUtil {
     /**
      * Copies a whole directory recursively.
      */
-    public static void copyDir(File src, File dest) {
+    public static void copyDir(File src, File dest, String excludes) {
         Copy cp = new Copy();
         cp.setProject(World.project);
         cp.setTodir(dest);
         FileSet fs = new FileSet();
+        if (excludes != null) {
+            fs.setExcludes(excludes);
+        }
         fs.setDir(src);
         cp.addFileset(fs);
         cp.execute();

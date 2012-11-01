@@ -98,6 +98,8 @@ public class DeploymentContext {
      */
     public final File workDir;
 
+    private File resources = null;
+
     public DeploymentContext(TestDescriptor descriptor, ApplicationContainer container, WsTool wsimport) {
         this.descriptor = descriptor;
         this.container = container;
@@ -126,8 +128,17 @@ public class DeploymentContext {
             FileUtil.deleteRecursive(workDir);
         }
         workDir.mkdirs();
+        if (descriptor.resources != null) {
+            resources = new File(workDir, "resources");
+            FileUtil.copyDir(descriptor.resources, resources, null);
+        }
 
-        for (DeployedService ds : services.values())
+        for (DeployedService ds : services.values()) {
             ds.prepare();
+        }
+    }
+
+    public File getResources() {
+        return resources;
     }
 }

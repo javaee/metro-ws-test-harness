@@ -329,8 +329,15 @@ public final class WAR {
      * Copies resources under the directory in to <tt>WEB-INF/classes</tt>
      */
     public void copyResources(File resourcesDir) {
-        if(resourcesDir != null)
-            FileUtil.copyDir(resourcesDir, classDir);
+        if(resourcesDir != null) {
+            FileUtil.copyDir(resourcesDir, classDir, "**/wsit-client.xml");
+        }
+    }
+
+    public void copyWsit(File wsitConf) {
+        if(wsitConf != null && wsitConf.exists()) {
+            FileUtil.copyFile(wsitConf, new File(classDir, wsitConf.getName()));
+        }
     }
 
     /**

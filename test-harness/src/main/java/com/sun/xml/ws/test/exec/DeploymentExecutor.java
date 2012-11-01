@@ -195,8 +195,9 @@ public class DeploymentExecutor extends Executor {
         classpath.add(classDir.toURL());
         // TODO: only the local container needs server classes in the classloader.
         classpath.add(new File(context.warDir, "WEB-INF/classes").toURL());
-        if(context.service.parent.resources!=null)
-            classpath.add(context.service.parent.resources.toURL());
+        if(context.getResources()!=null) {
+            classpath.add(context.getResources().toURL());
+        }
 
         /**
          * If there is a service like STS it has already been added to context.parent.clientClassLoader

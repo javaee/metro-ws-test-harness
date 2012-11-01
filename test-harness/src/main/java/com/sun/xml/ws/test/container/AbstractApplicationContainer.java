@@ -49,6 +49,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 /**
  * Base implementation of {@link ApplicationContainer}.
@@ -137,7 +142,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
         war.copyToClasses(service.service.getHandlerConfiguration());
 
         //copy resources to amke it available on classpath.
-        war.copyResources(service.service.parent.resources);
+        war.copyResources(service.getResources());
         return war;
     }
 
@@ -148,6 +153,32 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
                 service.parent.wsgenOptions.add("-x");
                 service.parent.wsgenOptions.add(path);
             }
+        }
+    }
+
+    protected void updateWsitClient(WAR war, DeployedService deployedService, String id) throws Exception {
+        File wsitClientFile = new File(deployedService.getResources(), "wsit-client.xml");
+        if (wsitClientFile.exists()) {
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(wsitClientFile);
+            Element root = document.getRootElement();
+            Element policy = root.element("Policy");
+            Element sts = policy.element("ExactlyOne").element("All").element("PreconfiguredSTS");
+
+            Attribute endpoint = sts.attribute("endpoint");
+            endpoint.setValue(id);
+
+            Attribute wsdlLoc = sts.attribute("wsdlLocation");
+            String x = deployedService.service.wsdl.get(0).wsdlFile.toURI().toString();
+            wsdlLoc.setValue(x);
+
+            XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
+            writer.write(document);
+            writer.close();
+//            war.copyWsit(wsitClientFile);
+        } else {
+            throw new RuntimeException("wsit-client.xml is absent. It is required. \n"
+                    + "Please check " + deployedService.getResources());
         }
     }
 

@@ -115,4 +115,8 @@ public final class DeployedService {
     /*package*/ void prepare() {
         warDir.mkdirs();
     }
+
+    public File getResources() {
+        return parent.getResources();
+    }
 }
