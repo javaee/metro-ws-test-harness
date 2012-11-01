@@ -175,7 +175,7 @@ public abstract class AbstractApplicationContainer implements ApplicationContain
             XMLWriter writer = new XMLWriter(new FileWriter(wsitClientFile));
             writer.write(document);
             writer.close();
-//            war.copyWsit(wsitClientFile);
+            war.copyWsit(wsitClientFile);
         } else {
             throw new RuntimeException("wsit-client.xml is absent. It is required. \n"
                     + "Please check " + deployedService.getResources());
