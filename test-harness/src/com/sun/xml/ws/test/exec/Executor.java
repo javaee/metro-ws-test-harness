@@ -103,7 +103,7 @@ abstract class Executor extends TestCase {
                 throw new IllegalArgumentException("Bad system property: " + property);
             String name = parts[0];
             String newValue = parts[1];
-            if (name == null || name.isEmpty() || newValue == null || newValue.isEmpty())
+            if (name == null || name.length() == 0 || newValue == null || newValue.length() == 0)
                 throw new IllegalArgumentException("Bad system property: " + property);
             // ************
 
