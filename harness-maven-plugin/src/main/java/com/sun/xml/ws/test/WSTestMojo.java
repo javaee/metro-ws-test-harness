@@ -59,6 +59,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
@@ -143,6 +145,10 @@ public class WSTestMojo extends AbstractMojo {
      */
     private List<String> args;
     /**
+     * @parameter property="ws.jvmOpts"
+     */
+    private String extraVmArgs;
+    /**
      * @parameter
      */
     private List<String> vmArgs;
@@ -197,6 +203,10 @@ public class WSTestMojo extends AbstractMojo {
      */
     private MavenProject project;
     /**
+     * @parameter default-value="${settings}"
+     * @readonly
+     */
+    private Settings settings;    /**
      * To look up Archiver/UnArchiver implementations
      *
      * @component
@@ -259,6 +269,43 @@ public class WSTestMojo extends AbstractMojo {
 
         if (isToplink()) {
             cmd.createArg().setLine("-DBindingContextFactory=" + TOPLINK_FACTORY);
+        }
+
+        if (extraVmArgs != null && extraVmArgs.trim().length() > 1) {
+            cmd.createArg().setLine(extraVmArgs);
+        }
+
+        if (settings != null) {
+            for (Proxy p : settings.getProxies()) {
+                if (p.isActive()) {
+                    String protocol = p.getProtocol().trim();
+                    if (p.getHost() != null) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("-D");
+                        sb.append(protocol);
+                        sb.append(".proxyHost=");
+                        sb.append(p.getHost());
+                        cmd.createArg().setLine(sb.toString());
+                    }
+                    if (p.getPort() > -1) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("-D");
+                        sb.append(protocol);
+                        sb.append(".proxyPort=");
+                        sb.append(p.getPort());
+                        cmd.createArg().setLine(sb.toString());
+                    }
+                    if (p.getNonProxyHosts() != null) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("-D");
+                        sb.append(protocol);
+                        sb.append(".nonProxyHosts=\"");
+                        sb.append(p.getNonProxyHosts().trim());
+                        sb.append("\"");
+                        cmd.createArg().setValue(sb.toString());
+                    }
+                }
+            }
         }
 
         if (vmArgs != null) {
@@ -344,7 +391,7 @@ public class WSTestMojo extends AbstractMojo {
             filters.add("-cp:jaxws");
             filters.add("-cp:wsit");
         }
-        
+
         if (args != null) {
             for (String arg : args) {
                 if (filters.isEmpty()) {
