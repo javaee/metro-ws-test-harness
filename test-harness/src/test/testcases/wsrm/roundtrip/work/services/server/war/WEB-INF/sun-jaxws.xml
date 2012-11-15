@@ -1,1 +1,0 @@
-<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0"><endpoint name="endpoint0" port="{http://tempuri.org/}WSHttpBinding_IPing" wsdl="WEB-INF/wsdl/EchoService.wsdl" service="{http://tempuri.org/}PingService" url-pattern="/IPingImpl" implementation="wsrm.roundtrip.server.IPingImpl"></endpoint></endpoints>

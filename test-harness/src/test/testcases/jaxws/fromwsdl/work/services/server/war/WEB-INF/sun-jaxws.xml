@@ -1,1 +1,0 @@
-<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0"><endpoint name="endpoint0" port="{http://example.org}AddNumbersPort" wsdl="WEB-INF/wsdl/AddNumbers.wsdl" service="{http://example.org}AddNumbersService" url-pattern="/AddNumbersImpl" implementation="jaxws.fromwsdl.server.AddNumbersImpl"></endpoint></endpoints>

@@ -1,1 +1,0 @@
-<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0"><endpoint name="endpoint0" port="{http://example.org/mtom}HelloPort" wsdl="WEB-INF/wsdl/hello.wsdl" service="{http://example.org/mtom}HelloService" url-pattern="/HelloImpl" implementation="jaxws.mtom.HelloImpl"></endpoint></endpoints>
