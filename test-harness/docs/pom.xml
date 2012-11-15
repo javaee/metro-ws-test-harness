@@ -40,9 +40,7 @@
     holder.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.glassfish.metro</groupId>
@@ -51,29 +49,44 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>harness-bootstrap</artifactId>
+    <artifactId>harness-docs</artifactId>
+    <packaging>pom</packaging>
 
-    <name>WS Test Harness Bootstrap</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
+    <name>WS Test Harness Documentation</name>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.sun.xml.ws.test.Bootstrap</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-docs</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>install</phase>
+                        <configuration>
+                            <target>
+                                <property name="dest.dir" location="target/docs"/>
+                                <taskdef name="htmlmacro" classname="com.sun.wts.tools.htmlmacro.HtmlMacroTask">
+                                    <classpath>
+                                        <fileset dir="lib" includes="*.jar" />
+                                    </classpath>
+                                </taskdef>
+                                <mkdir dir="${dest.dir}" />
+                                <htmlmacro destdir="${dest.dir}">
+                                    <documents dir="src/main/resources" includes="*.html" />
+                                    <!--property key="javaNetProjectName" value="htmlmacro" /-->
+                                </htmlmacro>
+                                <copy todir="${dest.dir}">
+                                    <fileset dir="src/main/resources" includes="*.png" />
+                                    <fileset dir="../core/src/main/resources/com/sun/xml/ws/test" includes="*.rnc" />
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

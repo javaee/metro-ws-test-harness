@@ -10,7 +10,7 @@
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -53,151 +53,155 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glassfish.metro</groupId>
-    <artifactId>harness-lib</artifactId>
+    <artifactId>ws-test-harness</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>WS Test Harness</name>
-
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
-        <metro.version>2.3-SNAPSHOT</metro.version>
-        <jaxws-ri.version>2.2.8-SNAPSHOT</jaxws-ri.version>
-        <test.options></test.options>
-        <!-- to pass extra JVM args to harness -->
-        <harness.extra.jvm.arg></harness.extra.jvm.arg>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.glassfish.metro</groupId>
-            <artifactId>harness-bootstrap</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant-junit</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>args4j</groupId>
-            <artifactId>args4j</artifactId>
-            <version>2.0.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh</artifactId>
-            <version>2.0b5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-core-uberjar</artifactId>
-            <version>1.2.4</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>msv</artifactId>
-                    <groupId>msv</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>relaxngDatatype</artifactId>
-                    <groupId>relaxngDatatype</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>isorelax</artifactId>
-                    <groupId>isorelax</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-classworlds</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hudson</groupId>
-            <artifactId>commons-jelly</artifactId>
-            <version>1.1-hudson-20100305</version>
-        </dependency>
-        <dependency>
-            <groupId>emma</groupId>
-            <artifactId>emma</artifactId>
-            <version>2.0.5312</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.istack</groupId>
-            <artifactId>istack-commons-runtime</artifactId>
-            <version>2.13</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.istack</groupId>
-            <artifactId>istack-commons-test</artifactId>
-            <version>2.13</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ant</groupId>
-                    <artifactId>ant-junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.4</version>
-        </dependency>
-        <dependency>
-            <!-- this should be in jdk6
-            but be aware of class conflict issue on Mac -->
-            <groupId>thaiopensource</groupId>
-            <artifactId>jing</artifactId>
-            <!-- should be 20081028-->
-            <version>20030619</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>parallel-junit</artifactId>
-            <version>1.1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>junit</artifactId>
-                    <groupId>junit</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- to get isorelax -->
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb1-impl</artifactId>
-            <version>2.2.5-2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.4</version>
-        </dependency>
-    </dependencies>
-
+    <modules>
+        <module>bootstrap</module>
+        <module>core</module>
+        <module>docs</module>
+    </modules>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish.metro</groupId>
+                <artifactId>harness-bootstrap</artifactId>
+                <version>0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant-junit</artifactId>
+                <version>1.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>args4j</groupId>
+                <artifactId>args4j</artifactId>
+                <version>2.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.beanshell</groupId>
+                <artifactId>bsh</artifactId>
+                <version>2.0b5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-core-uberjar</artifactId>
+                <version>1.2.4</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>jaxb-api</artifactId>
+                        <groupId>javax.xml.bind</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jaxb-impl</artifactId>
+                        <groupId>com.sun.xml.bind</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>msv</artifactId>
+                        <groupId>msv</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>relaxngDatatype</artifactId>
+                        <groupId>relaxngDatatype</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>isorelax</artifactId>
+                        <groupId>isorelax</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-classworlds</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jvnet.hudson</groupId>
+                <artifactId>commons-jelly</artifactId>
+                <version>1.1-hudson-20100305</version>
+            </dependency>
+            <dependency>
+                <groupId>emma</groupId>
+                <artifactId>emma</artifactId>
+                <version>2.0.5312</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.istack</groupId>
+                <artifactId>istack-commons-runtime</artifactId>
+                <version>2.13</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.istack</groupId>
+                <artifactId>istack-commons-test</artifactId>
+                <version>2.13</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-junit</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>1.1.4</version>
+            </dependency>
+            <dependency>
+                <!-- this should be in jdk6
+                but be aware of class conflict issue on Mac -->
+                <groupId>thaiopensource</groupId>
+                <artifactId>jing</artifactId>
+                <!-- should be 20081028-->
+                <version>20030619</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.kohsuke</groupId>
+                <artifactId>parallel-junit</artifactId>
+                <version>1.1</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>junit</artifactId>
+                        <groupId>junit</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <!-- to get isorelax -->
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb1-impl</artifactId>
+                <version>2.2.5-2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-discovery</groupId>
+                <artifactId>commons-discovery</artifactId>
+                <version>0.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <build>
         <pluginManagement>
             <plugins>
@@ -216,254 +220,12 @@
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.7</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
             </plugins>
         </pluginManagement>
-        
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-clean</id>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>${project.build.directory}</directory>
-                                </fileset>
-                                <fileset>
-                                    <directory>src/test/testcases</directory>
-                                    <includes>
-                                        <include>**/work/**</include>
-                                    </includes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-transport</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/transport</outputDirectory>
-                            <silent>false</silent>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.sun.xml.ws</groupId>
-                                    <artifactId>jaxws-local-transport</artifactId>
-                                    <version>${jaxws-ri.version}</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                            </artifactItems>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <configuration>
-                    <target>
-                        <delete dir="target/surefire-reports" />
-
-                        <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
-                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed ${harness.extra.jvm.arg}"/>
-                            <arg line="${image}" />
-
-                            <arg line="${test.options}"/>
-
-                            <arg value="-report" />
-                            <arg path="target/surefire-reports" />
-
-                            <arg value="-transport" />
-                            <arg path="target/transport/jaxws-local-transport.jar" />
-
-                            <!-- test data -->
-                            <arg value="-r" />
-                            <arg path="src/test/${testcases}" />
-
-                        </java>
-                    </target>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jaxws-ri</id>
-            <activation>
-                <property>
-                    <!-- run tests using jaxws-ri -->
-                    <name>jaxws-image</name>
-                </property>
-            </activation>
-            <properties>
-                <image>-cp:jaxws-image target/jaxws-ri-image/jaxws-ri</image>
-                <testcases>testcases/jaxws</testcases>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/endorsed</outputDirectory>
-                                    <silent>false</silent>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.xml.bind</groupId>
-                                            <artifactId>jaxb-api</artifactId>
-                                            <version>2.2.7</version>
-                                            <type>jar</type>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>javax.xml.soap</groupId>
-                                            <artifactId>saaj-api</artifactId>
-                                            <version>1.3.4</version>
-                                            <type>jar</type>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>javax.xml.ws</groupId>
-                                            <artifactId>jaxws-api</artifactId>
-                                            <version>2.2.8</version>
-                                            <type>jar</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>unpack-image</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/jaxws-ri-image</outputDirectory>
-                                    <silent>false</silent>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>com.sun.xml.ws</groupId>
-                                            <artifactId>jaxws-ri</artifactId>
-                                            <version>${jaxws-ri.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <id>run-tests</id>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        
-        <profile>
-            <id>metro</id>
-            <activation>
-                <property>
-                    <!-- run tests using metro -->
-                    <name>!jaxws-image</name>
-                </property>
-            </activation>
-            <properties>
-                <image>-cp:wsit-image target/metro-image/metro</image>
-                <testcases>testcases</testcases>
-                <harness.extra.jvm.arg>-DWSIT_HOME=${project.basedir}/src/test/certs</harness.extra.jvm.arg>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/endorsed</outputDirectory>
-                                    <silent>false</silent>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.glassfish.metro</groupId>
-                                            <artifactId>webservices-api</artifactId>
-                                            <version>${metro.version}</version>
-                                            <type>jar</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>unpack-image</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/metro-image</outputDirectory>
-                                    <silent>false</silent>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.glassfish.metro</groupId>
-                                            <artifactId>metro-standalone</artifactId>
-                                            <version>${metro.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <id>run-tests</id>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>    
 </project>
