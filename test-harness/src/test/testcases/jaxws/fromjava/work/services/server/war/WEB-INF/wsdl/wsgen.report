@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<report>
+  <wsdl>/space/sources/ws-test-harness/trunk/test-harness/src/test/testcases/jaxws/fromjava/work/services/server/war/WEB-INF/wsdl/AddNumbersImplService.wsdl</wsdl>
+  <service uri="http://server.fromjava/" localName="AddNumbersImplService"/>
+  <port uri="http://server.fromjava/" localName="AddNumbersPort"/>
+  <portType uri="http://server.fromjava/" localName="AddNumbers"/>
+  <implClass>fromjava.server.AddNumbersImpl</implClass>
+  <schema ns="http://server.fromjava/" location="/space/sources/ws-test-harness/trunk/test-harness/src/test/testcases/jaxws/fromjava/work/services/server/war/WEB-INF/wsdl/AddNumbersImplService_schema1.xsd"/>
+</report>
+

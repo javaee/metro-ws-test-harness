@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://server.fromjava/" xmlns:tns="http://server.fromjava/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AddNumbersException" type="tns:AddNumbersException"/>
+
+  <xs:element name="addNumbers" type="tns:addNumbers"/>
+
+  <xs:element name="addNumbersResponse" type="tns:addNumbersResponse"/>
+
+  <xs:complexType name="addNumbers">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:int"/>
+      <xs:element name="arg1" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addNumbersResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AddNumbersException">
+    <xs:sequence>
+      <xs:element name="detail" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

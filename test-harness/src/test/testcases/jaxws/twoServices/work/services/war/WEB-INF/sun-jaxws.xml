@@ -1,0 +1,1 @@
+<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0"><endpoint name="Bar" url-pattern="/Bar" implementation="jaxws.twoServices.Bar"></endpoint><endpoint name="Foo" url-pattern="/Foo" implementation="jaxws.twoServices.Foo"></endpoint></endpoints>
