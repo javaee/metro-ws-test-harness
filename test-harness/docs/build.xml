@@ -26,18 +26,18 @@
         <fileset dir="lib" includes="*.jar" />
       </classpath>
     </taskdef>
-    <mkdir dir="build" />
-    <htmlmacro destdir="build">
+    <mkdir dir="target" />
+    <htmlmacro destdir="target">
       <documents dir="src" includes="*.html" />
       <!--property key="javaNetProjectName" value="htmlmacro" /-->
     </htmlmacro>
-    <copy todir="build">
+    <copy todir="target">
       <fileset dir="src" includes="*.png" />
-      <fileset dir="../src/com/sun/xml/ws/test" includes="*.rnc" />
+      <fileset dir="../src/main/resources/com/sun/xml/ws/test" includes="*.rnc" />
     </copy>
   </target>
 
   <target name="clean">
-    <delete dir="build" />
+    <delete dir="target" />
   </target>
 </project>
