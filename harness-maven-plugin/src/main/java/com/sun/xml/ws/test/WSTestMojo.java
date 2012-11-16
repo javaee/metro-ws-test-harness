@@ -58,6 +58,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
@@ -73,10 +77,9 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
- * @goal ws-test
- * @phase test
  * @author lukas
  */
+@Mojo(name = "ws-test", defaultPhase = LifecyclePhase.TEST, requiresProject = false)
 public class WSTestMojo extends AbstractMojo {
 
     private static final String HARNESS_GID = "org.glassfish.metro";
@@ -84,137 +87,167 @@ public class WSTestMojo extends AbstractMojo {
     private static final String TOPLINK_FACTORY = "com.sun.xml.ws.db.toplink.JAXBContextFactory";
 
     public enum Databinding {
-
         DEFAULT, TOPLINK;
     }
 
     public enum Container {
-
         IN_VM, LWHS, TOMCAT;
     }
+
     /**
-     * @parameter default-value="0.1-SNAPSHOT"
+     * Version of Test Harness library to use for running tests.
      */
+    @Parameter(defaultValue = "0.1-SNAPSHOT")
     private String harnessVersion;
+
     /**
      * Specify the target JAX-WS version being tested. This determines test
      * exclusions.
-     *
-     * @parameter default-value="2.2.8"
      */
+    @Parameter(defaultValue = "2.2.8")
     private String version;
+
     /**
      * Target folder for JUnit test report XMLs.
-     *
-     * @parameter default-value="${project.build.directory}/surefire-reports"
      */
+    @Parameter(defaultValue = "${project.build.directory}/surefire-reports")
     private File resultsDirectory;
+
     /**
-     * @parameter
+     * Endorsed directory for forked VM.
      */
+    @Parameter
     private File endorsedDir;
+
     /**
      * Find test directories recursively.
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean recursive;
+
     /**
      * Enable all transport dumps.
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private boolean dump;
+
     /**
      * Generate output for debugging harness.
-     *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private boolean debug;
+
     /**
-     * @parameter default-value="${project.basedir}/src/test/testcases"
-     * @required
+     * Folder containing test(s).
      */
+    @Parameter(property = "ws.test", defaultValue = "${project.basedir}/src/test/testcases")
     private File tests;
+
     /**
-     * @parameter default-value="DEFAULT"
+     * Supported values:
+     * <ul>
+     * <li><code>DEFAULT</code>
+     * <li><code>TOPLINK</code>
+     * </ul>
      */
+    @Parameter(defaultValue = "DEFAULT")
     private Databinding databinding;
+
     /**
      * @parameter
      */
+    @Parameter
     private List<String> args;
+
     /**
-     * @parameter property="ws.jvmOpts"
+     * 
      */
+    @Parameter(property = "ws.jvmOpts")
     private String extraVmArgs;
     /**
-     * @parameter
+     * 
      */
+    @Parameter
     private List<String> vmArgs;
     /**
-     * @parameter default-value="${project.basedir}/lib/ext"
+     * 
      */
+    @Parameter(defaultValue = "${project.basedir}/lib/ext")
     private File extDir;
     /**
-     * @parameter property="ws.imageUrl"
+     * 
      */
+    @Parameter(property = "ws.imageUrl")
     private String imageUrl;
     /**
-     * @parameter property="ws.localImage"
-     * default-value="${project.build.directory}/image"
+     *
      */
+    @Parameter(property = "ws.localImage", defaultValue = "${project.build.directory}/image")
     private File localImage;
     /**
-     * @parameter property="ws.transport" default-value="IN_VM"
+     * Supported values:
+     * <ul>
+     * <li><code>IN_VM</code>
+     * <li><code>LWHS</code>
+     * <li><code>TOMCAT</code>
+     * </ul>
      */
+    @Parameter(property = "ws.transport", defaultValue = "IN_VM")
     private Container transport;
     /**
-     * @parameter property="ws.transportUrl"
+     * 
      */
+    @Parameter(property = "ws.transportUrl")
     private String transportUrl;
     /**
-     * @parameter property="tomcat.home"
+     * 
      */
+    @Parameter(property = "tomcat.home")
     private File tomcatHome;
     /**
-     * @parameter default-value="${project.basedir}/misc"
+     * 
      */
+    @Parameter(defaultValue = "${project.basedir}/misc")
     private File wsitConf;
     /**
-     * @component
+     * 
      */
-    private ArtifactFactory artifactFactory;
-    /**
-     * @component
-     */
-    private ArtifactResolver resolver;
-    /**
-     * @parameter default-value="${localRepository}"
-     */
+    @Parameter(readonly = true, defaultValue = "${localRepository}")
     private ArtifactRepository localRepo;
     /**
-     * @parameter default-value="${project.remoteArtifactRepositories}"
+     * 
      */
-    private List remoteRepos;
+    @Parameter(readonly = true, defaultValue = "${project.remoteArtifactRepositories}")
+    private List<ArtifactRepository> remoteRepos;
     /**
-     * @parameter property="project"
-     * @readonly
+     *
      */
+    @Component
+    private ArtifactFactory artifactFactory;
+    /**
+     *
+     */
+    @Component
+    private ArtifactResolver resolver;
+    /**
+     *
+     */
+    @Component
     private MavenProject project;
     /**
-     * @parameter default-value="${settings}"
-     * @readonly
-     */
-    private Settings settings;    /**
-     * To look up Archiver/UnArchiver implementations
      *
-     * @component
      */
-    protected ArchiverManager archiverManager;
+    @Component
+    private Settings settings;
     /**
-     * @component
+     * To look up Archiver/UnArchiver implementations
      */
+    @Component
+    private ArchiverManager archiverManager;
+    /**
+     * 
+     */
+    @Component
     private ArtifactMetadataSource mdataSource;
     private File imageRoot = null;
 
@@ -414,9 +447,11 @@ public class WSTestMojo extends AbstractMojo {
 
         cmd.createArg().setLine(tests.getAbsolutePath());
 
+        if (debug) {
+            getLog().info(cmd.toString());
+        }
+
         StreamConsumer sc = new DefaultConsumer();
-        //TODO: move to debug level
-        getLog().info(cmd.toString());
         try {
             CommandLineUtils.executeCommandLine(cmd, sc, sc);
         } catch (CommandLineException ex) {
