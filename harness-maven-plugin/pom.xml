@@ -56,7 +56,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
-    <name>WS-Test-Harness Maven Plugin</name>
+    <name>WS Test Harness Maven Plugin</name>
     <url>http://ws-test-harness.java.net/</url>
 
     <properties>
@@ -98,9 +98,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.2</version>
                 <configuration>
-                    <goalPrefix>harness-maven-plugin</goalPrefix>
+                    <goalPrefix>harness</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -111,6 +111,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.2</version>
+            </plugin>
         </plugins>
     </build>
+    
+    <reporting>
+        <excludeDefaults>true</excludeDefaults>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.2</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
