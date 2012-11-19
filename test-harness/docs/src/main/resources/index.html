@@ -40,7 +40,7 @@
   <d:taglib uri="layout">
     <!-- command example -->
     <d:tag name="harness-cmd">
-      <pre class="cmd">$$ java${jvmargs} -jar path/to/harness.jar <d:invokeBody /></pre>
+      <pre class="cmd">$$ mvn -U org.glassfish.metro:harness-maven-plugin:ws-test${jvmargs}<d:invokeBody /></pre>
     </d:tag>
     <!-- script example -->
     <d:tag name="script">
@@ -151,7 +151,7 @@
         the harness will look into various <tt>build/classes</tt> and library
         jars.
       </p>
-      <l:harness-cmd>-cp:jaxws path/to/jaxws-ri-workspace test-dir1 test-dir2 ...</l:harness-cmd>
+      <l:harness-cmd> -Dargs=-cp:jaxws,path/to/jaxws-ri-workspace,test-dir1,test-dir2,...</l:harness-cmd>
     </l:section>
     <l:section title="JAX-WS RI Binary Image">
       <p>
@@ -161,7 +161,7 @@
         the <TT>lib</TT> directory of the top-level dist image directory that
         you specify.
       </p>
-      <l:harness-cmd>-cp:jaxws-image path/to/jaxws-ri-image test-dir1 test-dir2 ...</l:harness-cmd>
+      <l:harness-cmd> -Dargs=-cp:jaxws-image,path/to/jaxws-ri-image,test-dir1,test-dir2,...</l:harness-cmd>
     </l:section>
     <l:section title="WSIT Workspace">
       <p>
@@ -170,7 +170,7 @@
         the harness will look into various <tt>build/classes</tt> and library
         jars.
       </p>
-      <l:harness-cmd><span style="color:red; font-weight:bold">-cp:wsit path/to/wsit-workspace</span> test-dir1 test-dir2 ...</l:harness-cmd>
+      <l:harness-cmd> -Dargs=<span style="color:red; font-weight:bold">-cp:wsit,path/to/wsit-workspace</span>,test-dir1,test-dir2,...</l:harness-cmd>
     </l:section>
     <l:section title="WSIT Binary Image">
       <p>
@@ -180,7 +180,7 @@
         webservices-tools.jar) found under the <TT>lib</TT> directory of the
         dist image directory that you specify.
       </p>
-      <l:harness-cmd>-cp:wsit-image path/to/wsit-image test-dir1 test-dir2 ...</l:harness-cmd>
+      <l:harness-cmd> -Dargs=-cp:wsit-image,path/to/wsit-image,test-dir1,test-dir2,...</l:harness-cmd>
     </l:section>
     <l:section title="Overriding jars">
       <p>
@@ -194,17 +194,17 @@
     <p>
       Each test is packaged in a directory. The following command runs a single test stored in <tt>testdata/abc/def</tt>:
     </p>
-    <l:harness-cmd>testdata/abc/def</l:harness-cmd>
+    <l:harness-cmd> -Dargs=testdata/abc/def</l:harness-cmd>
     <p>
       If you specify multiple directories, all the tests in the specified directories are run.
     </p>
-    <l:harness-cmd>testdata/abc/*</l:harness-cmd>
+    <l:harness-cmd> -Dargs=testdata/abc/*</l:harness-cmd>
     <p>
       The <tt>-r</tt> option tells the harness to recursively search for all tests inside the given directory:
     </p>
-    <l:harness-cmd>-r testdata/addressing</l:harness-cmd>
+    <l:harness-cmd> -Dargs=-r,testdata/addressing</l:harness-cmd>
     <l:tip>
-      Consider defining an alias to <tt>java -jar path/to/harness.jar</tt> or a wrapper shell script so that you don't have to type the path name manually.
+      Consider defining an alias to <tt>mvn -U org.glassfish.metro:harness-maven-plugin:ws-test</tt> or a wrapper shell script so that you don't have to type the path name manually.
     </l:tip>
   </l:section>
   
@@ -212,9 +212,9 @@
     <p>
       The following command executes a test with debugger support enabled. Run this command from a console, then set up a remote debugging with your IDE to port 8000. This allows you to set breakpoints anywhere both on the client and the server.
     </p>
-    <l:harness-cmd jvmargs=" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000">testdata/abc/def</l:harness-cmd>
+    <l:harness-cmd jvmargs=" -Dws.jvmOpts='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000'"> -Dargs=testdata/abc/def</l:harness-cmd>
     <l:tip>
-      You'll use this command very often, so consider defining an alias to <tt>java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000 -jar path/to/harness.jar</tt>
+      You'll use this command very often, so consider defining an alias to <tt>mvn -U org.glassfish.metro:harness-maven-plugin:ws-test -Dws.jvmOpts="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000"</tt>
     </l:tip>
     <p>
       If your test data resides in the Tango workspace or the JAX-WS workspace, the harness recognizes their directory layouts and pick up classes from respective <tt>build/class</tt> directories and libraries. So if you make a change to the source code, all you need to do is to compile them to class files.
@@ -225,7 +225,7 @@
     <p>
       If your change to the code is to the runtime and does not affect the code generation, then use the <tt>-skip</tt> option to skip the code generation. This allows you to quickly rerun the runtime portion of the tests without wasting time running all the tools just to produce the same results.
     </p>
-    <l:harness-cmd>-skip testdata/abc/def</l:harness-cmd>
+    <l:harness-cmd> -Dargs=-skip,testdata/abc/def</l:harness-cmd>
     
     <l:section title="Looking Inside Working Directory">
       <p>
@@ -255,7 +255,7 @@ work/                    (root test directory)
       <p>
         Some delivery vehicles (notably the distribution images) do not have the code needed to use the in-vm transport. To test those, find the matching <tt>jaxws-local-transport.jar</tt> and use the <tt>-transport</tt> option to specify it.
       </p>
-      <l:harness-cmd>-cp:wsit-image path/to/wsit -transport path/to/jaxws-local-transport.jar ...</l:harness-cmd>
+      <l:harness-cmd> -Dargs=-cp:wsit-image,path/to/wsit,-transport,path/to/jaxws-local-transport.jar,...</l:harness-cmd>
     </l:section>
     <l:section title="Tomcat">
       <p>
@@ -265,7 +265,7 @@ work/                    (root test directory)
         <p>
           The following command causes the harness to run Tomcat within the same VM. This mode is bit like the local transport, in the sense that both the server and the client runs inside the same VM, but this mode run tests by using HTTP and full servlet container.
         </p>
-        <l:harness-cmd>-tomcat-embedded path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-tomcat-embedded,path/to/tomcat,test-dir1,test-dir2,...</l:harness-cmd>
         <p>
           <tt>path/to/tomcat</tt> should point to the directory where you have Tomcat installed. The harness will load Tomcat jar files from there.
         <p>
@@ -276,7 +276,7 @@ work/                    (root test directory)
         <p>
           The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
         </p>
-        <l:harness-cmd>-tomcat-remote admin:admin@localhost:8080 test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-tomcat-remote,admin:admin@localhost:8080,test-dir1,test-dir2,...</l:harness-cmd>
         <p>
           It is your responsibility to launch Tomcat. In this mode, the harness will only deploy and undeploy services from this running instance.
           The tomcat used for this purpose should <b>NOT</b> have JAX-WS/Tango binaries installed in <tt>common/lib</tt> or anywhere else. The harness will include everything necessary into a war file, and this is the only way to make sure that you are testing the bits that you are supposed to be testing.
@@ -303,7 +303,7 @@ work/                    (root test directory)
         <p>
           Run the following command to use Tomcat in the local mode. In this mode, the haress launches Tomcat as a child process, run tests, and terminates Tomcat when everything is done.
         </p>
-        <l:harness-cmd>-tomcat-local path/to/tomcat test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-tomcat-local,path/to/tomcat,test-dir1,test-dir2,...</l:harness-cmd>
         <p>
           See the tips for the remote tomcat support for how to configure Tomcat to report logs to one place.
         </p>
@@ -320,7 +320,7 @@ work/                    (root test directory)
         <p>
           The following command causes the harness to run Jetty within the same VM. See the embedded tomcat description for more about what it means to embed a container.
         </p>
-        <l:harness-cmd>-jetty-embedded path/to/jetty-6.1.0 test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-jetty-embedded,path/to/jetty-6.1.0,test-dir1,test-dir2,...</l:harness-cmd>
       </l:section>
     </l:section>
     <l:section title="Glassfish">
@@ -331,7 +331,7 @@ work/                    (root test directory)
         <p>
           To test with existing instance of Glassfish, use the following option. This mode assumes that you have already started a domain, and the harness will simply deploy/undeploy applications to this running service:
         </p>
-        <l:harness-cmd>-glassfish-remote localhost test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-glassfish-remote,localhost,test-dir1,test-dir2,...</l:harness-cmd>
         <p>
           The "-glassfish-remote" takes the connection string as the parameter. The full syntax of the paramter is <tt>[USER:PASS@]HOST[:PORT][-HTTPURL]</tt>. The first four parts up to '-' specifies the Glassfish admin port. USER and PASS is used for the administrator login, and PORT is the admin TCP port. The last HTTPURL specifies the URL with which client test programs talk to the service. All components but HOST are defaulted, so if your glassfish installation is out of the box, then all you need to specify is the host name where Glassfish runs.
         </p>
@@ -343,7 +343,7 @@ work/                    (root test directory)
         <p>
           The test harness is capable of starting and stopping Glassfish on its own before/after running tests. This mode assumes that you have Glassfish installed locally. Use the following command line option to run in this mode:
         </p>
-        <l:harness-cmd>-glassfish-local path/to/glassfish test-dir1 test-dir2 ...</l:harness-cmd>
+        <l:harness-cmd> -Dargs=-glassfish-local,path/to/glassfish,test-dir1,test-dir2,...</l:harness-cmd>
         <p>
           The harness will create a domain configuration in a temporary directory and run tests from there, so this running mode will not touch the files in <tt>path/to/glassfish</tt> --- it is simply used to load jar files. All the TCP ports are chosen randomly from 20000-50000 ranges, to avoid collisions with other tests that happen to be running on the same machine. See the console output for the HTTP port and admin port, in case you need to manually access them for debugging. The admin user name and password will be set to "admin" and "adminadmin" respectively.
         </p><p>
