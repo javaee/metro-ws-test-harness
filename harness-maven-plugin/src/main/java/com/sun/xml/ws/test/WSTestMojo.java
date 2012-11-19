@@ -77,6 +77,8 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
+ * Executes tests written for WS Test Harness.
+ *
  * @author lukas
  */
 @Mojo(name = "ws-test", defaultPhase = LifecyclePhase.TEST, requiresProject = false)
@@ -109,6 +111,9 @@ public class WSTestMojo extends AbstractMojo {
 
     /**
      * Target folder for JUnit test report XMLs.
+     *
+     * Note: If used from command line (without pom.xml), default is set
+     * to <code>results</code> unless <code>-report</code> option is used.
      */
     @Parameter(defaultValue = "${project.build.directory}/surefire-reports")
     private File resultsDirectory;
@@ -134,7 +139,7 @@ public class WSTestMojo extends AbstractMojo {
     /**
      * Generate output for debugging harness.
      */
-    @Parameter(defaultValue = "false")
+    @Parameter(property = "ws.debug", defaultValue = "false")
     private boolean debug;
 
     /**
@@ -144,6 +149,8 @@ public class WSTestMojo extends AbstractMojo {
     private File tests;
 
     /**
+     * Define databinding mode to be used by tests.
+     *
      * Supported values:
      * <ul>
      * <li><code>DEFAULT</code>
@@ -154,37 +161,51 @@ public class WSTestMojo extends AbstractMojo {
     private Databinding databinding;
 
     /**
+     * Used when running without pom.xml on the command line.
+     * Comma (',') is used as a separator.
+     *
      * @parameter
      */
-    @Parameter
+    @Parameter(property = "args")
     private List<String> args;
 
     /**
-     * 
+     * Extra JVM options passed to JVM forked by the harness.
+     * Use this to pass debugging options to the harness from the command line.
      */
     @Parameter(property = "ws.jvmOpts")
     private String extraVmArgs;
+
     /**
-     * 
+     * Extra JVM options passed to JVM forked by the harness.
+     * Use this to pass options to the harness using plugin configuration in pom.xml.
      */
-    @Parameter
+    @Parameter(property = "vmArgs")
     private List<String> vmArgs;
+
     /**
-     * 
+     * Directory containing harness extensions.
      */
     @Parameter(defaultValue = "${project.basedir}/lib/ext")
     private File extDir;
+
     /**
-     * 
+     * URL from where to get a binary artifact to be tested.
+     * This supersedes <code>localImage</code> setting if set.
      */
     @Parameter(property = "ws.imageUrl")
     private String imageUrl;
+
     /**
-     *
+     * Path to local binary image to test.
+     * This supersedes workspace lookup process if set.
      */
     @Parameter(property = "ws.localImage", defaultValue = "${project.build.directory}/image")
     private File localImage;
+
     /**
+     * Define container mode to be used by tests.
+     *
      * Supported values:
      * <ul>
      * <li><code>IN_VM</code>
@@ -194,61 +215,49 @@ public class WSTestMojo extends AbstractMojo {
      */
     @Parameter(property = "ws.transport", defaultValue = "IN_VM")
     private Container transport;
+
     /**
-     * 
+     * URL from where to get a transport for <code>IN_VM</code> mode tests.
      */
     @Parameter(property = "ws.transportUrl")
     private String transportUrl;
+
     /**
-     * 
+     * Tomcat home, used only if <code>transport=TOMCAT</code> is set.
      */
     @Parameter(property = "tomcat.home")
     private File tomcatHome;
+
     /**
-     * 
+     * Misc files required by tests. For example JKSs for WSIT tests.
      */
     @Parameter(defaultValue = "${project.basedir}/misc")
     private File wsitConf;
-    /**
-     * 
-     */
+
     @Parameter(readonly = true, defaultValue = "${localRepository}")
     private ArtifactRepository localRepo;
-    /**
-     * 
-     */
+
     @Parameter(readonly = true, defaultValue = "${project.remoteArtifactRepositories}")
     private List<ArtifactRepository> remoteRepos;
-    /**
-     *
-     */
+
     @Component
     private ArtifactFactory artifactFactory;
-    /**
-     *
-     */
+
     @Component
     private ArtifactResolver resolver;
-    /**
-     *
-     */
+
     @Component
     private MavenProject project;
-    /**
-     *
-     */
+
     @Component
     private Settings settings;
-    /**
-     * To look up Archiver/UnArchiver implementations
-     */
+
     @Component
     private ArchiverManager archiverManager;
-    /**
-     * 
-     */
+
     @Component
     private ArtifactMetadataSource mdataSource;
+
     private File imageRoot = null;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -367,7 +376,11 @@ public class WSTestMojo extends AbstractMojo {
 
         cmd.createArg().setLine("-cp " + getHarnessClassPath());
         cmd.createArg().setValue("com.sun.xml.ws.test.Main");
-        cmd.createArg().setLine("-report " + resultsDirectory.getAbsolutePath());
+        if (project.getFile() != null) {
+            cmd.createArg().setLine("-report " + resultsDirectory.getAbsolutePath());
+        } else if (args != null && !args.contains("-report")) {
+            cmd.createArg().setLine("-report results");
+        }
 
         if (recursive) {
             cmd.createArg().setValue("-r");
