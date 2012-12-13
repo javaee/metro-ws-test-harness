@@ -98,8 +98,8 @@
             <artifactId>commons-jelly</artifactId>
         </dependency>
         <dependency>
-            <groupId>emma</groupId>
-            <artifactId>emma</artifactId>
+            <groupId>net.sourceforge.cobertura</groupId>
+            <artifactId>cobertura</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun.istack</groupId>
@@ -135,6 +135,11 @@
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
+        </dependency>
+        <!-- obsolete -->
+        <dependency>
+            <groupId>emma</groupId>
+            <artifactId>emma</artifactId>
         </dependency>
     </dependencies>
 
