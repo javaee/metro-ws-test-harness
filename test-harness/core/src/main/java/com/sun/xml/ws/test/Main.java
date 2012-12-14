@@ -436,18 +436,23 @@ public class Main {
 
             if (new File(jaxwsWs, "pom.xml").exists()) {
                 //maven build
-                runtime.addClassFolder(new File(jaxwsWs, "rt/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "rt-ha/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "servlet/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/target/classes"));
-                runtime.addClassFolder(new File(jaxwsWs, "httpspi-servlet/target/classes"));
+                //is the build instrumented by cobertura?
+                String classesFolder = new File(jaxwsWs, "target/generated-classes/cobertura").exists()
+                        ? "target/classes"
+                        : "target/generated-classes/cobertura";
 
-                runtime.addClassFolder(new File(jaxwsWs, "transports/local/target/classes"));
+                runtime.addClassFolder(new File(jaxwsWs, "rt/" + classesFolder));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-ha/" + classesFolder));
+                runtime.addClassFolder(new File(jaxwsWs, "servlet/" + classesFolder));
+                runtime.addClassFolder(new File(jaxwsWs, "rt-fi/" + classesFolder));
+                runtime.addClassFolder(new File(jaxwsWs, "httpspi-servlet/" + classesFolder));
+
+                runtime.addClassFolder(new File(jaxwsWs, "transports/local/" + classesFolder));
 
                 // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
                 runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src/main/resources"));
 
-                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/target/classes"));
+                tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/" + classesFolder));
 
                 //now find libraries
                 File libDir = System.getProperty("libraries.dir") != null
@@ -474,6 +479,7 @@ public class Main {
                     }
                 }
             } else if (new File(jaxwsWs, "rt/build/classes").exists()) {
+                System.out.println("WARNING: Ant based workspace...");
                 runtime.addClassFolder(new File(jaxwsWs, "rt/build/classes"));
                 File file = new File(jaxwsWs, "rt-ha/build/classes");
                 if (file.exists()) {            // rt-ha module may not be there
