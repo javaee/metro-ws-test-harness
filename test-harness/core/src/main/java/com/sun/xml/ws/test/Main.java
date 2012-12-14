@@ -438,8 +438,8 @@ public class Main {
                 //maven build
                 //is the build instrumented by cobertura?
                 String classesFolder = new File(jaxwsWs, "target/generated-classes/cobertura").exists()
-                        ? "target/classes"
-                        : "target/generated-classes/cobertura";
+                        ? "target/generated-classes/cobertura"
+                        : "target/classes";
 
                 runtime.addClassFolder(new File(jaxwsWs, "rt/" + classesFolder));
                 runtime.addClassFolder(new File(jaxwsWs, "rt-ha/" + classesFolder));
