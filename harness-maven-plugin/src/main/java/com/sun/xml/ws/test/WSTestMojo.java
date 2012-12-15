@@ -305,6 +305,10 @@ public class WSTestMojo extends AbstractMojo {
             getLog().info("'ext' directory not found");
         }
 
+        if (System.getProperty("net.sourceforge.cobertura.datafile") != null) {
+            cmd.createArg().setValue("-Dnet.sourceforge.cobertura.datafile=" + System.getProperty("net.sourceforge.cobertura.datafile"));
+        }
+
         if (wsitConf != null && wsitConf.exists() && wsitConf.isDirectory()) {
             cmd.createArg().setValue("-DWSIT_HOME=" + wsitConf.getAbsolutePath());
         }

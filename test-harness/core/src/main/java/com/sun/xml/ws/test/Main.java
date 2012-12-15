@@ -437,7 +437,7 @@ public class Main {
             if (new File(jaxwsWs, "pom.xml").exists()) {
                 //maven build
                 //is the build instrumented by cobertura?
-                String classesFolder = new File(jaxwsWs, "target/generated-classes/cobertura").exists()
+                String classesFolder = new File(jaxwsWs, "rt/target/generated-classes/cobertura").exists()
                         ? "target/generated-classes/cobertura"
                         : "target/classes";
 
