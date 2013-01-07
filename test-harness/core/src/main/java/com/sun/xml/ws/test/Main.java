@@ -452,6 +452,13 @@ public class Main {
                 // this is needed for Localizer (which lives in jaxb-impl available to runtime) to find message resources of wsimport
                 runtime.addClassFolder(new File(jaxwsWs, "tools/wscompile/src/main/resources"));
 
+                //databinding plugins
+                if ("com.sun.xml.ws.db.toplink.JAXBContextFactory".equals(System.getProperty("BindingContextFactory"))) {
+                    runtime.addClassFolder(new File(jaxwsWs, "eclipselink_jaxb/" + classesFolder));
+                } else if ("com.sun.xml.ws.db.sdo.SDOContextFactory".equals(System.getProperty("BindingContextFactory"))) {
+                    runtime.addClassFolder(new File(jaxwsWs, "eclipselink_sdo/" + classesFolder));
+                }
+
                 tool.addClassFolder(new File(jaxwsWs, "tools/wscompile/" + classesFolder));
 
                 //now find libraries

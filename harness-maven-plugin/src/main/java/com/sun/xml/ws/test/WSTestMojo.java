@@ -87,9 +87,10 @@ public class WSTestMojo extends AbstractMojo {
     private static final String HARNESS_GID = "org.glassfish.metro";
     private static final String HARNESS_AID = "harness-lib";
     private static final String TOPLINK_FACTORY = "com.sun.xml.ws.db.toplink.JAXBContextFactory";
+    private static final String SDO_FACTORY = "com.sun.xml.ws.db.sdo.SDOContextFactory";
 
     public enum Databinding {
-        DEFAULT, TOPLINK;
+        DEFAULT, TOPLINK, SDO;
     }
 
     public enum Container {
@@ -267,7 +268,7 @@ public class WSTestMojo extends AbstractMojo {
             try {
                 imageFolder.mkdirs();
                 imageRoot = prepareImage(u, imageFolder);
-                getLog().info("testing downloaded image...");
+                getLog().info("testing downloaded image (" + imageRoot.getPath() +")...");
             } catch (NoSuchArchiverException ex) {
                 throw new MojoExecutionException(ex.getMessage(), ex);
             } catch (IOException ex) {
@@ -278,7 +279,7 @@ public class WSTestMojo extends AbstractMojo {
         if (imageRoot == null) {
             if (localImage.exists() && localImage.isDirectory() && findImageRoot(localImage) != null) {
                 imageRoot = findImageRoot(localImage);
-                getLog().info("testing local image...");
+                getLog().info("testing local image (" + imageRoot.getPath() +")...");
             } else {
                 getLog().info("testing local workspace...");
             }
@@ -315,6 +316,8 @@ public class WSTestMojo extends AbstractMojo {
 
         if (isToplink()) {
             cmd.createArg().setLine("-DBindingContextFactory=" + TOPLINK_FACTORY);
+        } else if (isSDO()) {
+            cmd.createArg().setLine("-DBindingContextFactory=" + SDO_FACTORY);
         }
 
         if (extraVmArgs != null && extraVmArgs.trim().length() > 1) {
@@ -356,7 +359,7 @@ public class WSTestMojo extends AbstractMojo {
 
         if (vmArgs != null) {
             for (String arg : vmArgs) {
-                if (arg.contains("-DBindingContextFactory=") && isToplink()) {
+                if (arg.contains("-DBindingContextFactory=") && (isToplink() || isSDO())) {
                     String[] opts = arg.split(" ");
                     if (opts.length > 1) {
                         StringBuilder sb = new StringBuilder();
@@ -436,6 +439,9 @@ public class WSTestMojo extends AbstractMojo {
             }
             if (isToplink()) {
                 cmd.createArg().setLine("-cp:override " + getToplinkCP(imageRoot));
+                filters.add("-cp:override");
+            } else if (isSDO()) {
+                cmd.createArg().setLine("-cp:override " + getSdoCP(imageRoot));
                 filters.add("-cp:override");
             }
             filters.add("-cp:jaxws");
@@ -542,6 +548,10 @@ public class WSTestMojo extends AbstractMojo {
         return Databinding.TOPLINK == databinding;
     }
 
+    private boolean isSDO() {
+        return Databinding.SDO == databinding;
+    }
+
     private String getCP(File root, String... paths) {
         StringBuilder sb = new StringBuilder();
         for (String p : paths) {
@@ -571,6 +581,19 @@ public class WSTestMojo extends AbstractMojo {
                     "lib/plugins/mail.jar");
         } else if (isMetroRoot(root)) {
             return getCP(root, "lib/databinding/jaxws-eclipselink-plugin.jar") +
+                    File.pathSeparatorChar +
+                    getCP(new File(project.getBuild().getDirectory()), "test-lib/eclipselink.jar");
+        }
+        throw new MojoExecutionException("Unknown/Unsupported image: " + imageRoot);
+    }
+
+    private String getSdoCP(File root) throws MojoExecutionException {
+        if (isJaxWsRIRoot(root)) {
+            return getCP(root,
+                    "lib/plugins/sdo-eclipselink-plugin.jar",
+                    "lib/plugins/eclipselink.jar");
+        } else if (isMetroRoot(root)) {
+            return getCP(root, "lib/databinding/sdo-eclipselink-plugin.jar") +
                     File.pathSeparatorChar +
                     getCP(new File(project.getBuild().getDirectory()), "test-lib/eclipselink.jar");
         }
