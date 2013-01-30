@@ -228,7 +228,7 @@ public class Main {
     boolean leave = false;
 
     @Option(name = "-port", usage = "Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
-    int port = 18080;
+    int port = -1;
 
     @Option(name = "-wsgen", usage =
             "Control the packaging of Wrapper and Exception beans.\n" +
