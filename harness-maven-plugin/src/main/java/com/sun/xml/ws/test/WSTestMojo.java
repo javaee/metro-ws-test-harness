@@ -241,6 +241,9 @@ public class WSTestMojo extends AbstractMojo {
     @Parameter(readonly = true, defaultValue = "${project.remoteArtifactRepositories}")
     private List<ArtifactRepository> remoteRepos;
 
+    @Parameter(readonly = true, defaultValue = "${project.pluginArtifactRepositories}")
+    private List<ArtifactRepository> pluginRepos;
+
     @Component
     private ArtifactFactory artifactFactory;
 
@@ -535,9 +538,11 @@ public class WSTestMojo extends AbstractMojo {
                 new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
         ArtifactResolutionResult arr = null;
+        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>(pluginRepos);
+        repos.addAll(remoteRepos);
         try {
             arr = resolver.resolveTransitively(Collections.singleton(harnessLib), dummyArtifact,
-                    remoteRepos, localRepo, mdataSource);
+                    repos, localRepo, mdataSource);
         } catch (Exception e) {
             throw new MojoExecutionException("Couldn't download artifact: " + e.getMessage(), e);
         }
