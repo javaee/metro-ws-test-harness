@@ -166,11 +166,11 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
             // Set service name, port name
             Map<String, Object> props = new HashMap<String, Object>();
-            if (endpointInfoBean.getServiceName() != null) {
+            if (endpointInfoBean != null && endpointInfoBean.getServiceName() != null) {
                 // Endpoint.WSDL_SERVICE
                 props.put("javax.xml.ws.wsdl.service", endpointInfoBean.getServiceName());
             }
-            if (endpointInfoBean.getPortName() != null) {
+            if (endpointInfoBean != null && endpointInfoBean.getPortName() != null) {
                 // Endpoint.WSDL_PORT
                 props.put("javax.xml.ws.wsdl.port", endpointInfoBean.getPortName());
             }
@@ -201,11 +201,11 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
     private Object createMetadataFeature(DeployedService service, InterpreterEx interpreter) throws EvalError {
 
-        if (service.service.parent.metadatafiles == null || service.service.parent.metadatafiles.size() == 0) {
+        if (service.service.parent.metadatafiles == null || service.service.parent.metadatafiles.isEmpty()) {
             return null;
         }
 
-        String script = "org.jvnet.ws.databinding.ExternalMetadataFeature.builder().addFiles( metadataFiles ).build()";
+        String script = "com.oracle.webservices.api.databinding.ExternalMetadataFeature.builder().addFiles( metadataFiles ).build()";
         File [] files = new File[service.service.parent.metadatafiles.size()];
         int i = 0;
         for(String path : service.service.parent.metadatafiles) {
