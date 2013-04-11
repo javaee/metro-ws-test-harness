@@ -251,6 +251,9 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         if (paths != null) {
             for (String path : paths) {
                 if (path.endsWith("/")) {
+                    if (path.endsWith("/CVS/") || path.endsWith("/.svn/")) {
+                        continue;
+                    }
                     collectDocs(root, path, loader, metadata);
                 } else {
                     URL res = loader.getResource(path);
