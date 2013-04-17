@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2013 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -77,6 +77,7 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
         container = (EmbeddedLocalContainer) new DefaultContainerFactory(AbstractFactoryRegistry.class.getClassLoader()).createContainer(
             containerId, ContainerType.EMBEDDED, configuration);
         container.setClassLoader(World.runtime.getClassLoader());
+        container.setTimeout(30000);
     }
 
     @Override
@@ -91,6 +92,7 @@ public class EmbeddedCargoApplicationContainer extends AbstractRunnableCargoCont
         return false;
     }
 
+    @Override
     public String toString() {
         return "EmbeddedContainer:"+container.getId();
     }
