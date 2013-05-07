@@ -479,7 +479,12 @@ public class WSTestMojo extends AbstractMojo {
 
         StreamConsumer sc = new DefaultConsumer();
         try {
-            CommandLineUtils.executeCommandLine(cmd, sc, sc);
+            int i = CommandLineUtils.executeCommandLine(cmd, sc, sc);
+            if (i > 0) {
+                throw new MojoFailureException(i + " test(s) failed");
+            } else if (i < 0) {
+                throw new MojoExecutionException("Invalid command: " + cmd.toString());
+            }
         } catch (CommandLineException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
