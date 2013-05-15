@@ -55,8 +55,8 @@
     <name>WS Test Harness Library</name>
 
     <properties>
-        <metro.version>2.3</metro.version>
-        <jaxws-ri.version>2.2.8</jaxws-ri.version>
+        <metro.version>2.3.1-SNAPSHOT</metro.version>
+        <jaxws-ri.version>2.2.9-SNAPSHOT</jaxws-ri.version>
         <test.options />
         <!-- to pass extra JVM args to harness -->
         <harness.extra.jvm.arg />
