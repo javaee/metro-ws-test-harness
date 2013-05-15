@@ -88,6 +88,7 @@ public class WSTestMojo extends AbstractMojo {
     private static final String HARNESS_AID = "harness-lib";
     private static final String TOPLINK_FACTORY = "com.sun.xml.ws.db.toplink.JAXBContextFactory";
     private static final String SDO_FACTORY = "com.sun.xml.ws.db.sdo.SDOContextFactory";
+    private static final String JAXWS_API_VERSION = "2.2.8";
 
     public enum Databinding {
         DEFAULT, TOPLINK, SDO;
@@ -100,7 +101,7 @@ public class WSTestMojo extends AbstractMojo {
     /**
      * Version of Test Harness library to use for running tests.
      */
-    @Parameter(defaultValue = "0.1-SNAPSHOT")
+    @Parameter(defaultValue = "2.3")
     private String harnessVersion;
 
     /**
@@ -538,7 +539,7 @@ public class WSTestMojo extends AbstractMojo {
     private Set<Artifact> getHarnessLib() throws MojoExecutionException {
         Artifact harnessLib = artifactFactory.createBuildArtifact(HARNESS_GID, HARNESS_AID, harnessVersion, "jar");
         Artifact dummyArtifact =
-                artifactFactory.createBuildArtifact("javax.xml.ws", "jaxws-api", "2.2.8", "jar");
+                artifactFactory.createBuildArtifact("javax.xml.ws", "jaxws-api", JAXWS_API_VERSION, "jar");
         ArtifactRepositoryPolicy always =
                 new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
