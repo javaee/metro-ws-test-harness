@@ -40,14 +40,12 @@
     holder.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.glassfish.metro</groupId>
         <artifactId>ws-test-harness</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>2.3</version>
     </parent>
 
 
@@ -59,9 +57,9 @@
     <properties>
         <metro.version>2.3</metro.version>
         <jaxws-ri.version>2.2.8</jaxws-ri.version>
-        <test.options></test.options>
+        <test.options />
         <!-- to pass extra JVM args to harness -->
-        <harness.extra.jvm.arg></harness.extra.jvm.arg>
+        <harness.extra.jvm.arg />
     </properties>
 
     <dependencies>
@@ -205,10 +203,10 @@
                         <delete dir="target/surefire-reports" />
 
                         <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
-                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed ${harness.extra.jvm.arg}"/>
+                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed ${harness.extra.jvm.arg}" />
                             <arg line="${image}" />
 
-                            <arg line="${test.options}"/>
+                            <arg line="${test.options}" />
 
                             <arg value="-report" />
                             <arg path="target/surefire-reports" />

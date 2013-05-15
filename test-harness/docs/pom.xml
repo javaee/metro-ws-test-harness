@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.glassfish.metro</groupId>
         <artifactId>ws-test-harness</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>2.3</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -68,7 +68,7 @@
                         <phase>install</phase>
                         <configuration>
                             <target>
-                                <property name="dest.dir" location="target/docs"/>
+                                <property name="dest.dir" location="target/docs" />
                                 <taskdef name="htmlmacro" classname="com.sun.wts.tools.htmlmacro.HtmlMacroTask">
                                     <classpath>
                                         <fileset dir="lib" includes="*.jar" />
