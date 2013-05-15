@@ -1,7 +1,0 @@
-<descriptor since="2.0">
-  <description>This is a fromjava jaxws test </description>
-  <client href ="test.bsh" since="2.0"/>
-  <service basedir="./server">
-  </service>
-</descriptor>
-

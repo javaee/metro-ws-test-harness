@@ -1,8 +1,0 @@
-<descriptor>
-  <description>
-    Tests two @WebService with fromjava scenario.
-  </description>
-  <client href ="test.bsh"/>
-  <service />
-</descriptor>
-
