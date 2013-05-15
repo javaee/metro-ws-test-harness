@@ -101,7 +101,7 @@ public class WSTestMojo extends AbstractMojo {
     /**
      * Version of Test Harness library to use for running tests.
      */
-    @Parameter(defaultValue = "2.3")
+    @Parameter(defaultValue = "2.3.1-SNAPSHOT")
     private String harnessVersion;
 
     /**
