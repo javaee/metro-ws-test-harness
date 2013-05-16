@@ -14,7 +14,7 @@
 #
 start = element descriptor {
 
-    # 'verstionAttributes' element specifies which versions of the
+    # 'versionAttributes' element specifies which versions of the
     #   code-under-test a particular test case is to be run against.
     #
     # See also 'client' element's 'versionAttributes' description.
