@@ -397,9 +397,6 @@ public class Main {
 
         // fill in runtime and tool realms
         if (wsitImage != null) {
-//            File jaxbJar = new File(wsitImage, "osgi/jaxb-osgi.jar");
-//            runtime.addJar(jaxbJar);
-
             File rtJar = new File(wsitImage, "lib/webservices-rt.jar");
             runtime.addJar(rtJar);
 
