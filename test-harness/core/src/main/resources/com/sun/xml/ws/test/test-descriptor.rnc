@@ -131,7 +131,7 @@ start = element descriptor {
         text
     }? &
 
-    # XML resouce to be made available to clients
+    # XML resource to be made available to clients
     element xml-resource {
         # the resource is made available by this variable name
         attribute name {text},
