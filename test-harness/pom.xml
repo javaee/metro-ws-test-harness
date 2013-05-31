@@ -127,6 +127,10 @@
                         <artifactId>isorelax</artifactId>
                         <groupId>isorelax</groupId>
                     </exclusion>
+                    <exclusion>
+                        <artifactId>xercesImpl</artifactId>
+                        <groupId>xerces</groupId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
