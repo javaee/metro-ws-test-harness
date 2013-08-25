@@ -41,6 +41,8 @@ package com.sun.xml.ws.test.container.cargo;
 
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
+import com.sun.xml.ws.test.container.DeployedService;
+import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.FileUtil;
@@ -58,8 +60,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Zip;
+import org.codehaus.cargo.container.property.GeneralPropertySet;
 import org.codehaus.cargo.container.tomcat.TomcatPropertySet;
 
 /**
@@ -102,6 +108,7 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
                 containerWorkDir.getAbsolutePath());
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
+        configuration.setProperty(GeneralPropertySet.RMI_PORT, getPort());
 //        configuration.setLogger(new SimpleLogger());
 
         // In case this is Glassfish, override all the other TCP ports
@@ -116,6 +123,26 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
 
         if (containerId.startsWith("tomcat")) {
             configuration.setProperty(TomcatPropertySet.AJP_PORT, getPort());
+
+            if (Boolean.getBoolean("harness.useSSL")) {
+                configuration.setProperty(GeneralPropertySet.PROTOCOL, "https");
+                configuration.setProperty(TomcatPropertySet.HTTP_SECURE, "true");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-keystore.jks").getAbsolutePath());
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_PASSWORD, "changeit");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_TYPE, "JKS");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-truststore.jks").getAbsolutePath());
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_PASSWORD, "changeit");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_TYPE, "JKS");
+
+                HostnameVerifier hv = new HostnameVerifier() {
+                    public boolean verify(String urlHostName, SSLSession session) {
+                        System.out.println("Warning: got: '" + urlHostName
+                                + "' expected '" + session.getPeerHost() + "'");
+                        return true;
+                    }
+                };
+                HttpsURLConnection.setDefaultHostnameVerifier(hv);
+            }
         }
 
         // TODO: we should provide a mode to launch the container with debugger
@@ -171,4 +198,15 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
     private String getPort() {
         return String.valueOf(AbstractRunnableCargoContainer.getFreePort());
     }
+
+    @Override
+    protected WAR assembleWar(DeployedService service) throws Exception {
+        WAR war = super.assembleWar(service);
+        if (service.service.isSTS) {
+            updateWsitClient(war, service, getServiceUrl(service.service.getGlobalUniqueName()).toExternalForm());
+        }
+        return war;
+    }
+
+
 }

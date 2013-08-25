@@ -76,7 +76,7 @@ abstract class AbstractRunnableCargoContainer<C extends LocalContainer> extends 
     }
 
     protected URL getServiceUrl(String contextPath) throws Exception {
-        return new URL("http", "localhost", httpPort, "/" + contextPath + "/");
+        return new URL(Boolean.getBoolean("harness.useSSL") ? "https" : "http", "localhost", httpPort, "/" + contextPath + "/");
     }
 
     private static int findFreePort(int x) {

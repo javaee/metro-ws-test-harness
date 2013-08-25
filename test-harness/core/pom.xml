@@ -195,7 +195,7 @@
 
                         <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
                             <jvmarg line="-Djava.endorsed.dirs=${basedir}/target/endorsed ${harness.extra.jvm.arg}" />
-                            <jvmarg line="-Dharness.deploy.timeout=60000" />
+                            <!--<jvmarg line="-Dharness.deploy.timeout=60000 -Dharness.useSSL=true -Dharness.ssl.home=${project.basedir}/src/test/certs" />-->
                             <!--<jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=6000" />-->
                             <arg line="${image}" />
 
