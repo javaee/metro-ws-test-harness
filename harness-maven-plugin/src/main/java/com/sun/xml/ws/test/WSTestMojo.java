@@ -95,7 +95,7 @@ public class WSTestMojo extends AbstractMojo {
     }
 
     public enum Container {
-        IN_VM, LWHS, TOMCAT;
+        IN_VM, LWHS, TOMCAT, TOMCAT_LOCAL;
     }
 
     /**
@@ -430,6 +430,12 @@ public class WSTestMojo extends AbstractMojo {
                 }
                 cmd.createArg().setLine("-tomcat-embedded " + tomcatHome.getAbsolutePath());
                 break;
+            case TOMCAT_LOCAL:
+                if (tomcatHome == null) {
+                    throw new MojoExecutionException("'tomcat.home' is not set.");
+                }
+                cmd.createArg().setLine("-tomcat-local " + tomcatHome.getAbsolutePath());
+                break;
         }
 
         List<String> filters = new ArrayList<String>();
@@ -477,6 +483,7 @@ public class WSTestMojo extends AbstractMojo {
         if (debug) {
             getLog().info(cmd.toString());
         }
+            getLog().info(cmd.toString());
 
         StreamConsumer sc = new DefaultConsumer();
         try {

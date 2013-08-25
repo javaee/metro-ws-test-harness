@@ -259,9 +259,10 @@ work/                    (root test directory)
     </l:section>
     <l:section title="Tomcat">
       <p>
-        This test harness supports Tomcat 5.0.x or 5.5.x. There are a few different ways of using Tomcat.
+        This test harness supports Tomcat 5.0.x and newer. There are a few different ways of using Tomcat.
       </p>
       <l:section title="Embedded Tomcat">
+        <p><b>Applies to:</b> Tomcat 5.0.x, 5.5.x</p>
         <p>
           The following command causes the harness to run Tomcat within the same VM. This mode is bit like the local transport, in the sense that both the server and the client runs inside the same VM, but this mode run tests by using HTTP and full servlet container.
         </p>
@@ -273,6 +274,7 @@ work/                    (root test directory)
         </p>
       </l:section>
       <l:section title="Remote Tomcat">
+          <p><b>Applies to:</b> Tomcat 5.0.x and newer</p>
         <p>
           The following command causes tests to run by using Tomcat launched externally. The parameter to the -tomcat-remote option is <tt><i>adminUserName</i>:<i>adminPassword</i>@<i>hostname</i>:<i>port</i></tt>.
         </p>
@@ -300,6 +302,7 @@ work/                    (root test directory)
         </l:tip>
       </l:section>
       <l:section title="Local Tomcat">
+          <p><b>Applies to:</b> Tomcat 5.0.x and newer</p>
         <p>
           Run the following command to use Tomcat in the local mode. In this mode, the haress launches Tomcat as a child process, run tests, and terminates Tomcat when everything is done.
         </p>
@@ -365,6 +368,14 @@ work/                    (root test directory)
     <p>
       The test harness can generate <a href="http://emma.sourceforge.net/">EMMA</a> coverage report of the tests by specifying the <tt>-emma OUTPUTFILE</tt> option. The coverage will include both the runtime as well as tools. See <a href="http://emma.sourceforge.net/userguide/ar01s02s03.html">Emma User's Guide</a> for how to generate various reports from the coverage data file.
   </l:section>
+    <l:section title="Test Harness Properties">
+        <p>Following system properties can be passed to the harness:
+    <dl>
+        <dt><code>harness.deploy.timeout</code></dt>
+        <dd>deployment timeout in milliseconds, defaults to 30000</dd>
+    </dl>
+    </p>
+    </l:section>
 </l:section>
 <l:section title="Writing Tests">
   <l:section title="Conventions">

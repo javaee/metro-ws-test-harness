@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * http://glassfish.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
+ * file and include the License file at packager/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
  *
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -33,9 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.xml.ws.test.container.cargo;
 
+import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
 import com.sun.xml.ws.test.container.cargo.gf.GlassfishPropertySet;
 import com.sun.xml.ws.test.tool.WsTool;
@@ -49,10 +53,14 @@ import org.codehaus.cargo.generic.AbstractFactoryRegistry;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
-import org.codehaus.cargo.util.log.SimpleLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Zip;
+import org.codehaus.cargo.container.tomcat.TomcatPropertySet;
 
 /**
  * {@link ApplicationContainer} that launches a container from within the harness.
@@ -94,24 +102,52 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
                 containerWorkDir.getAbsolutePath());
 
         configuration.setProperty(ServletPropertySet.PORT, Integer.toString(httpPort));
-        configuration.setLogger(new SimpleLogger());
+//        configuration.setLogger(new SimpleLogger());
 
         // In case this is Glassfish, override all the other TCP ports
         // so that multiple test runs can co-exist on the same machine
-        configuration.setProperty(GlassfishPropertySet.JMS_PORT,                Integer.toString(httpPort+1));
-        configuration.setProperty(GlassfishPropertySet.IIOP_PORT,               Integer.toString(httpPort+2));
-        configuration.setProperty(GlassfishPropertySet.HTTPS_PORT,              Integer.toString(httpPort+3));
-        configuration.setProperty(GlassfishPropertySet.IIOPS_PORT,              Integer.toString(httpPort+4));
-        configuration.setProperty(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT,   Integer.toString(httpPort+5));
-        configuration.setProperty(GlassfishPropertySet.JMX_ADMIN_PORT,          Integer.toString(httpPort+6));
-        configuration.setProperty(GlassfishPropertySet.ADMIN_PORT,              Integer.toString(httpPort+7));
+        configuration.setProperty(GlassfishPropertySet.JMS_PORT,                getPort());
+        configuration.setProperty(GlassfishPropertySet.IIOP_PORT,               getPort());
+        configuration.setProperty(GlassfishPropertySet.HTTPS_PORT,              getPort());
+        configuration.setProperty(GlassfishPropertySet.IIOPS_PORT,              getPort());
+        configuration.setProperty(GlassfishPropertySet.IIOP_MUTUAL_AUTH_PORT,   getPort());
+        configuration.setProperty(GlassfishPropertySet.JMX_ADMIN_PORT,          getPort());
+        configuration.setProperty(GlassfishPropertySet.ADMIN_PORT,              getPort());
+
+        if (containerId.startsWith("tomcat")) {
+            configuration.setProperty(TomcatPropertySet.AJP_PORT, getPort());
+        }
 
         // TODO: we should provide a mode to launch the container with debugger
-
 
         container = (InstalledLocalContainer) containerFactory.createContainer(
             containerId, ContainerType.INSTALLED, configuration);
         container.setHome(homeDir.getAbsolutePath());
+        container.setOutput(containerWorkDir.getAbsolutePath() + File.separatorChar + "server.log");
+
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("java.endorsed.dirs", System.getProperty("java.endorsed.dirs"));
+        props.put("WSIT_HOME", System.getProperty("WSIT_HOME"));
+        container.setSystemProperties(props);
+
+        for (File f : World.runtime.list()) {
+            if (f.getName().endsWith(".jar")) {
+                container.addExtraClasspath(f.getAbsolutePath());
+            } else {
+                if ("classes".equals(f.getName())) {
+                    String fName = f.getParentFile().getParentFile().getName();
+                    File jar = new File(new File(System.getProperty("java.io.tmpdir")), fName + System.currentTimeMillis() + ".jar");
+                    jar.deleteOnExit();
+                    Zip zip = new Zip();
+                    zip.setProject(new Project());
+                    zip.setDestFile(jar);
+                    zip.setBasedir(f);
+                    zip.execute();
+                    container.addExtraClasspath(jar.getAbsolutePath());
+                }
+            }
+        }
+
     }
 
     /**
@@ -127,7 +163,12 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
     }
      */
 
+    @Override
     public String toString() {
         return "CargoLocalContainer:"+container.getId();
+    }
+
+    private String getPort() {
+        return String.valueOf(AbstractRunnableCargoContainer.getFreePort());
     }
 }

@@ -75,7 +75,16 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -285,12 +294,6 @@ public class Main {
             System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
         }
 
-
-        if (port == -1) {
-            // set TCP port to somewhere between 20000-60000
-            port = new Random().nextInt(40000) + 20000;
-        }
-
         // set up objects that represent test environment.
         WsTool wsimport, wsgen;
         if (skipCompilation) {
@@ -384,6 +387,11 @@ public class Main {
             runtime.addJarFolder(new File(embeddedTomcat, "bin"));
             runtime.addJarFolder(new File(embeddedTomcat, "common/lib"));
             runtime.addJarFolder(new File(embeddedTomcat, "server/lib"));
+        }
+
+        if (tomcat != null) {
+            runtime.addJarFolder(new File(tomcat, "bin"));
+            runtime.addJarFolder(new File(tomcat, "lib"));
         }
 
         if (embeddedJetty != null) {
@@ -656,10 +664,15 @@ public class Main {
     private ApplicationContainer createContainer(WsTool wsimport, WsTool wsgen) throws Exception {
         ApplicationContainer appContainer = null;
         if (tomcat != null) {
+            TomcatVersion tv = getTomcatVersion(tomcat);
             System.err.println("Using Tomcat from " + tomcat);
+            System.err.println("\tSpecification version " + tv.getSpecVersion());
+            System.err.println("\tImplementation version " + tv.getImplVersion());
             appContainer = new InstalledCargoApplicationContainer(
-                    wsimport, wsgen, "tomcat5x", tomcat, port, httpspi);
-            appContainer.getUnsupportedUses().add("servlet30");
+                    wsimport, wsgen, tv.getId(), tomcat, port, httpspi);
+            if (!tv.supports("servlet30")) {
+                appContainer.getUnsupportedUses().add("servlet30");
+            }
         }
 
         if (embeddedTomcat != null) {
@@ -892,5 +905,101 @@ public class Main {
             file = file.getParentFile();
         }
         return null;
+    }
+
+    private static TomcatVersion getTomcatVersion(File tcHome) {
+        String implVersion = null;
+        String specVersion = null;
+        try {
+            File f = new File(tcHome, "lib/catalina.jar");
+            if (f.exists() && f.canRead()) {
+                JarFile jar = new JarFile(f);
+                Manifest mf = jar.getManifest();
+                if (mf != null) {
+                    Attributes attrs = mf.getMainAttributes();
+                    if (attrs != null) {
+                        specVersion = attrs.getValue("Specification-Version");
+                        implVersion = attrs.getValue("Implementation-Version");
+                    }
+                }
+            } else {
+                System.err.println("Cannot read: " + f.getAbsolutePath());
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return TomcatVersion.create(specVersion, implVersion);
+    }
+
+    private static class TomcatVersion {
+        private String implVersion;
+        private String specVersion;
+        private String id;
+        private final Set<String> features = new HashSet<String>();
+
+        static TomcatVersion create(String specVersion, String implVersion) {
+            TomcatVersion tv = new TomcatVersion();
+            tv.setSpecVersion(specVersion);
+            tv.setImplVersion(implVersion);
+            char major = 0;
+            if (implVersion != null) {
+                major = implVersion.charAt(0);
+            } else if (specVersion != null) {
+                major = specVersion.charAt(0);
+            }
+            switch (major) {
+                case '5':
+                    tv.setId("tomcat5x");
+                    break;
+                case '6':
+                    tv.setId("tomcat6x");
+                    break;
+                case '7':
+                    tv.setId("tomcat7x");
+                    tv.addFeature("servlet30");
+                    break;
+                case '8':
+                    tv.setId("tomcat8x");
+                    tv.addFeature("servlet30");
+                    tv.addFeature("servlet31");
+                    break;
+                default:
+                    tv.setId("tomcat5x");
+            }
+            return tv;
+        }
+
+        public String getImplVersion() {
+            return implVersion;
+        }
+
+        public void setImplVersion(String implVersion) {
+            this.implVersion = implVersion;
+        }
+
+        public String getSpecVersion() {
+            return specVersion;
+        }
+
+        public void setSpecVersion(String specVersion) {
+            this.specVersion = specVersion;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        private void addFeature(String feature) {
+            features.add(feature);
+        }
+
+        public boolean supports(String feature) {
+            return features.contains(feature);
+        }
+
     }
 }
