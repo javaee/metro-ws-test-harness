@@ -483,7 +483,7 @@ public class WSTestMojo extends AbstractMojo {
         if (debug) {
             getLog().info(cmd.toString());
         }
-            getLog().info(cmd.toString());
+        getLog().debug(cmd.toString());
 
         StreamConsumer sc = new DefaultConsumer();
         try {
