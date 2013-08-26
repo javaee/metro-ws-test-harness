@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -68,6 +70,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineException;
@@ -297,8 +300,11 @@ public class WSTestMojo extends AbstractMojo {
 
         //set API bootclasspath/endorsed
         if (imageRoot != null) {
-            cmd.createArg().setLine("-Xbootclasspath/p:" + getAPICP(imageRoot));
+            File end = prepareEndorsed(imageRoot);
+            getLog().info("Setting endorsed directory to: " + end.getAbsolutePath());
+            cmd.createArg().setLine("-Djava.endorsed.dirs=" + end.getAbsolutePath());
         } else if (endorsedDir != null && endorsedDir.isDirectory()) {
+            getLog().info("Setting endorsed directory to: " + endorsedDir.getAbsolutePath());
             cmd.createArg().setValue("-Djava.endorsed.dirs=" + endorsedDir.getAbsolutePath());
         } else {
             getLog().warn("Endorsed not applied. Set 'endorsedDir' in plugin's configuration.");
@@ -579,14 +585,21 @@ public class WSTestMojo extends AbstractMojo {
         return sb.substring(0, sb.length() - 1);
     }
 
-    private String getAPICP(File root) throws MojoExecutionException {
-        if (isJaxWsRIRoot(root)) {
-            return getCP(root,
-                    "lib/saaj-api.jar",
-                    "lib/jaxb-api.jar",
-                    "lib/jaxws-api.jar");
-        } else if (isMetroRoot(root)) {
-            return getCP(root, "lib/webservices-api.jar");
+    private File prepareEndorsed(File root) throws MojoExecutionException {
+        getLog().info("Preparing endorsed directory...");
+        File endorsed = new File(root.getParentFile(), "endorsed");
+        try {
+            if (isJaxWsRIRoot(root)) {
+                FileUtils.copyFileToDirectory(new File(root, "lib/saaj-api.jar"), endorsed);
+                FileUtils.copyFileToDirectory(new File(root, "lib/jaxb-api.jar"), endorsed);
+                FileUtils.copyFileToDirectory(new File(root, "lib/jaxws-api.jar"), endorsed);
+                return endorsed;
+            } else if (isMetroRoot(root)) {
+                FileUtils.copyFileToDirectory(new File(root, "lib/webservices-api.jar"), endorsed);
+                return endorsed;
+            }
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Error while preparing endorsed directory for " + imageRoot, ex);
         }
         throw new MojoExecutionException("Unknown/Unsupported image: " + imageRoot);
     }
