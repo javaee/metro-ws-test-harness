@@ -588,7 +588,7 @@ public class WSTestMojo extends AbstractMojo {
         File endorsed = new File(root.getParentFile(), "endorsed");
         try {
             if (isJaxWsRIRoot(root)) {
-                FileUtils.copyFileToDirectory(new File(root, "lib/saaj-api.jar"), endorsed);
+                FileUtils.copyFileToDirectory(new File(root, "lib/javax.xml.soap-api.jar"), endorsed);
                 FileUtils.copyFileToDirectory(new File(root, "lib/jaxb-api.jar"), endorsed);
                 FileUtils.copyFileToDirectory(new File(root, "lib/jaxws-api.jar"), endorsed);
                 return endorsed;
