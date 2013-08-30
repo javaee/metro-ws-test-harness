@@ -105,7 +105,7 @@
             <dependency>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-core-uberjar</artifactId>
-                <version>1.4.3</version>
+                <version>1.2.4</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>jaxb-api</artifactId>
@@ -187,6 +187,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>1.1.4</version>
+            </dependency>
+            <dependency>
                 <!-- this should be in jdk6
                 but be aware of class conflict issue on Mac -->
                 <groupId>thaiopensource</groupId>
@@ -211,9 +216,15 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind.jaxb</groupId>
-                <artifactId>isorelax</artifactId>
-                <version>20090621</version>
+                <!-- to get isorelax -->
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb1-impl</artifactId>
+                <version>2.2.5-2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-discovery</groupId>
+                <artifactId>commons-discovery</artifactId>
+                <version>0.4</version>
             </dependency>
             <!-- obsolete -->
             <dependency>

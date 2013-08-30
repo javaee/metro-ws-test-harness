@@ -108,6 +108,10 @@
             <artifactId>istack-commons-test</artifactId>
         </dependency>
         <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+        </dependency>
+        <dependency>
             <!-- this should be in jdk6
             but be aware of class conflict issue on Mac -->
             <groupId>thaiopensource</groupId>
@@ -122,8 +126,13 @@
             <artifactId>parallel-junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind.jaxb</groupId>
-            <artifactId>isorelax</artifactId>
+            <!-- to get isorelax -->
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb1-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
         </dependency>
         <!-- obsolete -->
         <dependency>
@@ -194,18 +203,13 @@
                         <delete dir="target/surefire-reports" />
 
                         <java classname="com.sun.xml.ws.test.Main" fork="true" classpathref="maven.test.classpath">
-                            <jvmarg line="-Djava.endorsed.dirs=${basedir}/target/endorsed ${harness.extra.jvm.arg}" />
-                            <!--<jvmarg line="-Dharness.deploy.timeout=60000 -Dharness.useSSL=true -Dharness.ssl.home=${project.basedir}/src/test/certs" />-->
-                            <!--<jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=6000" />-->
+                            <jvmarg line="-Djava.endorsed.dirs=target/endorsed ${harness.extra.jvm.arg}" />
                             <arg line="${image}" />
 
                             <arg line="${test.options}" />
 
                             <arg value="-report" />
                             <arg path="target/surefire-reports" />
-
-<!--                            <arg value="-tomcat-local" />
-                            <arg path="/space/sources/ws-test-harness/apache-tomcat-7.0.42" />-->
 
                             <arg value="-transport" />
                             <arg path="target/transport/jaxws-local-transport.jar" />
