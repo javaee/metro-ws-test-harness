@@ -379,7 +379,11 @@ public class Main {
         }
 
         if (transportJar != null) {
-            runtime.addJar(transportJar);
+            if (transportJar.exists()) {
+                runtime.addJar(transportJar);
+            } else {
+                throw new IllegalArgumentException(transportJar + " does not exist.");
+            }
         }
 
         // fill in container realm.

@@ -124,25 +124,25 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         if (containerId.startsWith("tomcat")) {
             configuration.setProperty(TomcatPropertySet.AJP_PORT, getPort());
 
-//            if (Boolean.getBoolean("harness.useSSL")) {
-//                configuration.setProperty(GeneralPropertySet.PROTOCOL, "https");
-//                configuration.setProperty(TomcatPropertySet.HTTP_SECURE, "true");
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-keystore.jks").getAbsolutePath());
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_PASSWORD, "changeit");
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_TYPE, "JKS");
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-truststore.jks").getAbsolutePath());
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_PASSWORD, "changeit");
-//                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_TYPE, "JKS");
-//
-//                HostnameVerifier hv = new HostnameVerifier() {
-//                    public boolean verify(String urlHostName, SSLSession session) {
-//                        System.out.println("Warning: got: '" + urlHostName
-//                                + "' expected '" + session.getPeerHost() + "'");
-//                        return true;
-//                    }
-//                };
-//                HttpsURLConnection.setDefaultHostnameVerifier(hv);
-//            }
+            if (Boolean.getBoolean("harness.useSSL")) {
+                configuration.setProperty(GeneralPropertySet.PROTOCOL, "https");
+                configuration.setProperty(TomcatPropertySet.HTTP_SECURE, "true");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-keystore.jks").getAbsolutePath());
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_PASSWORD, "changeit");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_KEY_STORE_TYPE, "JKS");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_FILE, new File(System.getProperty("harness.ssl.home"), "server-truststore.jks").getAbsolutePath());
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_PASSWORD, "changeit");
+                configuration.setProperty(TomcatPropertySet.CONNECTOR_TRUST_STORE_TYPE, "JKS");
+
+                HostnameVerifier hv = new HostnameVerifier() {
+                    public boolean verify(String urlHostName, SSLSession session) {
+                        System.out.println("Warning: got: '" + urlHostName
+                                + "' expected '" + session.getPeerHost() + "'");
+                        return true;
+                    }
+                };
+                HttpsURLConnection.setDefaultHostnameVerifier(hv);
+            }
         }
 
         // TODO: we should provide a mode to launch the container with debugger
@@ -155,9 +155,9 @@ public class InstalledCargoApplicationContainer extends AbstractRunnableCargoCon
         Map<String, String> props = new HashMap<String, String>();
         props.put("java.endorsed.dirs", System.getProperty("java.endorsed.dirs"));
         props.put("WSIT_HOME", System.getProperty("WSIT_HOME"));
-        props.put("com.sun.xml.ws.transport.local.LocalTransportTube.dump", "true");
-        props.put("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        props.put("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
+//        props.put("com.sun.xml.ws.transport.local.LocalTransportTube.dump", "true");
+//        props.put("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+//        props.put("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
         container.setSystemProperties(props);
 
         for (File f : World.runtime.list()) {
