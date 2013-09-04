@@ -146,6 +146,12 @@ public class WSTestMojo extends AbstractMojo {
     private boolean debug;
 
     /**
+     * Fail the build in case of test errors/failures.
+     */
+    @Parameter(property = "ws.failonerror", defaultValue = "true")
+    private boolean failonerror;
+
+    /**
      * Folder containing test(s).
      */
     @Parameter(property = "ws.test", defaultValue = "${project.basedir}/src/test/testcases")
@@ -492,7 +498,7 @@ public class WSTestMojo extends AbstractMojo {
         StreamConsumer sc = new DefaultConsumer();
         try {
             int i = CommandLineUtils.executeCommandLine(cmd, sc, sc);
-            if (i > 0) {
+            if (i > 0 && failonerror) {
                 throw new MojoFailureException(i + " test(s) failed");
             } else if (i < 0) {
                 throw new MojoExecutionException("Invalid command: " + cmd.toString());
