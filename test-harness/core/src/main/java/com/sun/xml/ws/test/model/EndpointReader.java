@@ -39,7 +39,11 @@
  */
 package com.sun.xml.ws.test.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -73,15 +77,25 @@ public class EndpointReader extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        List<Element> classes = new ArrayList<Element>();
         for (Element e : roundEnv.getRootElements()) {
             if (e.getKind().equals(ElementKind.INTERFACE)) {
                 continue;
             }
+            classes.add(e);
+        }
+        Collections.sort(classes, new Comparator<Element>() {
+
+            public int compare(Element o1, Element o2) {
+                return getClassName(o1).compareTo(getClassName(o2));
+            }
+        });
+        for (Element e : classes) {
             String serviceName = null;
             String portName = null;
 //            String name = null;
 //            String tns = null;
-            String fullName = getPackageName(e) + e.getSimpleName().toString();
+            String fullName = getClassName(e);
             WebService ws = e.getAnnotation(WebService.class);
             if (ws != null) {
                 //SEI may not exist yet
@@ -117,5 +131,9 @@ public class EndpointReader extends AbstractProcessor {
     private String getPackageName(Element e) {
         String pkg = els.getPackageOf(e).getQualifiedName().toString();
         return pkg.isEmpty() ? "" : pkg + ".";
+    }
+
+    private String getClassName(Element e) {
+        return getPackageName(e) + e.getSimpleName().toString();
     }
 }
