@@ -47,7 +47,9 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -177,6 +179,12 @@ public class TestService {
             public boolean accept(File child) {
                 // don't go in our own work directory
                 return child.isDirectory() && !child.getName().equals("work");
+            }
+        });
+        Arrays.sort(dirs, new Comparator<File>() {
+
+            public int compare(File f1, File f2) {
+                return f2.compareTo(f1);
             }
         });
         for (File subdir : dirs) {
