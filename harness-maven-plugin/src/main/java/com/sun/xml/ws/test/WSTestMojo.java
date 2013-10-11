@@ -99,6 +99,10 @@ public class WSTestMojo extends AbstractMojo {
         IN_VM, LWHS, TOMCAT, TOMCAT_LOCAL;
     }
 
+    public enum FI {
+        none, pessimistic, optimistic;
+    }
+
     /**
      * Version of Test Harness library to use for running tests.
      */
@@ -168,6 +172,19 @@ public class WSTestMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "DEFAULT")
     private Databinding databinding;
+
+    /**
+     * Define FastInfoset mode to be used by tests.
+     * 
+     * Supported values:
+     * <ul>
+     * <li><code>none</code>
+     * <li><code>optimistic</code>
+     * <li><code>pessimistic</code>
+     * </ul>
+     */
+    @Parameter(defaultValue = "none")
+    private FI fastinfoset;
 
     /**
      * Used when running without pom.xml on the command line.
@@ -328,6 +345,20 @@ public class WSTestMojo extends AbstractMojo {
             cmd.createArg().setValue("-DWSIT_HOME=" + wsitConf.getAbsolutePath());
         }
 
+        if (isFastInfosetEnabled()) {
+            switch (fastinfoset) {
+                case optimistic:
+                    cmd.createArg().setLine("-Dcom.sun.xml.ws.client.ContentNegotiation=optimistic");
+                    break;
+                case pessimistic:
+                    cmd.createArg().setLine("-Dcom.sun.xml.ws.client.ContentNegotiation=pessimistic");
+                    break;
+                default:
+                    //none: cmd.createArg().setLine("-Dcom.sun.xml.ws.client.ContentNegotiation=none");
+                    break;
+            }
+        }
+
         if (isToplink()) {
             cmd.createArg().setLine("-DBindingContextFactory=" + TOPLINK_FACTORY);
         } else if (isSDO()) {
@@ -374,18 +405,16 @@ public class WSTestMojo extends AbstractMojo {
         if (vmArgs != null) {
             for (String arg : vmArgs) {
                 if (arg.contains("-DBindingContextFactory=") && (isToplink() || isSDO())) {
-                    String[] opts = arg.split(" ");
-                    if (opts.length > 1) {
-                        StringBuilder sb = new StringBuilder();
-                        for (String opt : opts) {
-                            if (opt.trim().startsWith("-DBindingContextFactory=")) {
-                                getLog().info("removing '" + opt + "' from default configuration.");
-                                continue;
-                            }
-                            sb.append(opt);
-                            sb.append(" ");
-                        }
-                        cmd.createArg().setLine(sb.toString().trim());
+                    String line = removeVmArg(arg, "BindingContextFactory");
+                    if (line != null) {
+                        cmd.createArg().setLine(line.trim());
+                    } else {
+                        getLog().info("removing '" + arg + "' from default configuration.");
+                    }
+                } else if (arg.contains("-Dcom.sun.xml.ws.client.ContentNegotiation=") && isFastInfosetEnabled()) {
+                    String line = removeVmArg(arg, "com.sun.xml.ws.client.ContentNegotiation");
+                    if (line != null) {
+                        cmd.createArg().setLine(line.trim());
                     } else {
                         getLog().info("removing '" + arg + "' from default configuration.");
                     }
@@ -580,6 +609,10 @@ public class WSTestMojo extends AbstractMojo {
         return Databinding.SDO == databinding;
     }
 
+    private boolean isFastInfosetEnabled() {
+        return fastinfoset != null && FI.none != fastinfoset;
+    }
+
     private String getCP(File root, String... paths) {
         StringBuilder sb = new StringBuilder();
         for (String p : paths) {
@@ -641,5 +674,22 @@ public class WSTestMojo extends AbstractMojo {
 
     private boolean isMetroRoot(File root) {
         return "metro".equals(root.getName());
+    }
+
+    private String removeVmArg(String line, String prop) {
+        String[] opts = line.split(" ");
+        if (opts.length > 1) {
+            StringBuilder sb = new StringBuilder();
+            for (String opt : opts) {
+                if (opt.trim().startsWith("-D" + prop + "=")) {
+                    getLog().info("removing '" + opt + "' from default configuration.");
+                    continue;
+                }
+                sb.append(opt);
+                sb.append(" ");
+            }
+            return sb.toString();
+        }
+        return null;
     }
 }
