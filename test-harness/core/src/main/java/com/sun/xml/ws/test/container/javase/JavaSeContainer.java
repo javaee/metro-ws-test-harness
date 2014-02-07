@@ -188,13 +188,18 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             Object feature = createMetadataFeature(service, interpreter);
             interpreter.set("feature", feature);
 
-            servers[i++] = interpreter.eval(
+            try {
+                servers[i++] = interpreter.eval(
                     "endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
                             (feature != null? ", new javax.xml.ws.WebServiceFeature[] {feature});" : ");") +
                     "endpoint.setMetadata(metadata);" +
                     "endpoint.setProperties(properties);" +
                     "endpoint.publish(endpointAddress);" +
                     "return endpoint;");
+            } catch(Throwable t) {
+                t.printStackTrace();
+                throw new Exception("Deploying endpoint "+ endpointAddress +" failed", t);
+            }
         }
         return new JavaSeApplication(servers, baseAddress, service);
     }
