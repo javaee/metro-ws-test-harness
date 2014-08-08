@@ -236,6 +236,9 @@ public class Main {
     @Option(name = "-leave", usage = "leave the container running after all the tests are completed. Often useful for debugging problems.")
     boolean leave = false;
 
+    @Option(name = "-debugWsTools", usage = "Runs WsTools in debugging mode. Used port: 8001")
+    boolean debugWsTools = false;
+
     @Option(name = "-port", usage = "Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = -1;
 
@@ -300,8 +303,8 @@ public class Main {
             System.err.println("Skipping compilation");
             wsimport = wsgen = WsTool.NOOP;
         } else {
-            wsimport = WsTool.createWsImport(externalWsImport);
-            wsgen = WsTool.createWsGen(externalWsGen);
+            wsimport = WsTool.createWsImport(externalWsImport, debugWsTools);
+            wsgen = WsTool.createWsGen(externalWsGen, debugWsTools);
         }
         ApplicationContainer container = createContainer(wsimport, wsgen);
 
@@ -526,18 +529,21 @@ public class Main {
 
         } else if (jaxwsInJDK) {
             System.out.println("Using JAX-WS in JDK");
-            File jreHome = new File(System.getProperty("java.home"));
-            externalWsGen = new File(jreHome.getParent(), "bin/wsgen");
-            if (!externalWsGen.exists()) {
-                externalWsGen = new File(jreHome.getParent(), "bin/wsgen.exe");
-            }
-            externalWsImport = new File(jreHome.getParent(), "bin/wsimport");
-            if (!externalWsImport.exists()) {
-                externalWsImport = new File(jreHome.getParent(), "bin/wsimport.exe");
-            }
+            File javaHome = new File(System.getProperty("java.home"));
+
+            // first try: standard jre/jdk layout
+            findWsTools(javaHome.getParent());
+
             if (!externalWsGen.exists() || !externalWsImport.exists()) {
+                // second try: is it jigsaw modularized build?
+                findWsTools(javaHome.getAbsolutePath());
+            }
+
+            if (!externalWsGen.exists() || !externalWsImport.exists()) {
+                // tools not found
                 throw new CmdLineException("wsgen or wsimport command line tools are not found in jdk");
             }
+
             System.out.println("Using wsgen from " + externalWsGen);
             System.out.println("Using wsimport from " + externalWsImport);
             lwhs = true;
@@ -599,6 +605,17 @@ public class Main {
             listener.setErrorPrintStream(System.err);
         }
 
+    }
+
+    private void findWsTools(String path) {
+        externalWsGen = new File(path, "bin/wsgen");
+        if (!externalWsGen.exists()) {
+            externalWsGen = new File(path, "bin/wsgen.exe");
+        }
+        externalWsImport = new File(path, "bin/wsimport");
+        if (!externalWsImport.exists()) {
+            externalWsImport = new File(path, "bin/wsimport.exe");
+        }
     }
 
     /**

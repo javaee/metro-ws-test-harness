@@ -54,8 +54,11 @@ final class RemoteWsTool extends WsTool {
      */
     private final File executable;
 
-    public RemoteWsTool(File executable) {
+    private final boolean debug;
+
+    public RemoteWsTool(File executable, boolean debug) {
         this.executable = executable;
+        this.debug = debug;
         if(!executable.exists())
             throw new IllegalArgumentException("Non-existent executable "+executable);
     }
@@ -77,6 +80,10 @@ final class RemoteWsTool extends WsTool {
         if (nonProxyHosts != null) {
             params.add("-J-Dhttp.nonProxyHosts="+nonProxyHosts);
         }
+        if (debug) {
+            params.add("-J-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8001");
+        }
+
 
         params.addAll(Arrays.asList(args));
 

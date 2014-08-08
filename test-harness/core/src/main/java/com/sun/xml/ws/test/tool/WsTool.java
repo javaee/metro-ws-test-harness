@@ -72,8 +72,8 @@ public abstract class WsTool extends Assert {
      *      null to run {@link WsTool} from {@link World#tool}.
      *      Otherwise this file will be the path to the script.
      */
-    public static WsTool createWsImport(File externalWsImport) {
-        return createTool(externalWsImport, "com.sun.tools.ws.WsImport");
+    public static WsTool createWsImport(File externalWsImport, boolean debug) {
+        return createTool(externalWsImport, "com.sun.tools.ws.WsImport", debug);
     }
 
     /**
@@ -83,13 +83,13 @@ public abstract class WsTool extends Assert {
      *      null to run {@link WsTool} from {@link World#tool}.
      *      Otherwise this file will be the path to the script.
      */
-    public static WsTool createWsGen(File externalWsGen) {
-        return createTool(externalWsGen,"com.sun.tools.ws.WsGen");
+    public static WsTool createWsGen(File externalWsGen, boolean debug) {
+        return createTool(externalWsGen,"com.sun.tools.ws.WsGen", debug);
     }
 
-    private static WsTool createTool(File externalExecutable, String className) {
+    private static WsTool createTool(File externalExecutable, String className, boolean debug) {
         if(externalExecutable !=null) {
-            return new RemoteWsTool(externalExecutable);
+            return new RemoteWsTool(externalExecutable, debug);
         } else {
             return new LocalWsTool(className);
         }
