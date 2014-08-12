@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2014 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,9 @@ import com.sun.istack.test.Which;
 import com.sun.xml.ws.test.World;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link WsTool} run locally within the same VM.
@@ -50,7 +53,8 @@ final class LocalWsTool extends WsTool {
 
     private final Method main;
 
-    public LocalWsTool(String className) {
+    public LocalWsTool(String className, boolean dumpParameters) {
+        super(dumpParameters);
         try {
             Class wsimport = World.tool.loadClass(className);
             System.out.println("Using "+Which.which(wsimport));
@@ -64,6 +68,14 @@ final class LocalWsTool extends WsTool {
     }
 
     public void invoke(String... args) throws Exception {
+
+        if (dumpParams()) {
+            List<String> params = new ArrayList<String>();
+            params.add(main.getDeclaringClass().getName() + "#" + main.getName() + "()");
+            params.addAll(Arrays.asList(args));
+            dumpWsParams(params);
+        }
+
         int r = (Integer)main.invoke(null,new Object[]{args});
         if(r!=0)
             assertEquals("wsimport reported exit code "+r, 0,r);

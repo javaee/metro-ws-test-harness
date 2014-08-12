@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2014 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@ import com.sun.xml.ws.test.World;
 import junit.framework.Assert;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Interface to the <tt>wsimport</tt> or <tt>wsgen</tt> command-line tool.
@@ -47,6 +48,13 @@ import java.io.File;
  * @author Kohsuke Kawaguchi
  */
 public abstract class WsTool extends Assert {
+
+    private boolean dumpParameters;
+
+    protected WsTool(boolean dumpParameters) {
+        this.dumpParameters = dumpParameters;
+    }
+
     /**
      * Invokes wsimport with the given arguments.
      *
@@ -69,29 +77,31 @@ public abstract class WsTool extends Assert {
      * Determines which compiler to use.
      *
      * @param externalWsImport
-     *      null to run {@link WsTool} from {@link World#tool}.
+     *      null to run {@link com.sun.xml.ws.test.tool.WsTool} from {@link com.sun.xml.ws.test.World#tool}.
      *      Otherwise this file will be the path to the script.
+     * @param extraWsToolsArgs
      */
-    public static WsTool createWsImport(File externalWsImport, boolean debug) {
-        return createTool(externalWsImport, "com.sun.tools.ws.WsImport", debug);
+    public static WsTool createWsImport(File externalWsImport, boolean dumpParameters, String extraWsToolsArgs) {
+        return createTool(externalWsImport, "com.sun.tools.ws.WsImport", dumpParameters, extraWsToolsArgs);
     }
 
     /**
      * Determines which wsgen to use.
      *
      * @param externalWsGen
-     *      null to run {@link WsTool} from {@link World#tool}.
+     *      null to run {@link com.sun.xml.ws.test.tool.WsTool} from {@link com.sun.xml.ws.test.World#tool}.
      *      Otherwise this file will be the path to the script.
+     * @param extraWsToolsArgs
      */
-    public static WsTool createWsGen(File externalWsGen, boolean debug) {
-        return createTool(externalWsGen,"com.sun.tools.ws.WsGen", debug);
+    public static WsTool createWsGen(File externalWsGen, boolean dumpParameters, String extraWsToolsArgs) {
+        return createTool(externalWsGen,"com.sun.tools.ws.WsGen", dumpParameters, extraWsToolsArgs);
     }
 
-    private static WsTool createTool(File externalExecutable, String className, boolean debug) {
+    private static WsTool createTool(File externalExecutable, String className, boolean dumpParameters, String extraWsToolsArgs) {
         if(externalExecutable !=null) {
-            return new RemoteWsTool(externalExecutable, debug);
+            return new RemoteWsTool(externalExecutable, dumpParameters, extraWsToolsArgs);
         } else {
-            return new LocalWsTool(className);
+            return new LocalWsTool(className, dumpParameters);
         }
     }
 
@@ -102,8 +112,22 @@ public abstract class WsTool extends Assert {
      * This assumes that files that are supposed to be generated
      * are already generated.
      */
-    public static WsTool NOOP = new WsTool() {
+    public static WsTool NOOP = new WsTool(false) {
         public void invoke(String... args) {
         }
     };
+
+    protected void dumpWsParams(List<String> params) {
+        System.err.println("\n\nINVOKING WS Tool:\n");
+        for(int i = 0; i < params.size(); i++) {
+            System.err.print(i == 0? " " : "     ");
+            System.err.print(params.get(i));
+            System.err.println(i + 1 < params.size()? " \\" : "\n");
+        }
+    }
+
+    protected boolean dumpParams() {
+        return dumpParameters;
+    }
+
 }

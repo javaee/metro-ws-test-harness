@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -201,6 +202,19 @@ public class TestService {
             // parse the Java file, looking for @WebService/Provider
             // (note that at this point those source files by themselves won't compile)
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
+            // TODO: workaround for Jake/Jigsaw. Remove after fixing https://bugs.openjdk.java.net/browse/JDK-6929461
+            if (compiler == null) {
+                try {
+                    Class compilerClass = Class.forName("com.sun.tools.javac.api.JavacTool");
+                    Constructor constructor = compilerClass.getConstructor();
+                    compiler = (JavaCompiler) constructor.newInstance();
+                } catch (Throwable ignored) {
+                    ignored.printStackTrace();
+                }
+            }
+            // </TODO>
+
             DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
             JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager,

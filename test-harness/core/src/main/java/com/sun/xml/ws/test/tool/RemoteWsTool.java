@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2014 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,11 +54,13 @@ final class RemoteWsTool extends WsTool {
      */
     private final File executable;
 
-    private final boolean debug;
+    private String toolsExtraArgs = null;
 
-    public RemoteWsTool(File executable, boolean debug) {
+
+    public RemoteWsTool(File executable, boolean dumpParameters, String toolsExtraArgs) {
+        super(dumpParameters);
         this.executable = executable;
-        this.debug = debug;
+        this.toolsExtraArgs = toolsExtraArgs;
         if(!executable.exists())
             throw new IllegalArgumentException("Non-existent executable "+executable);
     }
@@ -80,12 +82,17 @@ final class RemoteWsTool extends WsTool {
         if (nonProxyHosts != null) {
             params.add("-J-Dhttp.nonProxyHosts="+nonProxyHosts);
         }
-        if (debug) {
-            params.add("-J-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8001");
+        if (toolsExtraArgs != null) {
+            System.err.println("adding extra tools args [" + toolsExtraArgs + "]");
+            params.add(toolsExtraArgs);
         }
 
 
         params.addAll(Arrays.asList(args));
+
+        if (dumpParams()) {
+            dumpWsParams(params);
+        }
 
         ProcessBuilder b = new ProcessBuilder(params);
         b.redirectErrorStream(true);
@@ -105,4 +112,5 @@ final class RemoteWsTool extends WsTool {
             "wsimport reported exit code "+exit,
             0,exit);
     }
+
 }

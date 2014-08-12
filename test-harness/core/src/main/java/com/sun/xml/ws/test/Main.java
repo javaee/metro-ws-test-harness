@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -236,8 +236,13 @@ public class Main {
     @Option(name = "-leave", usage = "leave the container running after all the tests are completed. Often useful for debugging problems.")
     boolean leave = false;
 
-    @Option(name = "-debugWsTools", usage = "Runs WsTools in debugging mode. Used port: 8001")
-    boolean debugWsTools = false;
+    @Option(name = "-toolsDump", usage = "Dumps WsTools parameters. Useful for reproducing tools problems.")
+    boolean toolsDump = false;
+
+    @Option(name = "-toolsExtraArgs", usage = "Adds extra argument(s) to all WsTools invocation. \n" +
+            "Useful when extra JVM param is necessary \n" +
+            "e.g. -toolsExtraArgs -J-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005", metaVar = "TOOLS_ARGS")
+    String toolsExtraArgs = null;
 
     @Option(name = "-port", usage = "Choose the TCP port used for local/embedded container-based tests. Set to -1 to choose random port.")
     int port = -1;
@@ -292,9 +297,15 @@ public class Main {
         fillWorld();
 
         if (dump) {
+            // standalone version
             System.setProperty("com.sun.xml.ws.transport.local.LocalTransportTube.dump", "true");
             System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
             System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
+
+            // jdk version
+            System.setProperty("com.sun.xml.internal.ws.transport.local.LocalTransportTube.dump", "true");
+            System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
+            System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
         }
 
         // set up objects that represent test environment.
@@ -303,8 +314,8 @@ public class Main {
             System.err.println("Skipping compilation");
             wsimport = wsgen = WsTool.NOOP;
         } else {
-            wsimport = WsTool.createWsImport(externalWsImport, debugWsTools);
-            wsgen = WsTool.createWsGen(externalWsGen, debugWsTools);
+            wsimport = WsTool.createWsImport(externalWsImport, toolsDump, toolsExtraArgs);
+            wsgen = WsTool.createWsGen(externalWsGen, toolsDump, toolsExtraArgs);
         }
         ApplicationContainer container = createContainer(wsimport, wsgen);
 
@@ -357,6 +368,14 @@ public class Main {
         } finally {
             if (!leave) {
                 container.shutdown();
+            } else {
+                if (container instanceof JavaSeContainer) {
+                    for(int i = 10; i > 0; i--) {
+                        System.err.println("Keeping JavaSeContainer on for debugging. Shutting down in [" + (i * 30) + " secs] ...");
+                        Thread.sleep(30000l);
+                    }
+                    System.err.println("Shutting JavaSeContainer down.");
+                }
             }
             if (World.emma != null) {
                 World.emma.write(emma);
