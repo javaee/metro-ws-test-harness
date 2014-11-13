@@ -212,7 +212,7 @@ public class WSTestMojo extends AbstractMojo {
     /**
      * Directory containing harness extensions.
      */
-    @Parameter(defaultValue = "${project.basedir}/lib/ext")
+    @Parameter(property = "ws.extDir", defaultValue = "${project.basedir}/lib/ext")
     private File extDir;
 
     /**
