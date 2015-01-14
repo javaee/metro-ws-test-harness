@@ -52,16 +52,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glassfish.metro</groupId>
     <artifactId>ws-test-harness</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.3.1</version>
     <packaging>pom</packaging>
 
     <name>WS Test Harness</name>
     <url>http://ws-test-harness.java.net/</url>
 
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/trunk/test-harness</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/trunk/test-harness</developerConnection>
-        <url>https://java.net/projects/ws-test-harness/sources/svn/show/trunk/test-harness</url>
+        <connection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/tags/ws-test-harness-2.3.1</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/tags/ws-test-harness-2.3.1</developerConnection>
+        <url>https://java.net/projects/ws-test-harness/sources/svn/show/tags/ws-test-harness-2.3.1</url>
     </scm>
 
     <properties>
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>org.glassfish.metro</groupId>
                 <artifactId>harness-bootstrap</artifactId>
-                <version>2.3.1-SNAPSHOT</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
