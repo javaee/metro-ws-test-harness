@@ -52,7 +52,7 @@
 
     <groupId>org.glassfish.metro</groupId>
     <artifactId>harness-maven-plugin</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.3.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>WS Test Harness Maven Plugin</name>
