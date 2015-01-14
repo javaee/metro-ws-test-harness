@@ -52,16 +52,16 @@
 
     <groupId>org.glassfish.metro</groupId>
     <artifactId>harness-maven-plugin</artifactId>
-    <version>2.3.1</version>
+    <version>2.3.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>WS Test Harness Maven Plugin</name>
     <url>http://ws-test-harness.java.net/</url>
 
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/tags/harness-maven-plugin-2.3.1</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/tags/harness-maven-plugin-2.3.1</developerConnection>
-        <url>https://java.net/projects/ws-test-harness/sources/svn/show/tags/harness-maven-plugin-2.3.1</url>
+        <connection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/trunk/harness-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/ws-test-harness~svn/trunk/harness-maven-plugin</developerConnection>
+        <url>https://java.net/projects/ws-test-harness/sources/svn/show/trunk/harness-maven-plugin</url>
     </scm>
 
     <properties>
