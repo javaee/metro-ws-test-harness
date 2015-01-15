@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,6 +43,7 @@ import bsh.TargetError;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.client.ScriptBaseClass;
 import com.sun.xml.ws.test.client.XmlResource;
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestClient;
@@ -50,6 +51,8 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.World;
 
 import java.beans.Introspector;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -58,6 +61,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -70,14 +77,17 @@ public class ClientExecutor extends Executor {
      * Client test scenario to execute.
      */
     private final TestClient client;
+    private List<String> pImports = new ArrayList<String>();
+    private StringBuilder pContents = new StringBuilder();
+    private Map<String, String> varMap = new HashMap<String, String>();
 
     public ClientExecutor(DeploymentContext context, TestClient client) {
-        super("client "+client.script.getName().replace('.','_'), context);
+        super("client " + client.script.getName().replace('.', '_'), context);
         this.client = client;
     }
 
     public void runTest() throws Throwable {
-        if(context.clientClassLoader==null) {
+        if (context.clientClassLoader == null) {
             context.clientClassLoader = context.getResources() != null
                     ? new URLClassLoader(new URL[]{context.getResources().toURL()}, World.runtime.getClassLoader())
                     : World.runtime.getClassLoader();
@@ -87,32 +97,37 @@ public class ClientExecutor extends Executor {
 
         NameSpace ns = engine.getNameSpace();
         // import namespaces. what are the other namespaces to be imported?
-        ns.importPackage("javax.activation");
-        ns.importPackage("javax.xml.ws");
-        ns.importPackage("javax.xml.ws.soap");
-        ns.importPackage("javax.xml.ws.handler");
-        ns.importPackage("javax.xml.ws.handler.soap");
-        ns.importPackage("javax.xml.bind");
-        ns.importPackage("javax.xml.soap");
-        ns.importPackage("javax.xml.namespace");
-        ns.importPackage("javax.xml.transform");
-        ns.importPackage("javax.xml.transform.sax");
-        ns.importPackage("javax.xml.transform.dom");
-        ns.importPackage("javax.xml.transform.stream");
-        ns.importPackage("java.util");
-        ns.importPackage("java.util.concurrent");
+        importPackage(ns, "javax.activation");
+        importPackage(ns, "javax.xml.ws");
+        importPackage(ns, "javax.xml.ws.soap");
+        importPackage(ns, "javax.xml.ws.handler");
+        importPackage(ns, "javax.xml.ws.handler.soap");
+        importPackage(ns, "javax.xml.bind");
+        importPackage(ns, "javax.xml.soap");
+        importPackage(ns, "javax.xml.namespace");
+        importPackage(ns, "javax.xml.transform");
+        importPackage(ns, "javax.xml.transform.sax");
+        importPackage(ns, "javax.xml.transform.dom");
+        importPackage(ns, "javax.xml.transform.stream");
+        importPackage(ns, "java.util");
+        importPackage(ns, "java.util.concurrent");
+        importPackage(ns, "java.net");
         // if there's any client package, put them there
-        ns.importPackage(context.descriptor.name+".client");
-        ns.importPackage(context.descriptor.name+".common");
+        importPackage(ns, context.descriptor.name + ".client");
+        if (context.descriptor.common != null && context.descriptor.common.exists()) {
+            importPackage(ns, context.descriptor.name + ".common");
+        }
 
         // this will make 'thisObject' available as 'this' in script
         ns.importObject(new ScriptBaseClass(context, engine, client));
+
+        inlineUtilBshToGeneratedSource();
 
         // load additional helper methods
         try {
             engine.eval(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
         } catch (EvalError evalError) {
-            throw new Error("Failed to evaluate util.bsh",evalError);
+            throw new Error("Failed to evaluate util.bsh", evalError);
         }
 
         // when invoking JAX-WS, we need to set the context classloader accordingly
@@ -128,6 +143,17 @@ public class ClientExecutor extends Executor {
         }
     }
 
+    protected void inlineUtilBshToGeneratedSource() throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
+        String line = r.readLine();
+        varMap.put("util_bsh", "   // TODO: util.bsh" + line + "\n");
+    }
+
+    protected void importPackage(NameSpace ns, String p) {
+        ns.importPackage(p);
+        pImports.add(p + ".*");
+    }
+
     /**
      * Makes the test script invocation.
      */
@@ -135,15 +161,39 @@ public class ClientExecutor extends Executor {
         // executes the script
         Reader r = client.script.read();
         try {
-            if(client.parent.setUpScript!=null)
-                engine.eval(new StringReader(client.parent.setUpScript),
-                    engine.getNameSpace(), "pre-client script" );
-            engine.eval(r, engine.getNameSpace(), client.script.getName() );
-        } catch(TargetError e) {
+            if (client.parent.setUpScript != null) {
+                engine.eval(new StringReader(client.parent.setUpScript), engine.getNameSpace(), "pre-client script");
+                varMap.put("client_setUp_script", client.parent.setUpScript + "\n");
+            } else {
+                varMap.put("client_setUp_script", "");
+            }
+            generateClientSource();
+
+            engine.eval(r, engine.getNameSpace(), client.script.getName());
+        } catch (TargetError e) {
             throw e.getTarget();
         } finally {
             r.close();
         }
+    }
+
+    private void generateClientSource() throws IOException {
+        BufferedReader reader = new BufferedReader(client.script.read());
+        String line = reader.readLine();
+        while (line != null) {
+            pContents.append("      " + line + "\n");
+            line = reader.readLine();
+        }
+
+        String classpath = "client-classes:.";
+        String testName = client.parent.home + "/test-descriptor.xml @ " + client.script.getName();
+
+        CodeGenerator.generateClientClass(
+                classpath,
+                testName,
+                pImports,
+                pContents.toString(),
+                varMap);
     }
 
     private void injectResources(NameSpace ns, Interpreter engine) throws Exception {
@@ -152,16 +202,17 @@ public class ClientExecutor extends Executor {
         StringBuilder addressList = new StringBuilder("injected addresses:");
 
         // inject test home directory
-        engine.set("home",client.parent.home);
+        engine.set("home", client.parent.home);
+        varMap.put("home", client.parent.home.toString());
 
         // inject XML resources
         for (Entry<String, XmlResource> e : context.descriptor.xmlResources.entrySet())
-            engine.set(e.getKey(),e.getValue());
+            engine.set(e.getKey(), e.getValue());
 
         for (DeployedService svc : context.services.values()) {
-            if (! svc.service.isSTS) {
+            if (!svc.service.isSTS) {
                 // inject WSDL URLs
-                engine.set("wsdlUrls",svc.app.getWSDL());
+                engine.set("wsdlUrls", svc.app.getWSDL());
 
                 /*
                  TODO: some more work here
@@ -199,15 +250,17 @@ public class ClientExecutor extends Executor {
 
                     Object serviceInstance = clazz.newInstance();
 
-                    {// inject a service instance
-                        String serviceVarName = Introspector.decapitalize(clazz.getSimpleName());
-                        engine.set(serviceVarName,serviceInstance);
-                        serviceList.append(' ').append(serviceVarName);
-                    }
+                    //{// inject a service instance
+                    String serviceVarName = Introspector.decapitalize(clazz.getSimpleName());
+                    engine.set(serviceVarName, serviceInstance);
+                    varMap.put("simpleName", clazz.getSimpleName());
+                    varMap.put("serviceVarName", serviceVarName);
+                    serviceList.append(' ').append(serviceVarName);
+                    //}
 
                     for (Method method : methods) {
                         Annotation endpoint = method.getAnnotation(webendpointAnnotation);
-						// don't inject variables for methods like getHelloPort(WebServiceFeatures)
+                        // don't inject variables for methods like getHelloPort(WebServiceFeatures)
                         if (endpoint != null && method.getParameterTypes().length == 0) {
 
                             //For multiple endpoints the convention for injecting the variables is
@@ -218,11 +271,18 @@ public class ClientExecutor extends Executor {
 
                             try {
                                 engine.set(varName, method.invoke(serviceInstance));
-                                engine.set(varName +"Address",svc.app.getEndpointAddress(getEndpoint(svc, portName)));
+                                String portType = method.getReturnType().getSimpleName();
+
+                                varMap.put("portType", portType);
+                                varMap.put("varName", varName);
+                                varMap.put("serviceName", serviceVarName);
+                                varMap.put("portName", portName);
+                                engine.set("   " + varName + "Address", svc.app.getEndpointAddress(getEndpoint(svc, portName)));
                                 addressList.append(' ').append(varName).append("Address");
+                                varMap.put("address", svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString());
                             } catch (InvocationTargetException e) {
-                                if(e.getCause() instanceof Exception)
-                                    throw (Exception)e.getCause();
+                                if (e.getCause() instanceof Exception)
+                                    throw (Exception) e.getCause();
                                 else
                                     throw e;
                             }
@@ -240,13 +300,13 @@ public class ClientExecutor extends Executor {
     private TestEndpoint getEndpoint(DeployedService svc, String portName) {
         // first, look for the port name match
         for (TestEndpoint e : svc.service.endpoints) {
-            if(e.portName!=null && e.portName.equals(portName))
+            if (e.portName != null && e.portName.equals(portName))
                 return e;
         }
         // nothing explicitly matched.
-        if(svc.service.endpoints.size()!=1)
-            throw new Error("Multiple ports are defined on '"+svc.service.name+"', yet ports are ambiguous. Please use @WebService/Provider(portName=)");
+        if (svc.service.endpoints.size() != 1)
+            throw new Error("Multiple ports are defined on '" + svc.service.name + "', yet ports are ambiguous. Please use @WebService/Provider(portName=)");
         // there's only one
-        return (TestEndpoint)svc.service.endpoints.toArray()[0];
+        return (TestEndpoint) svc.service.endpoints.toArray()[0];
     }
 }

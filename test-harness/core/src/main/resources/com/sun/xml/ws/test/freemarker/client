@@ -1,0 +1,12 @@
+#!/bin/bash -ex
+# service id: ${serviceId}
+# stage: ${stage}
+export CTX=${serviceId}:${stage}-client
+
+r echo "Running ${testName}"
+r javac -cp ${classpath} bsh/Client${stage}.java
+
+if [ "$skipTests" != "true" ]; then 
+  r java -cp ${classpath} bsh.Client${stage}
+  r sleep 1
+fi;

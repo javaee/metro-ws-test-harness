@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@
 package com.sun.xml.ws.test.container;
 
 import com.sun.istack.NotNull;
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.Realm;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
@@ -477,6 +478,7 @@ public final class WAR {
 
         javac.setDestdir(classDir);
         javac.setDebug(true);
+        CodeGenerator.generateJavac(javac);
         javac.execute();
     }
 

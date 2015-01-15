@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,6 +41,7 @@ package com.sun.xml.ws.test.exec;
 
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.ApplicationContainer;
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.model.TestService;
 import com.sun.xml.ws.test.util.ArgumentListBuilder;
@@ -243,6 +244,7 @@ public class DeploymentExecutor extends Executor {
     public Executor createUndeployer() {
         return new Executor("Undeploy "+context.service.name,context.parent) {
             public void runTest() throws Throwable {
+                CodeGenerator.testDone();
                 if(DeploymentExecutor.this.context.app!=null)
                     DeploymentExecutor.this.context.app.undeploy();
             }

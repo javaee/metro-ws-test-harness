@@ -1,0 +1,60 @@
+#!/bin/bash -ex
+# service id: ${serviceId}
+# stage: ${stage}
+export CTX=${serviceId}:${stage}-run
+
+# global testcase status
+export G_STATUS=0
+
+function r {
+    if [ $G_STATUS -ne 0 ]; then
+        return $G_STATUS;
+    fi;
+    if [ "$debug" = "true" ]; then 
+       #echo $CTX: $G_STATUS
+       echo "$@"
+       echo ""
+       "$@"
+    else
+       echo "$@" >> log.txt 2>&1
+       echo "" >> log.txt 2>&1
+       "$@" >> log.txt 2>&1
+    fi;
+   
+    local status=$?
+    if [ $status -ne 0 ]; then
+        G_STATUS=$status
+        FAILED=$((FAILED+1))
+        echo "FAILED: $CTX/$1"
+    fi
+    return $status
+}
+
+cd ${workdir}
+
+# clean the log
+rm -rf log.txt
+
+<#list scripts as script>
+. ${script}
+</#list>
+
+# ----------------------------------------------------
+# undeploy
+# ----------------------------------------------------
+if [ "$debug" = "true" ]; then
+   wget http://127.0.0.1:8888/stop
+else
+   wget http://127.0.0.1:8888/stop >> log.txt 2>&1
+fi;
+
+r sleep 1
+
+# ----------------------------------------------------
+# testcase result
+# ----------------------------------------------------
+if [ $G_STATUS -eq 0 ]; then
+     echo "    OK: $CTX"
+     PASSED=$((PASSED+1))
+fi; 
+

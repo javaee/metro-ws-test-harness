@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -156,6 +156,9 @@ public class Main {
     @Option(name = "-dump", usage = "Enable all transport dumps")
     boolean dump;
 
+    @Option(name = "-generateTestSources", usage = "Generates plain java sources + bash scripts to run the testcase (works just for JavaSE deployment)")
+    boolean generateTestSources;
+
     @Option(name = "-report", usage = "Generate JUnit test report XMLs", metaVar = "DIR")
     File reportDir = null;
 
@@ -282,6 +285,8 @@ public class Main {
                 throw new CmdLineException("No test is given");
             }
 
+            CodeGenerator.setGenerateTestSources(main.generateTestSources);
+
             return main.run();
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
@@ -380,6 +385,8 @@ public class Main {
             if (World.emma != null) {
                 World.emma.write(emma);
             }
+            CodeGenerator.workDir = tests.get(0);
+            CodeGenerator.allTestsDone();
         }
     }
 

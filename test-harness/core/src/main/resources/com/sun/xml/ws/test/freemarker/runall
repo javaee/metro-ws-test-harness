@@ -1,0 +1,12 @@
+#!/bin/bash -ex
+
+# set counters
+export PASSED=0
+export FAILED=0
+
+
+<#list testcases as testcase>
+. ${testcase}
+</#list>
+
+echo "PASSED = $PASSED , FAILED = $FAILED , skipTests = $skipTests"

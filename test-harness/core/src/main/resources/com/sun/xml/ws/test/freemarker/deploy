@@ -1,0 +1,21 @@
+#!/bin/bash -ex
+# service id: ${serviceId}
+# stage: ${stage}
+export CTX=${serviceId}:${stage}-deploy
+
+r javac -cp ${classpath} bsh/Deploy${stage}.java
+
+if [ $G_STATUS -ne 0 ]; then
+   return $G_STATUS
+fi;
+    if [ "$debug" = "true" ]; then 
+       echo "java -cp .:${classpath} bsh.Deploy${stage} &
+
+"
+       java -cp .:${classpath} bsh.Deploy${stage} &
+    else
+       echo "java -cp .:${classpath} bsh.Deploy${stage} &" >> log.txt 2>&1
+
+       java -cp .:${classpath} bsh.Deploy${stage} >> log.txt 2>&1 &
+    fi;
+r sleep 3

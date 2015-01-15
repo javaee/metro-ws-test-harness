@@ -1,0 +1,12 @@
+#!/bin/bash -ex
+# service id:  ${serviceId}
+# stage: ${stage}
+export CTX=${serviceId}:${stage}-tool
+
+<#list dirs as dir>
+r mkdir -p ${dir}
+</#list>
+
+r <#list params as param>${param} <#if param_has_next>\</#if>
+</#list>
+

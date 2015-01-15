@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,10 +36,11 @@
 
 package com.sun.xml.ws.test.tool;
 
-import com.sun.xml.ws.test.World;
+import com.sun.xml.ws.test.CodeGenerator;
 import junit.framework.Assert;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,10 +125,30 @@ public abstract class WsTool extends Assert {
             System.err.print(params.get(i));
             System.err.println(i + 1 < params.size()? " \\" : "\n");
         }
+
+        List mkdirs = new ArrayList();
+        List params2 = new ArrayList();
+        for(int i = 0; i < params.size(); i++) {
+            String p = params.get(i);
+            if (i == 0) {
+                int index = p.lastIndexOf('/');
+                index++;
+                if (index > 0 && index < p.length()) {
+                    // remove full path from tool
+                    p = p.substring(index);
+                }
+            }
+            if ("-d".equals(p.trim()) || "-r".equals(p.trim())) {
+                String dir = params.get(i + 1);
+                mkdirs.add(dir);
+            }
+            params2.add(p.replaceAll("localhost", "127.0.0.1"));
+        }
+        CodeGenerator.generatedWsScript(mkdirs, params);
     }
 
     protected boolean dumpParams() {
-        return dumpParameters;
+        return dumpParameters || CodeGenerator.getGenerateTestSources();
     }
 
 }

@@ -1,0 +1,13 @@
+#!/bin/bash -ex
+# service id: ${serviceId}
+# stage: ${stage}
+export CTX=${serviceId}:${stage}-javac
+
+<#list mkdirs as dir>
+r mkdir -p ${dir}
+</#list>
+
+r javac \
+<#list params as param>
+        ${param} <#if param_has_next>\</#if>
+</#list>

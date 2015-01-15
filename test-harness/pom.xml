@@ -215,6 +215,11 @@
                 <artifactId>isorelax</artifactId>
                 <version>20090621</version>
             </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>2.3.21</version>
+            </dependency>
             <!-- obsolete -->
             <dependency>
                 <groupId>emma</groupId>

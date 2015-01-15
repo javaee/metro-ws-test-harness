@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2013 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,12 +42,14 @@ import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.client.InterpreterEx;
 import com.sun.xml.ws.test.container.AbstractApplicationContainer;
 import com.sun.xml.ws.test.container.Application;
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
@@ -95,6 +97,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         final String id = service.service.getGlobalUniqueName();
+        CodeGenerator.startDumpService(id, service.parent.workDir);
         final WAR war = assembleWar(service);
         List<EndpointInfoBean> beans = war.getEndpointsInfos();
 
@@ -188,20 +191,49 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             Object feature = createMetadataFeature(service, interpreter);
             interpreter.set("feature", feature);
 
+            generateDeploySources(war, testEndpoint, metadata, props, endpointAddress);
+
             try {
-                servers[i++] = interpreter.eval(
-                    "endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
-                            (feature != null? ", new javax.xml.ws.WebServiceFeature[] {feature});" : ");") +
-                    "endpoint.setMetadata(metadata);" +
-                    "endpoint.setProperties(properties);" +
-                    "endpoint.publish(endpointAddress);" +
-                    "return endpoint;");
+                String statements = "      javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
+                        (feature != null ? ", new javax.xml.ws.WebServiceFeature[] {feature});" : ");\n") +
+                        "      endpoint.setMetadata(metadata);\n" +
+                        "      endpoint.setProperties(properties);\n" +
+                        "      endpoint.publish(\"" + endpointAddress + "\");\n" +
+                        "      return endpoint;\n";
+                servers[i++] = interpreter.eval(statements);
             } catch(Throwable t) {
                 t.printStackTrace();
                 throw new Exception("Deploying endpoint "+ endpointAddress +" failed", t);
             }
         }
         return new JavaSeApplication(servers, baseAddress, service);
+    }
+
+    protected void generateDeploySources(WAR war, TestEndpoint testEndpoint, List<Source> metadata, Map<String, Object> props, String endpointAddress) {
+        Map<String, Object> templateParams = new HashMap<String, Object>();
+        templateParams.put("endpointAddress", endpointAddress);
+
+
+        List<String> metadata_files = new ArrayList<String>();
+        for (Source source : metadata) {;
+            metadata_files.add(source.getSystemId().replaceAll("file:", ""));
+        }
+        templateParams.put("metadata_files", metadata_files);
+        templateParams.put("props", props);
+
+        QName qname = (QName) props.get("javax.xml.ws.wsdl.port");
+        if (qname != null) {
+            templateParams.put("portURI", "" + qname.getNamespaceURI());
+            templateParams.put("portLOCAL", "" + qname.getLocalPart());
+        }
+        qname = (QName) props.get("javax.xml.ws.wsdl.service");
+        if (qname != null) {
+            templateParams.put("svcURI", "" + qname.getNamespaceURI());
+            templateParams.put("svcLOCAL", "" + qname.getLocalPart());
+        }
+        templateParams.put("endpointImpl", "" + testEndpoint.className);
+        templateParams.put("endpointAddress", "" + endpointAddress);
+        CodeGenerator.generateDeploy(templateParams, war.classDir.getAbsolutePath());
     }
 
     private Object createMetadataFeature(DeployedService service, InterpreterEx interpreter) throws EvalError {
@@ -237,6 +269,12 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     }
 
     private static int getFreePort() {
+
+        // use static port in case you want to run it in plain java
+        if (CodeGenerator.getGenerateTestSources()) {
+            return 8080;
+        }
+
         int port = -1;
         try {
             ServerSocket soc = new ServerSocket(0);
