@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -80,6 +80,10 @@ final class RemoteWsTool extends WsTool {
         }
         String nonProxyHosts = System.getProperty("http.nonProxyHosts");
         if (nonProxyHosts != null) {
+            // if running in bash, value must be quoted
+            if (!nonProxyHosts.startsWith("\"")) {
+                nonProxyHosts = "\"" + nonProxyHosts + "\"";
+            }
             params.add("-J-Dhttp.nonProxyHosts="+nonProxyHosts);
         }
         if (toolsExtraArgs != null) {

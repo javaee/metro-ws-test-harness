@@ -2,9 +2,12 @@
 # service id: ${serviceId}
 # stage: ${stage}
 export CTX=${serviceId}:${stage}-run
-
 # global testcase status
 export G_STATUS=0
+
+if [ "$debug" = "true" ]; then
+   echo == $CTX ========================================================
+fi;
 
 function r {
     if [ $G_STATUS -ne 0 ]; then

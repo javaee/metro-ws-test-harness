@@ -244,7 +244,7 @@ public class DeploymentExecutor extends Executor {
     public Executor createUndeployer() {
         return new Executor("Undeploy "+context.service.name,context.parent) {
             public void runTest() throws Throwable {
-                CodeGenerator.testDone();
+                CodeGenerator.testCaseDone();
                 if(DeploymentExecutor.this.context.app!=null)
                     DeploymentExecutor.this.context.app.undeploy();
             }

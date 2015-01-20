@@ -126,29 +126,32 @@ public abstract class WsTool extends Assert {
             System.err.println(i + 1 < params.size()? " \\" : "\n");
         }
 
-        List mkdirs = new ArrayList();
-        List params2 = new ArrayList();
-        for(int i = 0; i < params.size(); i++) {
-            String p = params.get(i);
-            if (i == 0) {
-                int index = p.lastIndexOf('/');
-                index++;
-                if (index > 0 && index < p.length()) {
-                    // remove full path from tool
-                    p = p.substring(index);
+        // generate ws script
+        if (CodeGenerator.isGenerateTestSources()) {
+            List mkdirs = new ArrayList();
+            List params2 = new ArrayList();
+            for (int i = 0; i < params.size(); i++) {
+                String p = params.get(i);
+                if (i == 0) {
+                    int index = p.lastIndexOf("/");
+                    index++;
+                    if (index > 0 && index < p.length()) {
+                        // remove full path from tool
+                        p = p.substring(index);
+                    }
                 }
+                if ("-s".equals(p.trim()) || "-d".equals(p.trim()) || "-r".equals(p.trim())) {
+                    String dir = params.get(i + 1);
+                    mkdirs.add(dir);
+                }
+                params2.add(p.replaceAll("localhost", "127.0.0.1"));
             }
-            if ("-d".equals(p.trim()) || "-r".equals(p.trim())) {
-                String dir = params.get(i + 1);
-                mkdirs.add(dir);
-            }
-            params2.add(p.replaceAll("localhost", "127.0.0.1"));
+            CodeGenerator.generatedWsScript(mkdirs, params2);
         }
-        CodeGenerator.generatedWsScript(mkdirs, params);
     }
 
     protected boolean dumpParams() {
-        return dumpParameters || CodeGenerator.getGenerateTestSources();
+        return dumpParameters || CodeGenerator.isGenerateTestSources();
     }
 
 }

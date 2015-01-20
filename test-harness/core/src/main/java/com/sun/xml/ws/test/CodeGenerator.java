@@ -40,28 +40,42 @@ import com.sun.xml.ws.test.util.FreeMarkerTemplate;
 import com.sun.xml.ws.test.util.JavacTask;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class responsible for generation of bash scripts and java sources to
+ * allow running ws-unit test(s) with plain java and bash only (no ws-harness)
+ */
 public class CodeGenerator {
 
+    // generate sources or not ....
+    private static boolean generateTestSources;
+
+    // context
     public static int scriptOrder = 0;
     public static String id;
-    public static String workDir;
-    static List<String> testcaseScripts = new ArrayList<String>();
 
+    private static String workDir;
+
+    // scripts for one "testcase" (= 1 test-desriptor.xml)
+    private static List<String> testcaseScripts = new ArrayList<String>();
+
+    // all tests
     private static List<String> testcases = new ArrayList<String>();
-    private static boolean generateTestSources;
 
     public static void setGenerateTestSources(boolean generateTestSources) {
         CodeGenerator.generateTestSources = generateTestSources;
     }
 
-    public static void testDone() {
+    public static boolean isGenerateTestSources() {
+        return generateTestSources;
+    }
+
+    public static void testCaseDone() {
         if (!generateTestSources) return;
         scriptOrder = 0;
 
@@ -77,7 +91,7 @@ public class CodeGenerator {
         if (!generateTestSources) return;
         FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, workDir, "runall");
         runall.put("testcases", testcases);
-        runall.writeFile();
+        runall.writeFileTo(chdir(workDir) + "/runall");
     }
 
     public static void generateDeploy(Map<String, Object> params, String classpath) {
@@ -87,7 +101,7 @@ public class CodeGenerator {
         //obsoleteDeploy(filename, classpath);
 
         FreeMarkerTemplate deploy = new FreeMarkerTemplate(id, scriptOrder, workDir, "deploy");
-        deploy.put("classpath", classpath);
+        deploy.put("classpath", chdir(classpath));
         String filename = deploy.writeFile();
         testcaseScripts.add(filename);
 
@@ -99,7 +113,13 @@ public class CodeGenerator {
 
         FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java");
         for(String key : params.keySet()) {
-            deployClass.put(key, params.get(key));
+            Object value = params.get(key);
+            if (value instanceof List) {
+                value = chdir((List<String>) value);
+            } else if (value instanceof String) {
+                value = chdir((String) value);
+            }
+            deployClass.put(key, value);
         }
         deployClass.writeFileTo(workDir + "/bsh/Deploy" + scriptOrder + ".java");
 
@@ -111,7 +131,7 @@ public class CodeGenerator {
         if (workDir == null) return;
 
         FreeMarkerTemplate client = new FreeMarkerTemplate(id, scriptOrder, workDir, "client");
-        client.put("classpath", classpath);
+        client.put("classpath", chdir(classpath));
         client.put("testName", testName);
         String filename = client.writeFile();
         testcaseScripts.add(filename);
@@ -123,50 +143,87 @@ public class CodeGenerator {
         scriptOrder++;
     }
 
-    public static void log(File file, String ... contents) {
-        if (!generateTestSources) return;
-        Writer fwriter = null;
-        try {
-            file.setExecutable(true);
-            fwriter = new FileWriter(file);
-
-            for (String s : contents) {
-                fwriter.write(s);
-            }
-
-            fwriter.flush();
-            fwriter.close();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        } finally {
-            if (fwriter != null) {
-                try {
-                    fwriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static void startDumpService(String id, File workDir) {
+    public static void startTestCase(String id, File workDir) {
         if (!generateTestSources) return;
         scriptOrder = 1;
         CodeGenerator.id = id;
-        CodeGenerator.workDir = workDir.getAbsolutePath();
+        CodeGenerator.workDir = chdir(workDir.getAbsolutePath());
+        String srcDir = new File(workDir.getAbsolutePath()).getParent();
+        cleanDestDirectory(srcDir);
+        SourcesCollector.ensureDirectoryExists(CodeGenerator.workDir);
+        copySources(srcDir);
+    }
+
+    public static void setWorkDir(String workDir) {
+        CodeGenerator.workDir = chdir(workDir);
+    }
+
+    protected static void cleanDestDirectory(String srcDir) {
+        String dstDir = chdir(srcDir);
+        try {
+            File f = new File(dstDir);
+            if (f.exists()) {
+                delete(f);
+            }
+        } catch (IOException e) {
+            System.err.println("Error while cleaning dest dir.");
+            e.printStackTrace();
+        }
+    }
+
+    static void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+            throw new FileNotFoundException("Failed to delete file: " + f);
+    }
+
+    protected static void copySources(String srcDir) {
+        SourcesCollector collector = new SourcesCollector(srcDir);
+        collector.copyFilesTo(chdir(srcDir) + "/src");
+    }
+
+    // move everything out of (harness) testcases directory
+    public static String chdir(String dir) {
+        return dir.replaceAll("/testcases/", "/testcases-no-harness/");
+    }
+
+    private static List<String> chdir(List<String> list) {
+        List<String> changed = new ArrayList<String>();
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            s = chdir(s);
+            changed.add(s);
+        }
+        return changed;
+    }
+
+    private static List<String> moveToSrc2(List<String> list) {
+        List<String> changed = new ArrayList<String>();
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            s = CodeGenerator.moveToSrc2(s);
+            changed.add(s);
+        }
+        return changed;
     }
 
     public static void generateJavac(JavacTask javac) {
         if (!generateTestSources) return;
 
         List<String> mkdirs = new ArrayList();
-        mkdirs.add(javac.getDestdir().toString());
+        String destDir = chdir(javac.getDestdir().toString());
+        mkdirs.add(destDir);
 
         List<String> params = new ArrayList();
-        params.add("-d " + javac.getDestdir());
-        params.add("-cp " + javac.getClasspath());
+        params.add("-d " + destDir);
+        params.add("-cp " + chdir(javac.getClasspath().toString()));
 
         for(String p : javac.getSrcdir().list()) {
+            p = chdir(p);
+            p = moveToSrc(p);
             params.add("`find " + p + " -name '*.java'`");
             mkdirs.add(p);
         }
@@ -180,12 +237,33 @@ public class CodeGenerator {
         scriptOrder++;
     }
 
-    public static void generatedWsScript(List dirsToBeCretaed, List<String> params) {
+    public static String moveToSrc(String directory) {
+        File dir = new File(directory);
+        File parent = dir.getParentFile();
+        File testcaseDir = new File(workDir).getParentFile();
+        if (parent.equals(testcaseDir)) {
+            return parent.toString() + "/src/" + dir.getName();
+        }
+        return directory;
+    }
+
+    public static String moveToSrc2(String directory) {
+        if (directory == null || workDir == null) return directory;
+        String workDirParent = new File(workDir).getParent();
+        if (directory.startsWith(workDirParent) && !directory.contains("/work/")) {
+            System.out.println("fixing directory = \n\t\t" + directory);
+            directory = directory.replaceAll(workDirParent, workDirParent + "/src/");
+            System.out.println("\t>>" + directory);
+        }
+        return directory;
+    }
+
+    public static void generatedWsScript(List<String> dirsToBeCretaed, List<String> params) {
         if (!generateTestSources) return;
 
         FreeMarkerTemplate template = new FreeMarkerTemplate(id, scriptOrder, workDir, "tool");
-        template.put("dirs", dirsToBeCretaed);
-        template.put("params", params);
+        template.put("dirs", moveToSrc2(chdir(dirsToBeCretaed)));
+        template.put("params", moveToSrc2(chdir(params)));
         String filename = template.writeFile();
         testcaseScripts.add(filename);
 
@@ -218,7 +296,4 @@ public class CodeGenerator {
         generateClient(classpath, testName);
     }
 
-    public static boolean getGenerateTestSources() {
-        return generateTestSources;
-    }
 }

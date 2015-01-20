@@ -97,7 +97,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     @NotNull
     public Application deploy(DeployedService service) throws Exception {
         final String id = service.service.getGlobalUniqueName();
-        CodeGenerator.startDumpService(id, service.parent.workDir);
+        CodeGenerator.startTestCase(id, service.parent.workDir);
         final WAR war = assembleWar(service);
         List<EndpointInfoBean> beans = war.getEndpointsInfos();
 
@@ -271,7 +271,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
     private static int getFreePort() {
 
         // use static port in case you want to run it in plain java
-        if (CodeGenerator.getGenerateTestSources()) {
+        if (CodeGenerator.isGenerateTestSources()) {
             return 8080;
         }
 
