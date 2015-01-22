@@ -75,19 +75,19 @@ public class FreeMarkerTemplate {
     public String writeFile() {
         String workdir = (String) root.get("workdir");
         String stage = "" + root.get("stage");
-        return writeFileTo(workdir + "/" + stage + "-" + templateName);
+        return writeFileTo(workdir, stage + "-" + templateName);
     }
 
-    public String writeFileTo(String filename) {
-        /* Get the template (uses cache internally) */
-        Writer out = null;
+    public String writeFileTo(String dir, String filename) {
+        String fullFileName = dir + "/" + filename;
+        System.out.println("generating file [" + fullFileName + "]");
 
+        Writer out = null;
         try {
             Template temp = cfg.getTemplate(templateName);
 
             /* Merge data-model with template */
-            System.out.println("generating file [" + filename + "]");
-            out = new FileWriter(filename);
+            out = new FileWriter(fullFileName);
             temp.process(root, out);
 
         } catch (IOException e) {
@@ -103,7 +103,7 @@ public class FreeMarkerTemplate {
                 }
             }
         }
-        return filename;
+        return fullFileName;
     }
 
 }

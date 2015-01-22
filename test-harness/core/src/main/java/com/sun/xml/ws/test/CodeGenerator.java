@@ -81,17 +81,18 @@ public class CodeGenerator {
 
         FreeMarkerTemplate run = new FreeMarkerTemplate(id, scriptOrder, workDir, "run");
         run.put("scripts", testcaseScripts);
-        String filename = run.writeFile();
+        String filename = run.writeFileTo(workDir, "run");
         testcases.add(filename);
-
         testcaseScripts.clear();
+
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "clean").writeFile();
     }
 
-    public static void allTestsDone() {
+    public static void allTestsDone(String dir) {
         if (!generateTestSources) return;
-        FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, workDir, "runall");
+        FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, chdir(dir), "runall");
         runall.put("testcases", testcases);
-        runall.writeFileTo(chdir(workDir) + "/runall");
+        runall.writeFileTo(chdir(dir), "/runall");
     }
 
     public static void generateDeploy(Map<String, Object> params, String classpath) {
@@ -121,7 +122,7 @@ public class CodeGenerator {
             }
             deployClass.put(key, value);
         }
-        deployClass.writeFileTo(workDir + "/bsh/Deploy" + scriptOrder + ".java");
+        deployClass.writeFileTo(workDir + "/bsh", "Deploy" + scriptOrder + ".java");
 
         scriptOrder++;
     }
@@ -292,7 +293,7 @@ public class CodeGenerator {
             String value = varMap.get(key);
             clientClass.put(key, value);
         }
-        clientClass.writeFileTo(workDir + "/bsh/Client" + scriptOrder + ".java");
+        clientClass.writeFileTo(workDir + "/bsh", "Client" + scriptOrder + ".java");
         generateClient(classpath, testName);
     }
 

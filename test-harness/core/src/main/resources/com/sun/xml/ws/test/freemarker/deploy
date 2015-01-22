@@ -45,10 +45,10 @@ fi;
        echo "java -cp .:${classpath} bsh.Deploy${stage} &
 
 "
-       java -cp .:${classpath} bsh.Deploy${stage} &
+       java $JAVA_OPTS -cp .:${classpath} bsh.Deploy${stage} &
     else
        echo "java -cp .:${classpath} bsh.Deploy${stage} &" >> log.txt 2>&1
 
-       java -cp .:${classpath} bsh.Deploy${stage} >> log.txt 2>&1 &
+       java $JAVA_OPTS -cp .:${classpath} bsh.Deploy${stage} >> log.txt 2>&1 &
     fi;
 r sleep 3

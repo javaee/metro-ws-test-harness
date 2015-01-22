@@ -34,16 +34,20 @@ function r {
 
 r echo "Running ${testName}"
 
-SRC_FILES=
-if [ -d "client-source" ]; then
-    SRC_FILES=`find client-source -name '*.java'`
-    r javac -cp ${classpath} -d client-classes $SRC_FILES
-fi
+if [ "$skipTests" != "true" ]; then
 
-r javac -cp ${classpath} -d client-classes \
-     bsh/Client${stage}.java
+    # compile generated client sources
+    SRC_FILES=
+    if [ -d "client-source" ]; then
+        SRC_FILES=`find client-source -name '*.java'`
+        r javac -cp ${classpath} -d client-classes $SRC_FILES
+    fi
 
-if [ "$skipTests" != "true" ]; then 
-  r java -cp ${classpath} bsh.Client${stage}
-  r sleep 1
+    # compile generated bash.Client#.java
+    r javac -cp ${classpath} -d client-classes \
+         bsh/Client${stage}.java
+
+    # actual running client
+    r java $JAVA_OPTS -cp ${classpath} bsh.Client${stage}
+    #r sleep 1
 fi;

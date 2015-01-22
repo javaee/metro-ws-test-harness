@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+START=$(date +%s)
+
 # set counters
 export PASSED=0
 export FAILED=0
@@ -9,4 +11,12 @@ export FAILED=0
 . ${testcase}
 </#list>
 
+echo $(date +%Y-%m-%d,%H:%M:%S)
+echo "java version: "
+java -version 2>&1
+
 echo "PASSED = $PASSED , FAILED = $FAILED , skipTests = $skipTests"
+
+END=$(date +%s)
+DIFF=$(( $END - $START ))
+echo "It took $DIFF seconds"
