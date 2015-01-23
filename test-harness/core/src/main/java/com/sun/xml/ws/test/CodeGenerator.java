@@ -79,6 +79,8 @@ public class CodeGenerator {
         if (!generateTestSources) return;
         scriptOrder = 0;
 
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "shared").writeFileTo(workDir, "shared");
+
         FreeMarkerTemplate run = new FreeMarkerTemplate(id, scriptOrder, workDir, "run");
         run.put("scripts", testcaseScripts);
         String filename = run.writeFileTo(workDir, "run");

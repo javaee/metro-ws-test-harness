@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function prolog() {
+    if [ "$debug" = "true" ]; then
+       echo == $1 ========================================================
+    fi;
+}
+
+function log() {
+    if [ "$debug" = "true" ]; then
+       echo $1
+    fi;
+}
+
+function r {
+    if [ $G_STATUS -ne 0 ]; then
+        return $G_STATUS;
+    fi;
+    if [ "$debug" = "true" ]; then
+       #echo $CTX: $G_STATUS
+       echo "$@"
+       echo ""
+       "$@"
+    else
+       echo "$@" >> log.txt 2>&1
+       echo "" >> log.txt 2>&1
+       "$@" >> log.txt 2>&1
+    fi;
+
+    local status=$?
+    if [ $status -ne 0 ]; then
+        G_STATUS=$status
+        FAILED=$((FAILED+1))
+        echo "FAILED: $CTX/$1"
+    fi
+    return $status
+}
+
+function mkdirp() {
+    log "creating directory [$1]"
+    mkdir -p $1 > /dev/null 2>&1 | true
+}
+
+function cpwsdl() {
+    log "copying [$1] to [services/server/war/WEB-INF/wsdl/]"
+    cp $1 services/server/war/WEB-INF/wsdl/ > /dev/null 2>&1 | true
+}
+
+prepareModule() {
+    log "preparing module"
+    if [ -d mods ]; then
+       echo "module exists"
+    else
+        cp -r ../mods mods
+        javac mods/server/module-info.java
+        javac mods/client/module-info.java
+    fi;
+}
+
+runjavabg() {
+    CP=$1
+    CLAZZ=$2
+
+    if [ "$debug" = "true" ]; then
+       echo "java $JAVA_OPTS -cp $CP $CLAZZ &
+
+
+       "
+       java $JAVA_OPTS -cp $CP $CLAZZ &
+    else
+       echo "java $JAVA_OPTS -cp $CP $CLAZZ" >> log.txt 2>&1
+       java $JAVA_OPTS -cp $CP $CLAZZ >> log.txt 2>&1 &
+    fi;
+}
+runjava() {
+    CP=$1
+    CLAZZ=$2
+
+    if [ "$debug" = "true" ]; then
+       echo "java $JAVA_OPTS -cp $CP $CLAZZ"
+       java $JAVA_OPTS -cp $CP $CLAZZ
+    else
+       echo "java $JAVA_OPTS -cp $CP $CLAZZ" >> log.txt 2>&1
+       java $JAVA_OPTS -cp $CP $CLAZZ >> log.txt 2>&1
+    fi;
+}

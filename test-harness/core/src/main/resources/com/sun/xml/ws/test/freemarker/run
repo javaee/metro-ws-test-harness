@@ -5,33 +5,9 @@ export CTX=${serviceId}:${stage}-run
 # global testcase status
 export G_STATUS=0
 
-if [ "$debug" = "true" ]; then
-   echo == $CTX ========================================================
-fi;
+. shared
 
-function r {
-    if [ $G_STATUS -ne 0 ]; then
-        return $G_STATUS;
-    fi;
-    if [ "$debug" = "true" ]; then 
-       #echo $CTX: $G_STATUS
-       echo "$@"
-       echo ""
-       "$@"
-    else
-       echo "$@" >> log.txt 2>&1
-       echo "" >> log.txt 2>&1
-       "$@" >> log.txt 2>&1
-    fi;
-   
-    local status=$?
-    if [ $status -ne 0 ]; then
-        G_STATUS=$status
-        FAILED=$((FAILED+1))
-        echo "FAILED: $CTX/$1"
-    fi
-    return $status
-}
+prolog $CTX
 
 cd ${workdir}
 
