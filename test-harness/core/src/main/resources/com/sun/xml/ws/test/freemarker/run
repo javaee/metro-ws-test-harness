@@ -5,11 +5,11 @@ export CTX=${serviceId}:${stage}-run
 # global testcase status
 export G_STATUS=0
 
+cd ${workdir}
+
 . shared
 
 prolog $CTX
-
-cd ${workdir}
 
 # clean the log
 rm -rf log.txt

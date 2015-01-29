@@ -6,6 +6,7 @@ START=$(date +%s)
 export PASSED=0
 export FAILED=0
 
+echo "JAVA_OPTS=$JAVA_OPTS"
 
 <#list testcases as testcase>
 . ${testcase}

@@ -13,8 +13,8 @@ prolog $CTX
 
 mkdirp services/server/war/WEB-INF/wsdl/
 
-cpwsdl ../src/server/*.wsdl
-cpwsdl ../src/server/*.xsd
+cpwsdl '../src/server/*.wsdl'
+cpwsdl '../src/server/*.xsd'
 
 r javac -cp ${classpath} bsh/Deploy${stage}.java
 

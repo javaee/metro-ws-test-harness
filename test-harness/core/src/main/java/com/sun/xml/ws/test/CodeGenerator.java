@@ -82,7 +82,7 @@ public class CodeGenerator {
         new FreeMarkerTemplate(id, scriptOrder, workDir, "shared").writeFileTo(workDir, "shared");
 
         FreeMarkerTemplate run = new FreeMarkerTemplate(id, scriptOrder, workDir, "run");
-        run.put("scripts", testcaseScripts);
+        run.put("scripts", toRelativePath(testcaseScripts));
         String filename = run.writeFileTo(workDir, "run");
         testcases.add(filename);
         testcaseScripts.clear();
@@ -95,6 +95,14 @@ public class CodeGenerator {
         FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, chdir(dir), "runall");
         runall.put("testcases", testcases);
         runall.writeFileTo(chdir(dir), "/runall");
+    }
+
+    private static List<String> toRelativePath(List<String> absolutePaths) {
+        List<String> testcasesRelative = new ArrayList<String>();
+        for(String s : absolutePaths) {
+            testcasesRelative.add(s.substring(s.lastIndexOf('/') + 1));
+        }
+        return testcasesRelative;
     }
 
     public static void generateDeploy(Map<String, Object> params, String classpath) {
@@ -190,7 +198,9 @@ public class CodeGenerator {
 
     // move everything out of (harness) testcases directory
     public static String chdir(String dir) {
-        return dir.replaceAll("/testcases/", "/testcases-no-harness/");
+        // to avoid multiple replacements ...
+        dir = dir.replaceAll("/testcases-no-harness", "/testcases");
+        return dir.replaceAll("/testcases", "/testcases-no-harness");
     }
 
     private static List<String> chdir(List<String> list) {

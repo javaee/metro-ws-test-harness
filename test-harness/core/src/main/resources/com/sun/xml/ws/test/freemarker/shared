@@ -46,41 +46,71 @@ function cpwsdl() {
     cp $1 services/server/war/WEB-INF/wsdl/ > /dev/null 2>&1 | true
 }
 
-prepareModule() {
-    log "preparing module"
-    if [ -d mods ]; then
-       echo "module exists"
+function prepareModule() {
+    MODULE=$1
+    MODS=/Users/miran/dev/jigsaw/TESTS/JAXWS/unit/mods
+
+    log "preparing module [$MODULE]"
+
+    mkdir -p ../mods/
+    cp -r $MODS/$MODULE ../mods/
+    mkdir -p ../mods/$MODULE/bsh
+
+    # SERVER
+    if [ "$MODULE" = "server" ]; then
+        cp -r services/server/war/WEB-INF/classes/* ../mods/$MODULE/
+        cp -r bsh/Deploy*.class ../mods/$MODULE/bsh
+        cp -r bsh/Endpoint*.class ../mods/$MODULE/bsh
     else
-        cp -r ../mods mods
-        javac mods/server/module-info.java
-        javac mods/client/module-info.java
+        cp -r client-classes/* ../mods/$MODULE/
+        cp -r bsh/Client*.class ../mods/$MODULE/bsh
     fi;
+
+    javac ../mods/$MODULE/module-info.java
+
 }
 
-runjavabg() {
+function runjavabg() {
     CP=$1
     CLAZZ=$2
+    MODULE=server
+    J_OPTIONS="-cp $CP $CLAZZ"
+
+    if [ "$useNamedModule" = "true" ]; then
+        prepareModule $MODULE
+        J_OPTIONS="-mp ../mods -m $MODULE/$CLAZZ"
+        # nothing for cp mode
+    fi;
 
     if [ "$debug" = "true" ]; then
-       echo "java $JAVA_OPTS -cp $CP $CLAZZ &
+       echo "java $JAVA_OPTS $J_OPTIONS &
 
 
        "
-       java $JAVA_OPTS -cp $CP $CLAZZ &
+       java $JAVA_OPTS $J_OPTIONS &
     else
-       echo "java $JAVA_OPTS -cp $CP $CLAZZ" >> log.txt 2>&1
-       java $JAVA_OPTS -cp $CP $CLAZZ >> log.txt 2>&1 &
+       echo "java $JAVA_OPTS $J_OPTIONS" >> log.txt 2>&1
+       java $JAVA_OPTS $J_OPTIONS >> log.txt 2>&1 &
     fi;
 }
-runjava() {
+
+function runjava() {
     CP=$1
     CLAZZ=$2
+    MODULE=client
+    J_OPTIONS="-cp $CP $CLAZZ"
+
+    if [ "$useNamedModule" = "true" ]; then
+        prepareModule $MODULE
+        J_OPTIONS="-mp ../mods -m $MODULE/$CLAZZ"
+        # nothing for cp mode
+    fi;
 
     if [ "$debug" = "true" ]; then
-       echo "java $JAVA_OPTS -cp $CP $CLAZZ"
-       java $JAVA_OPTS -cp $CP $CLAZZ
+       echo "java $JAVA_OPTS $J_OPTIONS"
+       r java $JAVA_OPTS $J_OPTIONS
     else
-       echo "java $JAVA_OPTS -cp $CP $CLAZZ" >> log.txt 2>&1
-       java $JAVA_OPTS -cp $CP $CLAZZ >> log.txt 2>&1
+       echo "java $JAVA_OPTS $J_OPTIONS" >> log.txt 2>&1
+       r java $JAVA_OPTS $J_OPTIONS >> log.txt 2>&1
     fi;
 }
