@@ -254,6 +254,13 @@ public class CodeGenerator {
         File dir = new File(directory);
         File parent = dir.getParentFile();
         File testcaseDir = new File(workDir).getParentFile();
+
+        // directory is same as testcase dir
+        if (dir.equals(testcaseDir)) {
+            return dir.toString() + "/src";
+        }
+
+        // directory is first level in testcase dir
         if (parent.equals(testcaseDir)) {
             return parent.toString() + "/src/" + dir.getName();
         }

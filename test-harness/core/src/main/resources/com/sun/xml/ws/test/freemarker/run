@@ -35,5 +35,8 @@ r sleep 1
 if [ $G_STATUS -eq 0 ]; then
      echo "    OK: $CTX"
      PASSED=$((PASSED+1))
-fi; 
+else
+     echo "FAILED: $CTX"
+     FAILED=$((FAILED+1))
+fi;
 

@@ -1,15 +1,19 @@
 #!/bin/bash -ex
 # service id: ${serviceId}
 # stage: ${stage}
-export CTX=${serviceId}:${stage}-client
-
-. shared
-
-prolog $CTX
-
-log "Running ${testName}"
+if [ "$G_STATUS" = "1" ]; then
+    return 1
+fi;
 
 if [ "$skipTests" != "true" ]; then
+
+    export CTX=${serviceId}:${stage}-client
+
+    . shared
+
+    prolog $CTX
+
+    log "Running ${testName}"
 
     # compile generated client sources
     SRC_FILES=

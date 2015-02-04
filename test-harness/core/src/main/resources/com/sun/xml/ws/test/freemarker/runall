@@ -21,3 +21,14 @@ echo "PASSED = $PASSED , FAILED = $FAILED , skipTests = $skipTests"
 END=$(date +%s)
 DIFF=$(( $END - $START ))
 echo "It took $DIFF seconds"
+
+echo "=============================================== global variables ==="
+echo "G_STATUS=[$G_STATUS]"
+echo "  ~ result so far of current testcase"
+echo "debug=[$debug]"
+echo "  ~ silent / verbose mode + debugging on port 5005"
+echo "skipTests=[$skipTests]"
+echo "  ~ run tests just up to deploy / all (client tests needs to be fixed bsh scripts > valid Java snippets)"
+echo "useNamedModule=[$useNamedModule]"
+echo "  ~ run as unnamed module / named (including module-info.java)"
+echo "===================================================================="

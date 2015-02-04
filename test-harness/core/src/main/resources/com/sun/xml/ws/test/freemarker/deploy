@@ -1,13 +1,13 @@
 #!/bin/bash -ex
 # service id: ${serviceId}
 # stage: ${stage}
+if [ "$G_STATUS" = "1" ]; then
+    return 1
+fi;
+
 export CTX=${serviceId}:${stage}-deploy
 
 . shared
-
-if [ $G_STATUS -ne 0 ]; then
-   return $G_STATUS
-fi;
 
 prolog $CTX
 
