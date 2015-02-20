@@ -12,10 +12,33 @@ cd ${workdir}
 prolog $CTX
 
 # clean the log
-rm -rf log.txt
+if [ -f log.txt ]; then
+    mv log.txt log-`date +%Y-%m-%d_%H-%M-%S`.txt
+fi;
+rm -rf services
+rm -rf server
+rm -rf client-source
+rm -rf client-classes
+
+function resetStepStatus() {
+    L_STATUS=0
+}
+
+function logStepStatus() {
+    if [ $L_STATUS -eq 0 ]; then
+         TOTAL_PASSED=$((TOTAL_PASSED+1))
+         echo "PASSED:  $TOTAL_PASSED. $CTX" >> $GLOBAL_LOG_PREFIX-passed-total.txt 2>&1
+    else
+         TOTAL_FAILED=$((TOTAL_FAILED+1))
+         echo "FAILED:  $TOTAL_FAILED. $CTX" >> $GLOBAL_LOG_PREFIX-failed-total.txt 2>&1
+    fi;
+}
 
 <#list scripts as script>
+resetStepStatus
 . ${script}
+logStepStatus
+
 </#list>
 
 # ----------------------------------------------------
@@ -35,8 +58,10 @@ r sleep 1
 if [ $G_STATUS -eq 0 ]; then
      echo "    OK: $CTX"
      PASSED=$((PASSED+1))
+     echo "PASSED:  $PASSED. $CTX" >> $GLOBAL_LOG_PREFIX-passed.txt 2>&1
 else
-     echo "FAILED: $CTX"
+     echo "FAILED: ${serviceId}"
      FAILED=$((FAILED+1))
+     echo "FAILED:  $FAILED. ${serviceId}" >> $GLOBAL_LOG_PREFIX-failed.txt 2>&1
 fi;
 

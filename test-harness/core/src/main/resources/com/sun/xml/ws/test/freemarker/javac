@@ -5,6 +5,8 @@ if [ "$G_STATUS" = "1" ]; then
     return 1
 fi;
 
+TOTAL_STEPS=$((TOTAL_STEPS+1))
+
 export CTX=${serviceId}:${stage}-javac
 
 . shared

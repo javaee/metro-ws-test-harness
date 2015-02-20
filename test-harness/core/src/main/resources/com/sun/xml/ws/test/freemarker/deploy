@@ -5,16 +5,20 @@ if [ "$G_STATUS" = "1" ]; then
     return 1
 fi;
 
+TOTAL_STEPS=$((TOTAL_STEPS+1))
+
 export CTX=${serviceId}:${stage}-deploy
 
 . shared
 
 prolog $CTX
 
-mkdirp services/server/war/WEB-INF/wsdl/
+export SVC_DIR=${serviceDirectory}
 
-cpwsdl '../src/server/*.wsdl'
-cpwsdl '../src/server/*.xsd'
+mkdirp services/$SVC_DIR/war/WEB-INF/wsdl/
+
+cpwsdl "../src/$SVC_DIR/*.wsdl"
+cpwsdl "../src/$SVC_DIR/*.xsd"
 
 r javac -cp ${classpath} bsh/Deploy${stage}.java
 

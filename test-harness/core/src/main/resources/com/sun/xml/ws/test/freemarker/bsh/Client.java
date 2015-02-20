@@ -15,9 +15,7 @@ public class Client${stage} {
     static ${portType} ${varName} = ${serviceName}.get${portType}Port();
     static URI ${varName}Address = null; // TODO: ${address}; //TODO
 
-    static void setUp() throws Throwable {
 ${client_setUp_script}
-    }
 
     public static void main(String[] args) throws Throwable {
         // bsh script START

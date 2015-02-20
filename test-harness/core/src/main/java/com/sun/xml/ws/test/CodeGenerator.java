@@ -112,7 +112,12 @@ public class CodeGenerator {
         //obsoleteDeploy(filename, classpath);
 
         FreeMarkerTemplate deploy = new FreeMarkerTemplate(id, scriptOrder, workDir, "deploy");
-        deploy.put("classpath", chdir(classpath));
+        String classPathAdjusted = chdir(classpath);
+        deploy.put("classpath", classPathAdjusted);
+
+        String serviceDirectory = classPathAdjusted.replace(workDir, "").replaceAll("/services", "").replaceAll("/war/WEB-INF/classes", "");
+        deploy.put("serviceDirectory", serviceDirectory);
+
         String filename = deploy.writeFile();
         testcaseScripts.add(filename);
 
