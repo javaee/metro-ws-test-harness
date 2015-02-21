@@ -12,7 +12,7 @@ if [ "$skipTests" != "true" ]; then
 
     TOTAL_STEPS=$((TOTAL_STEPS+1))
 
-    export CTX=${serviceId}:${stage}-client
+    export CTX="${serviceId}:${stage}-client(${testName})"
 
     . shared
 

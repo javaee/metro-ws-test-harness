@@ -10,9 +10,13 @@ function log() {
     if [ "$debug" = "true" ]; then
        echo $1
     fi;
+    echo $1 >> log.txt 2>&1
 }
 
 function r {
+    if [ $L_STATUS -ne 0 ]; then
+        return $L_STATUS;
+    fi;
     if [ "$failFast" = "true" ]; then
         if [ $G_STATUS -ne 0 ]; then
             return $G_STATUS;
@@ -33,6 +37,7 @@ function r {
     if [ $status -ne 0 ]; then
         G_STATUS=$status
         L_STATUS=$status
+        log "FAILED:$CTX"
     fi
     return $status
 }

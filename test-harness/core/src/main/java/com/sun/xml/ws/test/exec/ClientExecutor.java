@@ -186,7 +186,7 @@ public class ClientExecutor extends Executor {
         }
 
         String classpath = "client-classes:.";
-        String testName = client.parent.home + "/test-descriptor.xml @ " + client.script.getName();
+        String testName = client.script.getName();
 
         CodeGenerator.generateClientClass(
                 classpath,
