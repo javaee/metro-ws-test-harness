@@ -51,8 +51,6 @@ import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.World;
 
 import java.beans.Introspector;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -121,8 +119,6 @@ public class ClientExecutor extends Executor {
         // this will make 'thisObject' available as 'this' in script
         ns.importObject(new ScriptBaseClass(context, engine, client));
 
-        inlineUtilBshToGeneratedSource();
-
         // load additional helper methods
         try {
             engine.eval(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
@@ -143,12 +139,6 @@ public class ClientExecutor extends Executor {
         }
     }
 
-    protected void inlineUtilBshToGeneratedSource() throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("util.bsh")));
-        String line = r.readLine();
-        varMap.put("util_bsh", "   // TODO: util.bsh" + line + "\n");
-    }
-
     protected void importPackage(NameSpace ns, String p) {
         ns.importPackage(p);
         pImports.add(p + ".*");
@@ -167,33 +157,25 @@ public class ClientExecutor extends Executor {
             } else {
                 varMap.put("client_setUp_script", "");
             }
-            generateClientSource();
+
+            CodeGenerator.generateClientClass(
+                    "client-classes:.",      // classpath
+                    client.script.getName(), // test name
+                    pImports,
+                    client.script.getSource(),
+                    varMap);
 
             engine.eval(r, engine.getNameSpace(), client.script.getName());
+
         } catch (TargetError e) {
             throw e.getTarget();
+        } catch (Throwable t) {
+            System.err.println("Caught throwable while evaluating script: [\n" + client.script.getSource() + "\n]");
+            t.printStackTrace();
+            throw t;
         } finally {
             r.close();
         }
-    }
-
-    private void generateClientSource() throws IOException {
-        BufferedReader reader = new BufferedReader(client.script.read());
-        String line = reader.readLine();
-        while (line != null) {
-            pContents.append("      " + line + "\n");
-            line = reader.readLine();
-        }
-
-        String classpath = "client-classes:.";
-        String testName = client.script.getName();
-
-        CodeGenerator.generateClientClass(
-                classpath,
-                testName,
-                pImports,
-                pContents.toString(),
-                varMap);
     }
 
     private void injectResources(NameSpace ns, Interpreter engine) throws Exception {
@@ -274,12 +256,14 @@ public class ClientExecutor extends Executor {
                                 String portType = method.getReturnType().getSimpleName();
 
                                 varMap.put("portType", portType);
+                                varMap.put("getPortMethod", method.getName());
                                 varMap.put("varName", varName);
                                 varMap.put("serviceName", serviceVarName);
                                 varMap.put("portName", portName);
-                                engine.set("   " + varName + "Address", svc.app.getEndpointAddress(getEndpoint(svc, portName)));
+                                String endpointAddress = svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString();
+                                engine.set("" + varName + "Address", endpointAddress);
                                 addressList.append(' ').append(varName).append("Address");
-                                varMap.put("address", svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString());
+                                varMap.put("address", endpointAddress);
                             } catch (InvocationTargetException e) {
                                 if (e.getCause() instanceof Exception)
                                     throw (Exception) e.getCause();

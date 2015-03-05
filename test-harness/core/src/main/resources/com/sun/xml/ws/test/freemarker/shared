@@ -52,6 +52,11 @@ function cpwsdl() {
     cp $1 services/$SVC_DIR/war/WEB-INF/wsdl/ > /dev/null 2>&1 | true
 }
 
+function cpclasses() {
+    log "copying [$1] to [services/$SVC_DIR/war/WEB-INF/classes/]"
+    cp $1 services/$SVC_DIR/war/WEB-INF/classes/ > /dev/null 2>&1 | true
+}
+
 function prepareModule() {
     MODULE=$1
     MODS=/Users/miran/dev/jigsaw/TESTS/JAXWS/unit/mods

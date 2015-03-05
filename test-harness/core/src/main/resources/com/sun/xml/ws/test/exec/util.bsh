@@ -46,3 +46,10 @@ SOAPMessage getSOAPMessage12(Source msg) {
 JAXBContext createJAXBContext() {
   return JAXBContext.newInstance(new Class[]{ObjectFactory.class});
 }
+
+/**
+ * Creates JAXBContext for the current compiled artifacts
+ */
+JAXBContext createJAXBContext(clazz) {
+  return JAXBContext.newInstance(new Class[]{clazz});
+}

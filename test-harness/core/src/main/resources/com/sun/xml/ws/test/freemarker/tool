@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 # service id:  ${serviceId}
 # stage: ${stage}
+L_STATUS=0
+
 if [ "$G_STATUS" = "1" ]; then
     return 1
 fi;

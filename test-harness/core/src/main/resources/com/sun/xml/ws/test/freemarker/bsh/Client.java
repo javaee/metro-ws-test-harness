@@ -3,19 +3,33 @@ package bsh;
 <#list pImports as imp>
 import ${imp};
 </#list>
+import java.net.URI;
+
+import static junit.framework.TestCase.*;
+import static bsh.Util.*;
+
 
 public class Client${stage} {
 
-    ${util_bsh}
+    static String home = "${home}";
 
-    String home = "${home}";
     // TODO
-    List<URL> wsdlUrls = new ArrayList<URL>();
-    static ${simpleName} ${serviceVarName} = new ${simpleName}();
-    static ${portType} ${varName} = ${serviceName}.get${portType}Port();
-    static URI ${varName}Address = null; // TODO: ${address}; //TODO
+    static List<URL> wsdlUrls = new ArrayList<URL>();
 
+    static ${simpleName} ${serviceVarName} = new ${simpleName}();
+    static ${portType} ${varName} = ${serviceName}.${getPortMethod}();
+    static URI ${varName}Address = createUri("${address}");
+
+    // injected from bsh scripts
 ${client_setUp_script}
+
+    static URI createUri(String s) {
+        try{
+            return new URI(s);
+        }catch(Throwable t){
+            throw new RuntimeException(t);
+        }
+    }
 
     public static void main(String[] args) throws Throwable {
         // bsh script START
@@ -25,31 +39,4 @@ ${client_setUp_script}
         System.out.println("= TEST PASSED: Client${stage}");
     }
 
-    static void assertEquals(Object a, Object b) {
-        if (a == null) {
-            if (b != null) {
-                throw new RuntimeException("ERROR: assertEquals: a is null, but b not!");
-            }
-        } else {
-            if (!a.equals(b)) {
-                throw new RuntimeException("ERROR: assertEquals: a NOT equal to b!");
-            }
-        }
-        System.out.println("PASSED: assertEquals");
-    }
-
-    static void assertTrue(boolean condition) {
-        if (!condition) {
-            throw new RuntimeException("ERROR: assertTrue failed!");
-        }
-        System.out.println("PASSED: assertEquals");
-    }
-
-    static void fail() {
-        fail("");
-    }
-
-    static void fail(String s) {
-        throw new RuntimeException("ERROR: " + s);
-    }
 }

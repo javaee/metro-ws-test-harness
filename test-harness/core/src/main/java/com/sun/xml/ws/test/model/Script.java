@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 
 /**
  * Bean shell script.
@@ -62,6 +63,30 @@ public abstract class Script {
      */
     public abstract Reader read() throws IOException;
 
+
+    public String getSource() {
+        Reader reader = null;
+        try {
+            reader = read();
+            StringWriter writer = new StringWriter();
+            char [] buf = new char[1024];
+            int read;
+            while ((read = reader.read(buf)) != -1) {
+                writer.write(buf, 0, read);
+            }
+            return writer.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "<ERROR READING SCRIPT>";
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
 
     /**
      * {@link Script} where the script is given as literal text.

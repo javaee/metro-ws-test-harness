@@ -3,6 +3,7 @@
 # stage: ${stage}
 export CTX=${serviceId}:${stage}-run
 # global testcase status
+L_STATUS=0
 export G_STATUS=0
 
 cd ${workdir}
@@ -20,10 +21,6 @@ rm -rf server
 rm -rf client-source
 rm -rf client-classes
 
-function resetStepStatus() {
-    L_STATUS=0
-}
-
 function logStepStatus() {
     if [ $L_STATUS -eq 0 ]; then
          TOTAL_PASSED=$((TOTAL_PASSED+1))
@@ -35,7 +32,6 @@ function logStepStatus() {
 }
 
 <#list scripts as script>
-resetStepStatus
 . ${script}
 logStepStatus
 

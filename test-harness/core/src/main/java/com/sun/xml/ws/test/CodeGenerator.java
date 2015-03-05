@@ -127,6 +127,14 @@ public class CodeGenerator {
 
         //obsoleteDeployCLass(contents, className);
 
+        FreeMarkerTemplate utilClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Util.java");
+        utilClass.writeFileTo(workDir + "/bsh", "Util.java");
+
+        new File(workDir + "/junit").mkdir();
+        new File(workDir + "/junit/framework").mkdir();
+        FreeMarkerTemplate junitClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/TestCase.java");
+        junitClass.writeFileTo(workDir + "/junit/framework", "TestCase.java");
+
         FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java");
         for(String key : params.keySet()) {
             Object value = params.get(key);
@@ -168,10 +176,6 @@ public class CodeGenerator {
         cleanDestDirectory(srcDir);
         SourcesCollector.ensureDirectoryExists(CodeGenerator.workDir);
         copySources(srcDir);
-    }
-
-    public static void setWorkDir(String workDir) {
-        CodeGenerator.workDir = chdir(workDir);
     }
 
     protected static void cleanDestDirectory(String srcDir) {

@@ -4,6 +4,7 @@
 export CTX=${serviceId}:${stage}-client
 
 G_STATUS=0
+L_STATUS=0
 wget http://127.0.0.1:8888/stop
 
 echo "==================================================================== global variables ============"

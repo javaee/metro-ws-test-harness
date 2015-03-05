@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 # service id: ${serviceId}
 # stage: ${stage}
+L_STATUS=0
+
 if [ "$G_STATUS" = "1" ]; then
     return 1
 fi;
@@ -19,6 +21,10 @@ mkdirp services/$SVC_DIR/war/WEB-INF/wsdl/
 
 cpwsdl "../src/$SVC_DIR/*.wsdl"
 cpwsdl "../src/$SVC_DIR/*.xsd"
+
+# handlers.xml, example: testcases/bugs/jaxws1015
+cpclasses "../src/$SVC_DIR/*.xml"
+
 
 r javac -cp ${classpath} bsh/Deploy${stage}.java
 
