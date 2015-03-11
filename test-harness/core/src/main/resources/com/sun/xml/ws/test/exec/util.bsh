@@ -53,3 +53,7 @@ JAXBContext createJAXBContext() {
 JAXBContext createJAXBContext(clazz) {
   return JAXBContext.newInstance(new Class[]{clazz});
 }
+
+javax.xml.transform.stream.StreamSource streamSource(File file) {
+    return new javax.xml.transform.stream.StreamSource(new FileInputStream(file));
+}

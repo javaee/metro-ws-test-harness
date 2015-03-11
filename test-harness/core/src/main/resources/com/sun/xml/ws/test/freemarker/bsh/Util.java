@@ -7,9 +7,14 @@ import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 import static junit.framework.TestCase.*;
@@ -86,6 +91,19 @@ public class Util {
             fail("Error creating JAXBContext");
             return null;
         }
+    }
+
+    public static java.io.File resource(String path) {
+        URL resource = Util.class.getResource("/" + path);
+        try {
+            return new File(resource.toURI());
+        } catch (URISyntaxException e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    public static javax.xml.transform.stream.StreamSource streamSource(File file) throws java.io.FileNotFoundException {
+        return new StreamSource(new FileInputStream(file));
     }
 
 }

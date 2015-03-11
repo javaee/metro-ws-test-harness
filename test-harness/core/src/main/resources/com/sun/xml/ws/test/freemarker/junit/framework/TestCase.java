@@ -5,6 +5,9 @@ package junit.framework;
  */
 public class TestCase {
 
+    public TestCase() {}
+    public TestCase(String name) {}
+
     public static void assertEquals(String msg, Object a, Object b) {
         if (a == null) {
             if (b != null) {

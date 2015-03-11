@@ -26,7 +26,7 @@ public class Deploy${stage} {
         new EndpointStopper(8888, e);
     }
 
-    static Endpoint deploy() throws Exception {
+    static javax.xml.ws.Endpoint deploy() throws Exception {
         List<Source> metadata = new ArrayList<Source>();
 <#list metadata_files as metadata_file>
         metadata.add(new StreamSource(new File("${metadata_file}")));

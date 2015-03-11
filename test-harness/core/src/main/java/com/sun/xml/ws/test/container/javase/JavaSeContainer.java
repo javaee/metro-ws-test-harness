@@ -191,7 +191,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             Object feature = createMetadataFeature(service, interpreter);
             interpreter.set("feature", feature);
 
-            generateDeploySources(war, testEndpoint, metadata, props, endpointAddress);
+            generateDeploySources(war, testEndpoint, metadata, props, endpointAddress, wsdlLocation, !service.service.wsdl.isEmpty());
 
             try {
                 String statements = "      javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
@@ -209,13 +209,22 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         return new JavaSeApplication(servers, baseAddress, service);
     }
 
-    protected void generateDeploySources(WAR war, TestEndpoint testEndpoint, List<Source> metadata, Map<String, Object> props, String endpointAddress) {
+    protected void generateDeploySources(WAR war, TestEndpoint testEndpoint, List<Source> metadata, Map<String, Object> props, String endpointAddress, String wsdlLocation, boolean fromwsdl) {
         Map<String, Object> templateParams = new HashMap<String, Object>();
+
+        // ugly hack:
+        // in case explicit wsdlLocation (in java annotation) exists
+        // ws-harness creates URLClassloader reading WEB-INF/wsdl + WEB-INF/classes to load service
+        // let's fake it here ...
+        if (wsdlLocation != null && wsdlLocation.length() > 0) {
+            templateParams.put("wsdlLocation", wsdlLocation.replaceAll("WEB-INF/wsdl/", ""));
+        }
+
         templateParams.put("endpointAddress", endpointAddress);
 
 
         List<String> metadata_files = new ArrayList<String>();
-        for (Source source : metadata) {;
+        for (Source source : metadata) {
             metadata_files.add(source.getSystemId().replaceAll("file:", ""));
         }
         templateParams.put("metadata_files", metadata_files);
@@ -233,7 +242,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
         }
         templateParams.put("endpointImpl", "" + testEndpoint.className);
         templateParams.put("endpointAddress", "" + endpointAddress);
-        CodeGenerator.generateDeploy(templateParams, war.classDir.getAbsolutePath());
+        CodeGenerator.generateDeploy(templateParams, war.classDir.getAbsolutePath(), fromwsdl);
     }
 
     private Object createMetadataFeature(DeployedService service, InterpreterEx interpreter) throws EvalError {

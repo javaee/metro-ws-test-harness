@@ -19,17 +19,27 @@ export SVC_DIR=${serviceDirectory}
 
 mkdirp services/$SVC_DIR/war/WEB-INF/wsdl/
 
-cpwsdl "../src/$SVC_DIR/*.wsdl"
-cpwsdl "../src/$SVC_DIR/*.xsd"
+<#if wsdlDocs??>
+    <#list wsdlDocs as wsdl>
+cpwsdl ../src/$SVC_DIR ${wsdl}
+    </#list>
+</#if>
+
+<#if wsdlLocation??>
+cpwsdl ../src/$SVC_DIR ${wsdlLocation}
+mkdir -p services/$SVC_DIR/war/classes/WEB-INF
+mv -v services/$SVC_DIR/war/WEB-INF/wsdl services/$SVC_DIR/war/classes/WEB-INF/
+</#if>
 
 # handlers.xml, example: testcases/bugs/jaxws1015
 cpclasses "../src/$SVC_DIR/*.xml"
 
+SHARED_DIR=/Users/miran/dev/jaxws-ri/jaxws-ri/tests/unit/testcases-no-harness/SHARED/
+SHARED_LIB=$SHARED_DIR/lib/jaxwsTestUtil.jar
+SERVER_CLASSPATH=${classpath}:$SHARED_LIB:.
 
 r javac -cp ${classpath} bsh/Deploy${stage}.java
 
-runjavabg \
-    .:${classpath} \
-    bsh.Deploy${stage}
+runjavabg $SERVER_CLASSPATH bsh.Deploy${stage}
 
 r sleep 3

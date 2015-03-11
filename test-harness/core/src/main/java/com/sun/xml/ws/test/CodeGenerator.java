@@ -105,7 +105,7 @@ public class CodeGenerator {
         return testcasesRelative;
     }
 
-    public static void generateDeploy(Map<String, Object> params, String classpath) {
+    public static void generateDeploy(Map<String, Object> params, String classpath, boolean fromwsdl) {
         if (!generateTestSources) return;
         if (workDir == null) return;
 
@@ -117,6 +117,16 @@ public class CodeGenerator {
 
         String serviceDirectory = classPathAdjusted.replace(workDir, "").replaceAll("/services", "").replaceAll("/war/WEB-INF/classes", "");
         deploy.put("serviceDirectory", serviceDirectory);
+
+        // applicable if starting from wsdl - required to copy resources
+        if (fromwsdl) {
+            deploy.put("wsdlDocs", getWSDLDocs(params));
+        }
+
+        // applicable if wsdlLocation is in java annotation - TODO: to be be solved (not working now)
+        if (params.containsKey("wsdlLocation")) {
+            deploy.put("wsdlLocation", params.get("wsdlLocation"));
+        }
 
         String filename = deploy.writeFile();
         testcaseScripts.add(filename);
@@ -148,6 +158,17 @@ public class CodeGenerator {
         deployClass.writeFileTo(workDir + "/bsh", "Deploy" + scriptOrder + ".java");
 
         scriptOrder++;
+    }
+
+    protected static List<String> getWSDLDocs(Map<String, Object> params) {
+        List<String> list = chdir((List<String>) params.get("metadata_files"));
+        List<String> result = new ArrayList<String>();
+        String prefix = "WEB-INF/wsdl/";
+        for(String file : list) {
+            int pos = file.lastIndexOf(prefix) + prefix.length();
+            result.add(file.substring(pos));
+        }
+        return result;
     }
 
     public static void generateClient(String classpath, String testName) {

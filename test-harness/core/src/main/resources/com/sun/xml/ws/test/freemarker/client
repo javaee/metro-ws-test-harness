@@ -9,6 +9,19 @@ if [ "$failFast" = "true" ]; then
     fi;
 fi;
 
+SHARED_DIR=/Users/miran/dev/jaxws-ri/jaxws-ri/tests/unit/testcases-no-harness/SHARED/
+SHARED_LIB=$SHARED_DIR/lib/jaxwsTestUtil.jar
+CLIENT_CLASSPATH=${classpath}:$SHARED_LIB
+
+function compileClientClasses() {
+    DIR=$1
+    SRC_FILES=
+    if [ -d $DIR ]; then
+        SRC_FILES=`find $DIR -name '*.java'`
+        r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes $SRC_FILES
+    fi
+}
+
 if [ "$skipTests" != "true" ]; then
 
     TOTAL_STEPS=$((TOTAL_STEPS+1))
@@ -21,33 +34,20 @@ if [ "$skipTests" != "true" ]; then
 
     log "Running ${testName}"
 
-    # TODO: what about JUnit??? compile also ../src/client?
-    if [ -d "../src/junit" ]; then
-        SRC_FILES=`find ../src/junit -name '*.java'`
-        r javac -cp client-classes:. -d client-classes $SRC_FILES
-    fi
     # compile generated client sources
-    SRC_FILES=
-    if [ -d "client-source" ]; then
-        SRC_FILES=`find client-source -name '*.java'`
-        r javac -cp ${classpath} -d client-classes $SRC_FILES
-    fi
-    # TODO: introduce hash fcion
-    if [ -d "../src/common" ]; then
-        SRC_FILES=`find ../src/common -name '*.java'`
-        r javac -cp client-classes:. -d client-classes $SRC_FILES
-    fi
-    # TODO: what about JUnit??? compile also ../src/client?
-    if [ -d "../src/client" ]; then
-        SRC_FILES=`find ../src/client -name '*.java'`
-        r javac -cp client-classes:. -d client-classes $SRC_FILES
+    compileClientClasses "../src/junit"
+    compileClientClasses "client-source"
+    compileClientClasses "../src/common"
+    compileClientClasses "../src/client"
+
+    # copy resources
+    if [ -d ../src/resources ]; then
+        r cp -rv ../src/resources/* client-classes | true
     fi
 
     # compile generated bash.Client#.java
-    r javac -cp ${classpath} -d client-classes \
-         bsh/Client${stage}.java bsh/Util.java
+    r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes bsh/Client${stage}.java bsh/Util.java
 
-    # actual running client
-    runjava ${classpath} bsh.Client${stage}
-    #r sleep 1
+    runjava $CLIENT_CLASSPATH bsh.Client${stage}
 fi;
+

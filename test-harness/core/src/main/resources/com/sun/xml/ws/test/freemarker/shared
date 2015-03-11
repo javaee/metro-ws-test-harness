@@ -48,8 +48,14 @@ function mkdirp() {
 }
 
 function cpwsdl() {
-    log "copying [$1] to [services/$SVC_DIR/war/WEB-INF/wsdl/]"
-    cp $1 services/$SVC_DIR/war/WEB-INF/wsdl/ > /dev/null 2>&1 | true
+    log "copying [$1/$2] to [services/$SVC_DIR/war/WEB-INF/wsdl/]"
+
+    #create directories for target file ...
+    mkdir -p services/$SVC_DIR/war/WEB-INF/wsdl/$2
+    rm -rf services/$SVC_DIR/war/WEB-INF/wsdl/$2
+
+    # make actual copy ...
+    cp -v $1/$2 services/$SVC_DIR/war/WEB-INF/wsdl/$2 > /dev/null 2>&1 | true
 }
 
 function cpclasses() {

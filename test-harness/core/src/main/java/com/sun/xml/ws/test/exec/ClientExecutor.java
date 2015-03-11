@@ -235,7 +235,7 @@ public class ClientExecutor extends Executor {
                     //{// inject a service instance
                     String serviceVarName = Introspector.decapitalize(clazz.getSimpleName());
                     engine.set(serviceVarName, serviceInstance);
-                    varMap.put("simpleName", clazz.getSimpleName());
+                    varMap.put("simpleName", clazz.getName());
                     varMap.put("serviceVarName", serviceVarName);
                     serviceList.append(' ').append(serviceVarName);
                     //}
