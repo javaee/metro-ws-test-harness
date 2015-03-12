@@ -16,7 +16,7 @@ public class Client${stage} {
     // TODO
     static List<URL> wsdlUrls = new ArrayList<URL>();
 
-    static ${simpleName} ${serviceVarName} = new ${simpleName}();
+    static ${serviceClassName} ${serviceVarName} = new ${serviceClassName}();
     static ${portType} ${varName} = ${serviceName}.${getPortMethod}();
     static URI ${varName}Address = createUri("${address}");
 

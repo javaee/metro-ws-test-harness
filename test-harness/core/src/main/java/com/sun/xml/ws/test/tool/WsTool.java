@@ -144,9 +144,23 @@ public abstract class WsTool extends Assert {
                     String dir = params.get(i + 1);
                     mkdirs.add(dir);
                 }
+                // TODO: Miran relative paths!
+                p = CodeGenerator.fixedURL(p);
+
+                // change absolute path to relative
+                p = CodeGenerator.toRelativePath(p);
+
+                // handle inner classes
+                p = p.replaceAll("\\$", "\\\\\\$");
+
+                // ugly - "move" source wsdl to no-harness/ .. / .. /src dir
+                if (p.startsWith("../") && !p.startsWith("../src")) {
+                    p = p.replaceAll("\\.\\./", "../src/");
+                }
+
                 params2.add(p.replaceAll("localhost", "127.0.0.1"));
             }
-            CodeGenerator.generatedWsScript(mkdirs, params2);
+            CodeGenerator.generateTool(mkdirs, params2);
         }
     }
 

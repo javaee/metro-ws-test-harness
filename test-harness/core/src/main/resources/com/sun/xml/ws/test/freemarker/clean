@@ -5,7 +5,11 @@ export CTX=${serviceId}:${stage}-client
 
 G_STATUS=0
 L_STATUS=0
-wget http://127.0.0.1:8888/stop
+<#if shutdownPorts??>
+    <#list shutdownPorts as port>
+wget http://127.0.0.1:${port}/stop
+    </#list>
+</#if>
 
 echo "==================================================================== global variables ============"
 echo "      G_STATUS=[$G_STATUS] ~ result so far of current testcase"

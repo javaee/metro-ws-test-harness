@@ -36,13 +36,18 @@
 
 package com.sun.xml.ws.test;
 
+import com.sun.xml.ws.test.container.WAR;
+import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.util.FreeMarkerTemplate;
 import com.sun.xml.ws.test.util.JavacTask;
 
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +71,14 @@ public class CodeGenerator {
 
     // all tests
     private static List<String> testcases = new ArrayList<String>();
+    private static List<String> shutdownPortList = new ArrayList<String>();
+
+    // if just one service is being deployed, it's always on 8080 port + endpoint stopper at 8888.
+    // if multiple services deployed, we have to change port of second (and next ones) to avoid conflict
+    // it is changed while being deployed (method fixPort)
+    private static int deployedServices = 0;
+    private static int freePort = 8080;
+    private static Map<String, String> fixedServiceURLs = new HashMap<String, String>();
 
     public static void setGenerateTestSources(boolean generateTestSources) {
         CodeGenerator.generateTestSources = generateTestSources;
@@ -82,12 +95,19 @@ public class CodeGenerator {
         new FreeMarkerTemplate(id, scriptOrder, workDir, "shared").writeFileTo(workDir, "shared");
 
         FreeMarkerTemplate run = new FreeMarkerTemplate(id, scriptOrder, workDir, "run");
-        run.put("scripts", toRelativePath(testcaseScripts));
+        run.put("scripts", toFilenames(testcaseScripts));
+        run.put("shutdownPorts", shutdownPortList);
         String filename = run.writeFileTo(workDir, "run");
         testcases.add(filename);
         testcaseScripts.clear();
 
-        new FreeMarkerTemplate(id, scriptOrder, workDir, "clean").writeFile();
+        FreeMarkerTemplate clean = new FreeMarkerTemplate(id, scriptOrder, workDir, "clean");
+        clean.put("shutdownPorts", shutdownPortList);
+        clean.writeFile();
+
+        shutdownPortList.clear();
+        fixedServiceURLs.clear();
+        deployedServices = 0;
     }
 
     public static void allTestsDone(String dir) {
@@ -97,10 +117,18 @@ public class CodeGenerator {
         runall.writeFileTo(chdir(dir), "/runall");
     }
 
+    private static List<String> toFilenames(List<String> absolutePaths) {
+        List<String> testcasesRelative = new ArrayList<String>();
+        for (String s : absolutePaths) {
+            testcasesRelative.add(s.substring(s.lastIndexOf('/') + 1));
+        }
+        return testcasesRelative;
+    }
+
     private static List<String> toRelativePath(List<String> absolutePaths) {
         List<String> testcasesRelative = new ArrayList<String>();
-        for(String s : absolutePaths) {
-            testcasesRelative.add(s.substring(s.lastIndexOf('/') + 1));
+        for (String s : absolutePaths) {
+            testcasesRelative.add(toRelativePath(s));
         }
         return testcasesRelative;
     }
@@ -113,7 +141,7 @@ public class CodeGenerator {
 
         FreeMarkerTemplate deploy = new FreeMarkerTemplate(id, scriptOrder, workDir, "deploy");
         String classPathAdjusted = chdir(classpath);
-        deploy.put("classpath", classPathAdjusted);
+        deploy.put("classpath", toRelativePath(classPathAdjusted));
 
         String serviceDirectory = classPathAdjusted.replace(workDir, "").replaceAll("/services", "").replaceAll("/war/WEB-INF/classes", "");
         deploy.put("serviceDirectory", serviceDirectory);
@@ -146,7 +174,7 @@ public class CodeGenerator {
         junitClass.writeFileTo(workDir + "/junit/framework", "TestCase.java");
 
         FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java");
-        for(String key : params.keySet()) {
+        for (String key : params.keySet()) {
             Object value = params.get(key);
             if (value instanceof List) {
                 value = chdir((List<String>) value);
@@ -155,16 +183,20 @@ public class CodeGenerator {
             }
             deployClass.put(key, value);
         }
+        String port = "" + (8888 + deployedServices);
+        shutdownPortList.add(port);
+        deployClass.put("shutdownPort", port);
         deployClass.writeFileTo(workDir + "/bsh", "Deploy" + scriptOrder + ".java");
 
         scriptOrder++;
+        deployedServices++;
     }
 
     protected static List<String> getWSDLDocs(Map<String, Object> params) {
         List<String> list = chdir((List<String>) params.get("metadata_files"));
         List<String> result = new ArrayList<String>();
         String prefix = "WEB-INF/wsdl/";
-        for(String file : list) {
+        for (String file : list) {
             int pos = file.lastIndexOf(prefix) + prefix.length();
             result.add(file.substring(pos));
         }
@@ -261,20 +293,20 @@ public class CodeGenerator {
         mkdirs.add(destDir);
 
         List<String> params = new ArrayList();
-        params.add("-d " + destDir);
-        params.add("-cp " + chdir(javac.getClasspath().toString()));
+        params.add("-d " + toRelativePath(destDir));
+        params.add("-cp " + toRelativePath(chdir(javac.getClasspath().toString())));
 
-        for(String p : javac.getSrcdir().list()) {
+        for (String p : javac.getSrcdir().list()) {
             p = chdir(p);
-            p = moveToSrc(p);
+            p = toRelativePath(moveToSrc(p));
             params.add("`find " + p + " -name '*.java'`");
             mkdirs.add(p);
         }
 
         FreeMarkerTemplate run = new FreeMarkerTemplate(id, scriptOrder, workDir, "javac");
         // TODO: how comes this is null?!
-        run.put("mkdirs", mkdirs);
-        run.put("params", params);
+        run.put("mkdirs", toRelativePath(mkdirs));
+        run.put("params", toRelativePath(params));
         String filename = run.writeFile();
         testcaseScripts.add(filename);
         scriptOrder++;
@@ -308,11 +340,11 @@ public class CodeGenerator {
         return directory;
     }
 
-    public static void generatedWsScript(List<String> dirsToBeCretaed, List<String> params) {
+    public static void generateTool(List<String> dirsToBeCretaed, List<String> params) {
         if (!generateTestSources) return;
 
         FreeMarkerTemplate template = new FreeMarkerTemplate(id, scriptOrder, workDir, "tool");
-        template.put("dirs", moveToSrc2(chdir(dirsToBeCretaed)));
+        template.put("dirs", toRelativePath(moveToSrc2(chdir(dirsToBeCretaed))));
         template.put("params", moveToSrc2(chdir(params)));
         String filename = template.writeFile();
         testcaseScripts.add(filename);
@@ -338,12 +370,88 @@ public class CodeGenerator {
         clientClass.put("testName", testName);
         clientClass.put("pImports", pImports);
         clientClass.put("contents", pContents);
-        for(String key : varMap.keySet()) {
+        for (String key : varMap.keySet()) {
             String value = varMap.get(key);
+            value = fixedURL(value);
             clientClass.put(key, value);
         }
         clientClass.writeFileTo(workDir + "/bsh", "Client" + scriptOrder + ".java");
         generateClient(classpath, testName);
     }
 
+    public static String fixPort(String value) {
+        if (value.contains("http://localhost:8080")) {
+            String fixed = value.replaceAll("http://localhost:8080", "http://localhost:" + getFreePort());
+            fixedServiceURLs.put(value, fixed);
+            return fixed;
+        }
+        return value;
+    }
+
+    public static int getFreePort() {
+        return freePort + deployedServices;
+    }
+
+    public static void generateDeploySources(WAR war, TestEndpoint testEndpoint, List<Source> metadata,
+                                             Map<String, Object> props, String endpointAddress,
+                                             String wsdlLocation, boolean fromwsdl) {
+
+        Map<String, Object> templateParams = new HashMap<String, Object>();
+
+        // ugly hack:
+        // in case explicit wsdlLocation (in java annotation) exists
+        // ws-harness creates URLClassloader reading WEB-INF/wsdl + WEB-INF/classes to load service
+        // let's fake it here ...
+        if (wsdlLocation != null && wsdlLocation.length() > 0) {
+            templateParams.put("wsdlLocation", wsdlLocation.replaceAll("WEB-INF/wsdl/", ""));
+        }
+
+        List<String> metadata_files = new ArrayList<String>();
+        for (Source source : metadata) {
+            metadata_files.add(source.getSystemId().replaceAll("file:", ""));
+        }
+        templateParams.put("metadata_files", metadata_files);
+        templateParams.put("props", props);
+
+        QName qname = (QName) props.get("javax.xml.ws.wsdl.port");
+        if (qname != null) {
+            templateParams.put("portURI", "" + qname.getNamespaceURI());
+            templateParams.put("portLOCAL", "" + qname.getLocalPart());
+        }
+        qname = (QName) props.get("javax.xml.ws.wsdl.service");
+        if (qname != null) {
+            templateParams.put("svcURI", "" + qname.getNamespaceURI());
+            templateParams.put("svcLOCAL", "" + qname.getLocalPart());
+        }
+        templateParams.put("endpointImpl", "" + testEndpoint.className.replaceAll("\\$", "."));
+        templateParams.put("endpointAddress", "" + CodeGenerator.fixPort(endpointAddress));
+        generateDeploy(templateParams, war.classDir.getAbsolutePath(), fromwsdl);
+    }
+
+    // if the value is recognized as a client url, which was previously changed, it returns chnaged value,
+    // otherwise returns original value
+    public static String fixedURL(String value) {
+        if (value.startsWith("http://")) {
+            for (String partToBeFixed : fixedServiceURLs.keySet()) {
+                if (value.contains(partToBeFixed)) {
+                    String fixed = fixedServiceURLs.get(partToBeFixed);
+                    return value.replaceAll(partToBeFixed, fixed);
+                }
+            }
+        }
+        return value;
+    }
+
+    public static String toRelativePath(String value) {
+        if (!value.contains("http://")) {
+            String fixed = chdir(value);
+            fixed = fixed.replaceAll("//", "/");
+            fixed = fixed.replaceAll(workDir + "/", "");
+            fixed = fixed.replaceAll(workDir, "");
+            String workDirParent = workDir.substring(0, workDir.lastIndexOf('/'));
+            fixed = fixed.replaceAll(workDirParent, "..");
+            return fixed;
+        }
+        return value;
+    }
 }

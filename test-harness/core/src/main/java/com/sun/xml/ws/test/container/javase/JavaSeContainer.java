@@ -49,7 +49,6 @@ import com.sun.xml.ws.test.container.jelly.EndpointInfoBean;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.tool.WsTool;
 
-import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
@@ -191,7 +190,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             Object feature = createMetadataFeature(service, interpreter);
             interpreter.set("feature", feature);
 
-            generateDeploySources(war, testEndpoint, metadata, props, endpointAddress, wsdlLocation, !service.service.wsdl.isEmpty());
+            CodeGenerator.generateDeploySources(war, testEndpoint, metadata, props, endpointAddress, wsdlLocation, !service.service.wsdl.isEmpty());
 
             try {
                 String statements = "      javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl" +
@@ -207,42 +206,6 @@ public class JavaSeContainer extends AbstractApplicationContainer {
             }
         }
         return new JavaSeApplication(servers, baseAddress, service);
-    }
-
-    protected void generateDeploySources(WAR war, TestEndpoint testEndpoint, List<Source> metadata, Map<String, Object> props, String endpointAddress, String wsdlLocation, boolean fromwsdl) {
-        Map<String, Object> templateParams = new HashMap<String, Object>();
-
-        // ugly hack:
-        // in case explicit wsdlLocation (in java annotation) exists
-        // ws-harness creates URLClassloader reading WEB-INF/wsdl + WEB-INF/classes to load service
-        // let's fake it here ...
-        if (wsdlLocation != null && wsdlLocation.length() > 0) {
-            templateParams.put("wsdlLocation", wsdlLocation.replaceAll("WEB-INF/wsdl/", ""));
-        }
-
-        templateParams.put("endpointAddress", endpointAddress);
-
-
-        List<String> metadata_files = new ArrayList<String>();
-        for (Source source : metadata) {
-            metadata_files.add(source.getSystemId().replaceAll("file:", ""));
-        }
-        templateParams.put("metadata_files", metadata_files);
-        templateParams.put("props", props);
-
-        QName qname = (QName) props.get("javax.xml.ws.wsdl.port");
-        if (qname != null) {
-            templateParams.put("portURI", "" + qname.getNamespaceURI());
-            templateParams.put("portLOCAL", "" + qname.getLocalPart());
-        }
-        qname = (QName) props.get("javax.xml.ws.wsdl.service");
-        if (qname != null) {
-            templateParams.put("svcURI", "" + qname.getNamespaceURI());
-            templateParams.put("svcLOCAL", "" + qname.getLocalPart());
-        }
-        templateParams.put("endpointImpl", "" + testEndpoint.className);
-        templateParams.put("endpointAddress", "" + endpointAddress);
-        CodeGenerator.generateDeploy(templateParams, war.classDir.getAbsolutePath(), fromwsdl);
     }
 
     private Object createMetadataFeature(DeployedService service, InterpreterEx interpreter) throws EvalError {
@@ -281,7 +244,7 @@ public class JavaSeContainer extends AbstractApplicationContainer {
 
         // use static port in case you want to run it in plain java
         if (CodeGenerator.isGenerateTestSources()) {
-            return 8080;
+            return CodeGenerator.getFreePort();
         }
 
         int port = -1;

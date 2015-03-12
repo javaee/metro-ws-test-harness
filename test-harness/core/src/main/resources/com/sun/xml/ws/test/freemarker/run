@@ -40,11 +40,17 @@ logStepStatus
 # ----------------------------------------------------
 # undeploy
 # ----------------------------------------------------
+<#if shutdownPorts??>
 if [ "$debug" = "true" ]; then
-   wget http://127.0.0.1:8888/stop
+    <#list shutdownPorts as port>
+    wget http://127.0.0.1:${port}/stop
+    </#list>
 else
-   wget http://127.0.0.1:8888/stop >> log.txt 2>&1
+    <#list shutdownPorts as port>
+   wget http://127.0.0.1:${port}/stop >> log.txt 2>&1
+    </#list>
 fi;
+</#if>
 
 r sleep 1
 

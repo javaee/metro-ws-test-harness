@@ -19,6 +19,6 @@ prolog $CTX
 mkdirp ${dir}
 </#list>
 
-r <#list params as param>      ${param} <#if param_has_next>\</#if>
+r <#list params as param><#if param_index != 0>      </#if>${param} <#if param_has_next>\</#if>
 </#list>
 

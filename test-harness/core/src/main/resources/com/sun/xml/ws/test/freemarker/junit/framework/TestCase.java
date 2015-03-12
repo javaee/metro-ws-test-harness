@@ -30,16 +30,24 @@ public class TestCase {
         pass("assertFalse");
     }
 
-    public static void assertNull(Object nullObject) {
+    public static void assertNull(String msg, Object nullObject) {
         if (nullObject != null)
-            fail("assertNull failed!");
-        pass("assertNull");
+            fail(msg);
+        pass(msg);
+    }
+
+    public static void assertNotNull(String msg, Object object) {
+        if (object == null)
+            fail(msg);
+        pass(msg);
+    }
+
+    public static void assertNull(Object nullObject) {
+        assertNull("assertNull", nullObject);
     }
 
     public static void assertNotNull(Object object) {
-        if (object == null)
-            fail("assertNotNull failed!");
-        pass("assertNotNull");
+        assertNotNull("assertNotNull", object);
     }
 
     public static void assertTrue(boolean condition) {

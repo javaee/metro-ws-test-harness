@@ -23,7 +23,7 @@ public class Deploy${stage} {
     public static void main(String[] args) throws Throwable {
         Endpoint e = deploy();
         System.out.println("Endpoint [" + e + "] successfully deployed.");
-        new EndpointStopper(8888, e);
+        new EndpointStopper(${shutdownPort}, e);
     }
 
     static javax.xml.ws.Endpoint deploy() throws Exception {

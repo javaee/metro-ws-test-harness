@@ -235,7 +235,7 @@ public class ClientExecutor extends Executor {
                     //{// inject a service instance
                     String serviceVarName = Introspector.decapitalize(clazz.getSimpleName());
                     engine.set(serviceVarName, serviceInstance);
-                    varMap.put("simpleName", clazz.getName());
+                    varMap.put("serviceClassName", clazz.getName().replaceAll("\\$", "."));
                     varMap.put("serviceVarName", serviceVarName);
                     serviceList.append(' ').append(serviceVarName);
                     //}
@@ -253,7 +253,7 @@ public class ClientExecutor extends Executor {
 
                             try {
                                 engine.set(varName, method.invoke(serviceInstance));
-                                String portType = method.getReturnType().getSimpleName();
+                                String portType = method.getReturnType().getName();
 
                                 varMap.put("portType", portType);
                                 varMap.put("getPortMethod", method.getName());
