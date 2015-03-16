@@ -140,20 +140,29 @@ public class CodeGenerator {
         //obsoleteDeploy(filename, classpath);
 
         FreeMarkerTemplate deploy = new FreeMarkerTemplate(id, scriptOrder, workDir, "deploy");
-        String classPathAdjusted = chdir(classpath);
-        deploy.put("classpath", toRelativePath(classPathAdjusted));
+        classpath = chdir(classpath);
+        classpath = toRelativePath(classpath);
 
-        String serviceDirectory = classPathAdjusted.replace(workDir, "").replaceAll("/services", "").replaceAll("/war/WEB-INF/classes", "");
+        String serviceDirectory = classpath.replace(workDir, "").replaceAll("services/", "").replaceAll("war/WEB-INF/classes", "");
         deploy.put("serviceDirectory", serviceDirectory);
+
+        // add also parent-parent dir in order to find resource "WEB-INF/wsdl/my.wsdl"
+        // for @Provider services
+        classpath = classpath + ":" + classpath.replaceAll("/WEB-INF/classes", "");
+        deploy.put("classpath", classpath);
 
         // applicable if starting from wsdl - required to copy resources
         if (fromwsdl) {
             deploy.put("wsdlDocs", getWSDLDocs(params));
         }
 
-        // applicable if wsdlLocation is in java annotation - TODO: to be be solved (not working now)
+        // applicable for annotations @Provider/wsdlLocation
         if (params.containsKey("wsdlLocation")) {
             deploy.put("wsdlLocation", params.get("wsdlLocation"));
+
+            // deployment of provider requires jax-ws.xml descriptor;
+            // lets 'steel' what harness generated
+            copySunJaxwsXML(serviceDirectory);
         }
 
         String filename = deploy.writeFile();
@@ -190,6 +199,17 @@ public class CodeGenerator {
 
         scriptOrder++;
         deployedServices++;
+    }
+
+    protected static void copySunJaxwsXML(String serviceDirectory) {
+        String source = workDir + "/services/" + serviceDirectory + "/war/WEB-INF/sun-jaxws.xml";
+        source = source.replaceAll("testcases-no-harness", "testcases");
+        String destination = workDir + "/../src/" + serviceDirectory + "/sun-jaxws.xml";
+        try {
+            SourcesCollector.copy(new File(source), new File(destination));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected static List<String> getWSDLDocs(Map<String, Object> params) {
@@ -403,6 +423,7 @@ public class CodeGenerator {
         // ws-harness creates URLClassloader reading WEB-INF/wsdl + WEB-INF/classes to load service
         // let's fake it here ...
         if (wsdlLocation != null && wsdlLocation.length() > 0) {
+            // location in no-harness directory structure; will be copied by deploy script
             templateParams.put("wsdlLocation", wsdlLocation.replaceAll("WEB-INF/wsdl/", ""));
         }
 

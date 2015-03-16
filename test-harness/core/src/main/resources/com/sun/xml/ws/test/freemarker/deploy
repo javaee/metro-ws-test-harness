@@ -20,15 +20,14 @@ export SVC_DIR=${serviceDirectory}
 mkdirp services/$SVC_DIR/war/WEB-INF/wsdl/
 
 <#if wsdlDocs??>
-    <#list wsdlDocs as wsdl>
-cpwsdl ../src/$SVC_DIR ${wsdl}
+    <#list wsdlDocs as doc>
+cpwsdl ../src/$SVC_DIR ${doc}
     </#list>
 </#if>
 
 <#if wsdlLocation??>
 cpwsdl ../src/$SVC_DIR ${wsdlLocation}
-mkdir -p services/$SVC_DIR/war/classes/WEB-INF
-mv -v services/$SVC_DIR/war/WEB-INF/wsdl services/$SVC_DIR/war/classes/WEB-INF/
+cpwsdl ../src/$SVC_DIR sun-jaxws.xml
 </#if>
 
 # handlers.xml, example: testcases/bugs/jaxws1015

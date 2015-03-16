@@ -93,7 +93,7 @@ public class SourcesCollector {
         }
     }
 
-    private static void copy(File source, File dest) throws IOException {
+    public static void copy(File source, File dest) throws IOException {
         InputStream is = null;
         OutputStream os = null;
         try {
