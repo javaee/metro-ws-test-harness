@@ -19,6 +19,20 @@ prolog $CTX
 mkdirp ${dir}
 </#list>
 
+# to be sure the directory is there (used in classpath ...)
+mkdirp client-classes
+
+<#if classpath??>
+CLIENT_CLASSPATH=${classpath}
+</#if>
+CLIENT_CLASSPATH=$CLIENT_CLASSPATH:$SHARED_LIB
+
+# compile generated client sources
+compileShared
+#compileClientClasses "client-source"
+compileClientClasses "../src/common"
+#compileClientClasses "../src/client"
+
 r javac \
 <#list params as param>
         ${param} <#if param_has_next>\</#if>

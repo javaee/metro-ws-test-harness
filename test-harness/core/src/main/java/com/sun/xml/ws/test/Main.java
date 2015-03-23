@@ -385,6 +385,7 @@ public class Main {
             if (World.emma != null) {
                 World.emma.write(emma);
             }
+            CodeGenerator.testCaseDone();
             CodeGenerator.allTestsDone(tests.get(0));
         }
     }

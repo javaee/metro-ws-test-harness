@@ -9,19 +9,6 @@ if [ "$failFast" = "true" ]; then
     fi;
 fi;
 
-SHARED_DIR=/Users/miran/dev/jaxws-ri/jaxws-ri/tests/unit/testcases-no-harness/SHARED/
-SHARED_LIB=$SHARED_DIR/lib/jaxwsTestUtil.jar
-CLIENT_CLASSPATH=${classpath}:$SHARED_LIB
-
-function compileClientClasses() {
-    DIR=$1
-    SRC_FILES=
-    if [ -d $DIR ]; then
-        SRC_FILES=`find $DIR -name '*.java'`
-        r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes $SRC_FILES
-    fi
-}
-
 if [ "$skipTests" != "true" ]; then
 
     TOTAL_STEPS=$((TOTAL_STEPS+1))
@@ -34,8 +21,13 @@ if [ "$skipTests" != "true" ]; then
 
     log "Running ${testName}"
 
+    # to be sure the directory is there (used in classpath ...)
+    mkdirp client-classes
+
+    CLIENT_CLASSPATH=${classpath}:$SHARED_LIB
+
     # compile generated client sources
-    compileClientClasses "../src/junit"
+    compileShared
     compileClientClasses "client-source"
     compileClientClasses "../src/common"
     compileClientClasses "../src/client"
@@ -46,8 +38,8 @@ if [ "$skipTests" != "true" ]; then
     fi
 
     # compile generated bash.Client#.java
-    r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes bsh/Client${stage}.java bsh/Util.java
+    r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes bsh/${clientClass}${stage}.java bsh/Util.java
 
-    runjava $CLIENT_CLASSPATH bsh.Client${stage}
+    runjava $CLIENT_CLASSPATH bsh.${clientClass}${stage}
 fi;
 

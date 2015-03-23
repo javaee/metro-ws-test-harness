@@ -33,9 +33,9 @@ cpwsdl ../src/$SVC_DIR sun-jaxws.xml
 # handlers.xml, example: testcases/bugs/jaxws1015
 cpclasses "../src/$SVC_DIR/*.xml"
 
-SHARED_DIR=/Users/miran/dev/jaxws-ri/jaxws-ri/tests/unit/testcases-no-harness/SHARED/
-SHARED_LIB=$SHARED_DIR/lib/jaxwsTestUtil.jar
 SERVER_CLASSPATH=${classpath}:$SHARED_LIB:.
+
+compileShared
 
 r javac -cp ${classpath} bsh/Deploy${stage}.java
 

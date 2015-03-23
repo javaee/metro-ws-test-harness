@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,6 +36,7 @@
 
 package com.sun.xml.ws.test.exec;
 
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.container.DeployedService;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.model.TestEndpoint;
@@ -55,6 +56,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -129,6 +132,7 @@ public class JavaClientExecutor extends Executor {
 
     @Override
     public void run(TestResult result) {
+        CodeGenerator.testStarting(context.workDir);
         if(skipTest) {
             System.out.printf("Version Requirement not satisfied, Skipping Test"+ testClassName);
             return;
@@ -146,11 +150,12 @@ public class JavaClientExecutor extends Executor {
         try {
             TestSuite ts;
             try {
-                injectResources();
+                Map<String, String> injectedProperties = injectResources();
                 Class<?> testClass = context.clientClassLoader.loadClass(testClassName);
 
                 // let JUnit parse all the test cases
                 ts = new TestSuite(testClass);
+                CodeGenerator.generateJUnitClient(ts, testClass, injectedProperties);
 
                 for(int i=0; i<ts.testCount(); i++) {
                     Test t = ts.testAt(i);
@@ -219,10 +224,11 @@ public class JavaClientExecutor extends Executor {
         }
     }
 
-    private void injectResources() throws Exception {
+    private Map<String, String> injectResources() throws Exception {
         StringBuilder addressList = new StringBuilder("injected addresses:");
 
         Properties properties = System.getProperties();
+        Map<String, String> injectedProperties = new HashMap<String, String>();
 
         for (DeployedService svc : context.services.values()) {
             if (! svc.service.isSTS) {
@@ -252,7 +258,10 @@ public class JavaClientExecutor extends Executor {
                             String varName = Introspector.decapitalize(portName);
 
                             try {
-                                properties.setProperty(varName +"Address",svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString());
+                                String key = varName + "Address";
+                                String value = svc.app.getEndpointAddress(getEndpoint(svc, portName)).toString();
+                                properties.setProperty(key, value);
+                                injectedProperties.put(key, value);
                                 addressList.append(' ').append(varName).append("Address");
                             } catch (InvocationTargetException e) {
                                 if(e.getCause() instanceof Exception)
@@ -266,6 +275,7 @@ public class JavaClientExecutor extends Executor {
             }
         }
         System.out.println(addressList);
+        return injectedProperties;
     }
 
     private TestEndpoint getEndpoint(DeployedService svc, String portName) {

@@ -168,3 +168,24 @@ function runjava() {
        r java $JAVA_OPTS $J_OPTIONS >> log.txt 2>&1
     fi;
 }
+
+SHARED_DIR=/Users/miran/dev/jaxws-ri/jaxws-ri/tests/unit/testcases-no-harness/SHARED/
+SHARED_LIB=$SHARED_DIR/lib/jaxwsTestUtil.jar:$SHARED_DIR/classes
+
+
+function compileClientClasses() {
+    DIR=$1
+    SRC_FILES=
+    if [ -d $DIR ]; then
+        SRC_FILES=`find $DIR -name '*.java'`
+        r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes $SRC_FILES
+    fi
+}
+
+function compileShared() {
+    SRC_FILES=
+    SRC_FILES=`find $SHARED_DIR/src -name '*.java'`
+    r javac -XDignore.symbol.file -d $SHARED_DIR/classes $SRC_FILES
+}
+
+

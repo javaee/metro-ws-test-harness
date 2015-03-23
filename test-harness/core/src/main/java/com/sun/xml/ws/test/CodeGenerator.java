@@ -40,12 +40,16 @@ import com.sun.xml.ws.test.container.WAR;
 import com.sun.xml.ws.test.model.TestEndpoint;
 import com.sun.xml.ws.test.util.FreeMarkerTemplate;
 import com.sun.xml.ws.test.util.JavacTask;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +68,10 @@ public class CodeGenerator {
     public static int scriptOrder = 0;
     public static String id;
 
+    // to detect new testcase
+    private static String lastTestcaseDir;
+
+    // current testcase working directory (moved to no-harness)
     private static String workDir;
 
     // scripts for one "testcase" (= 1 test-desriptor.xml)
@@ -91,6 +99,7 @@ public class CodeGenerator {
     public static void testCaseDone() {
         if (!generateTestSources) return;
         scriptOrder = 0;
+        if (workDir == null) return;
 
         new FreeMarkerTemplate(id, scriptOrder, workDir, "shared").writeFileTo(workDir, "shared");
 
@@ -166,21 +175,12 @@ public class CodeGenerator {
         }
 
         String filename = deploy.writeFile();
-        testcaseScripts.add(filename);
 
         // create dir
         File dir = new File(workDir + "/bsh");
         dir.mkdir();
 
         //obsoleteDeployCLass(contents, className);
-
-        FreeMarkerTemplate utilClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Util.java");
-        utilClass.writeFileTo(workDir + "/bsh", "Util.java");
-
-        new File(workDir + "/junit").mkdir();
-        new File(workDir + "/junit/framework").mkdir();
-        FreeMarkerTemplate junitClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/TestCase.java");
-        junitClass.writeFileTo(workDir + "/junit/framework", "TestCase.java");
 
         FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java");
         for (String key : params.keySet()) {
@@ -197,7 +197,7 @@ public class CodeGenerator {
         deployClass.put("shutdownPort", port);
         deployClass.writeFileTo(workDir + "/bsh", "Deploy" + scriptOrder + ".java");
 
-        scriptOrder++;
+        addScript(filename);
         deployedServices++;
     }
 
@@ -223,38 +223,57 @@ public class CodeGenerator {
         return result;
     }
 
-    public static void generateClient(String classpath, String testName) {
+    public static void generateClient(String testName, String mainClass) {
         if (!generateTestSources) return;
         if (workDir == null) return;
 
         FreeMarkerTemplate client = new FreeMarkerTemplate(id, scriptOrder, workDir, "client");
-        client.put("classpath", chdir(classpath));
+        client.put("classpath", "client-classes:.");
         client.put("testName", testName);
+        client.put("clientClass", mainClass);
         String filename = client.writeFile();
-        testcaseScripts.add(filename);
+        addScript(filename);
 
         // create dir
         File dir = new File(workDir + "/bsh");
         dir.mkdir();
 
-        scriptOrder++;
     }
 
-    public static void startTestCase(String id, File workDir) {
+    // testcaseDir = /../../testcases/fromjava/nosei
+    public static void startTestCase(String testcaseDir) {
         if (!generateTestSources) return;
         scriptOrder = 1;
-        CodeGenerator.id = id;
-        CodeGenerator.workDir = chdir(workDir.getAbsolutePath());
-        String srcDir = new File(workDir.getAbsolutePath()).getParent();
-        cleanDestDirectory(srcDir);
+
+        // fromjava.nosei
+        int beginIndex = testcaseDir.indexOf("testcases/") + "testcases/".length();
+        String testId = testcaseDir.substring(beginIndex).replaceAll("/", ".");
+        CodeGenerator.id = testId;
+
+        // testcases-no-harness/fromjava/nosei
+        String destDir = chdir(testcaseDir);
+
+        // testcases-no-harness/fromjava/nosei/work
+        CodeGenerator.workDir = destDir + "/work";
+
+        // testcases-no-harness/fromjava/nosei
+        cleanDirectory(destDir);
+
         SourcesCollector.ensureDirectoryExists(CodeGenerator.workDir);
-        copySources(srcDir);
+        copySources(testcaseDir);
+
+        // generate common classes
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Util.java").writeFileTo(workDir + "/bsh", "Util.java");
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/TestCase.java").writeFileTo(
+                workDir + "/junit/framework", "TestCase.java");
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/Assert.java").writeFileTo(
+                workDir + "/junit/framework", "Assert.java");
+
     }
 
-    protected static void cleanDestDirectory(String srcDir) {
-        String dstDir = chdir(srcDir);
+    protected static void cleanDirectory(String dir) {
         try {
-            File f = new File(dstDir);
+            File f = new File(dir);
             if (f.exists()) {
                 delete(f);
             }
@@ -269,6 +288,7 @@ public class CodeGenerator {
             for (File c : f.listFiles())
                 delete(c);
         }
+        System.out.println("deleting file [" + f + "]");
         if (!f.delete())
             throw new FileNotFoundException("Failed to delete file: " + f);
     }
@@ -314,7 +334,7 @@ public class CodeGenerator {
 
         List<String> params = new ArrayList();
         params.add("-d " + toRelativePath(destDir));
-        params.add("-cp " + toRelativePath(chdir(javac.getClasspath().toString())));
+        params.add("-cp " + "$SHARED_CLASSES:" + toRelativePath(chdir(javac.getClasspath().toString())));
 
         for (String p : javac.getSrcdir().list()) {
             p = chdir(p);
@@ -328,8 +348,7 @@ public class CodeGenerator {
         run.put("mkdirs", toRelativePath(mkdirs));
         run.put("params", toRelativePath(params));
         String filename = run.writeFile();
-        testcaseScripts.add(filename);
-        scriptOrder++;
+        addScript(filename);
     }
 
     public static String moveToSrc(String directory) {
@@ -367,13 +386,15 @@ public class CodeGenerator {
         template.put("dirs", toRelativePath(moveToSrc2(chdir(dirsToBeCretaed))));
         template.put("params", moveToSrc2(chdir(params)));
         String filename = template.writeFile();
-        testcaseScripts.add(filename);
+        addScript(filename);
+    }
 
+    protected static void addScript(String filename) {
+        testcaseScripts.add(filename);
         scriptOrder++;
     }
 
     public static void generateClientClass(
-            String classpath,
             String testName,
             List<String> pImports,
             String pContents,
@@ -386,7 +407,6 @@ public class CodeGenerator {
         dir.mkdir();
 
         FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Client.java");
-        clientClass.put("classpath", classpath);
         clientClass.put("testName", testName);
         clientClass.put("pImports", pImports);
         clientClass.put("contents", pContents);
@@ -396,8 +416,42 @@ public class CodeGenerator {
             clientClass.put(key, value);
         }
         clientClass.writeFileTo(workDir + "/bsh", "Client" + scriptOrder + ".java");
-        generateClient(classpath, testName);
+        generateClient(testName, "Client");
     }
+
+    public static void generateJUnitClient(TestSuite ts, Class<?> testClass, Map<String, String> injectedProperties) {
+        if (!generateTestSources) return;
+
+        // create dir
+        File dir = new File(workDir + "/bsh");
+        dir.mkdir();
+
+        FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/ClientJUnit.java");
+        String testClassName = ts.getName();
+        clientClass.put("className", testClassName);
+        String constructorArg = hasNoArgConstructor(testClass)? "" : "\"" + testClassName + "\"";
+        clientClass.put("constructorArg", constructorArg);
+        clientClass.put("injectedProperties", injectedProperties);
+        List<String> tests = new ArrayList<String>();
+        for(int i=0; i<ts.testCount(); i++) {
+            Test t = ts.testAt(i);
+            String method = t.toString();
+            tests.add(method.substring(0, method.indexOf('(')));
+        }
+        clientClass.put("methods", tests);
+        clientClass.writeFileTo(workDir + "/bsh", "ClientJUnit" + scriptOrder + ".java");
+        generateClient(testClassName, "ClientJUnit");
+    }
+
+    private static boolean hasNoArgConstructor(Class<?> clazz) {
+        try {
+            Constructor<?> c = clazz.getConstructor(new Class<?>[0]);
+            return c != null && (c.getModifiers() & Modifier.PUBLIC) != 0;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
 
     public static String fixPort(String value) {
         if (value.contains("http://localhost:8080")) {
@@ -474,5 +528,20 @@ public class CodeGenerator {
             return fixed;
         }
         return value;
+    }
+
+    public static void testStarting(File workDir) {
+        String path = workDir.getPath();
+        //path = chdir(path);
+        int i = path.indexOf("/work");
+        if (i != -1) {
+            path = path.substring(0, i);
+        }
+
+        if (!path.equals(CodeGenerator.lastTestcaseDir)) {
+            testCaseDone();
+            startTestCase(path);
+            CodeGenerator.lastTestcaseDir = path;
+        }
     }
 }

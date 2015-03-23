@@ -37,16 +37,19 @@
 package com.sun.xml.ws.test.util;
 
 
+import com.sun.xml.ws.test.SourcesCollector;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class FreeMarkerTemplate {
 
@@ -80,7 +83,16 @@ public class FreeMarkerTemplate {
 
     public String writeFileTo(String dir, String filename) {
         String fullFileName = dir + "/" + filename;
-        System.out.println("generating file [" + fullFileName + "]");
+        SourcesCollector.ensureDirectoryExists(new File(fullFileName).getParent());
+        System.out.println("\ngenerating file [" + fullFileName + "];\nparametersMap: [");
+        Set<Map.Entry> entryset = root.entrySet();
+        for(Map.Entry entry : entryset) {
+            System.out.print("        ");
+            System.out.print(entry.getKey());
+            System.out.print(" : ");
+            System.out.println(entry.getValue());
+        }
+        System.out.println("]\n");
 
         Writer out = null;
         try {

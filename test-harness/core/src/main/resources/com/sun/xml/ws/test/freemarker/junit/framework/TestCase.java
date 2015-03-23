@@ -8,19 +8,38 @@ public class TestCase {
     public TestCase() {}
     public TestCase(String name) {}
 
+    /**
+     * Sets up the fixture, for example, open a network connection.
+     * This method is called before a test is executed.
+     */
+    protected void setUp() throws Exception {
+    }
+
+    /**
+     * Tears down the fixture, for example, close a network connection.
+     * This method is called after a test is executed.
+     */
+    protected void tearDown() throws Exception {
+    }
+
     public static void assertEquals(String msg, Object a, Object b) {
         if (a == null) {
             if (b != null) {
-                fail(msg + " assertEquals: a is null, but b not!");
+                fail(msg);
             }
         } else {
             if (!a.equals(b))
-                fail(msg + " assertEquals: a NOT equal to b!");
+                fail(msg);
         }
-        pass("assertEquals");
+        pass(msg);
     }
 
     public static void assertEquals(Object a, Object b) {
+        assertEquals("assertEquals", a, b);
+    }
+
+    // necessary for bytecode compatibility
+    public static void assertEquals(String a, String b) {
         assertEquals("", a, b);
     }
 
@@ -50,10 +69,38 @@ public class TestCase {
         assertNotNull("assertNotNull", object);
     }
 
+    public static void assertNotSame(String message, Object expected, Object actual) {
+        if (expected == actual) {
+            fail(message);
+        } else {
+            pass(message);
+        }
+    }
+
+    public static void assertNotSame(Object expected, Object actual) {
+        assertNotSame("assertNotSame", expected, actual);
+    }
+
+    public static void assertSame(String message, Object expected, Object actual) {
+        if (expected == actual) {
+            pass(message);
+        } else {
+            fail(message);
+        }
+    }
+
+    public static void assertSame(Object expected, Object actual) {
+        assertSame("assertSame", expected, actual);
+    }
+
     public static void assertTrue(boolean condition) {
+        assertTrue("assertTrue", condition);
+    }
+
+    public static void assertTrue(String msg, boolean condition) {
         if (!condition)
-            fail("assertTrue failed!");
-        pass("assertTrue");
+            fail(msg);
+        pass(msg);
     }
 
     public static void fail() {

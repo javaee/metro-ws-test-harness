@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2015 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,6 +36,7 @@
 
 package com.sun.xml.ws.test.exec;
 
+import com.sun.xml.ws.test.CodeGenerator;
 import com.sun.xml.ws.test.World;
 import com.sun.xml.ws.test.container.DeploymentContext;
 import com.sun.xml.ws.test.util.JavacTask;
@@ -55,6 +56,7 @@ public class ClientCompileExecutor extends Executor {
     }
 
     public void runTest() throws Throwable {
+        CodeGenerator.testStarting(context.workDir);
         File classDir = makeWorkDir("client-classes");
 
         // compile the generated source files to javac
@@ -66,9 +68,11 @@ public class ClientCompileExecutor extends Executor {
         );
         javac.setDestdir(classDir);
         javac.setDebug(true);
-        if(!context.wsimport.isNoop())
+        if(!context.wsimport.isNoop()) {
             // if we are just reusing the existing artifacts, no need to recompile.
             javac.execute();
+            CodeGenerator.generateJavac(javac);
+        }
 
         // load the generated classes and resources
         URL[] url = (context.getResources() == null)

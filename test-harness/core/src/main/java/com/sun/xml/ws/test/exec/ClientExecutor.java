@@ -85,6 +85,7 @@ public class ClientExecutor extends Executor {
     }
 
     public void runTest() throws Throwable {
+        CodeGenerator.testStarting(context.workDir);
         if (context.clientClassLoader == null) {
             context.clientClassLoader = context.getResources() != null
                     ? new URLClassLoader(new URL[]{context.getResources().toURL()}, World.runtime.getClassLoader())
@@ -159,7 +160,6 @@ public class ClientExecutor extends Executor {
             }
 
             CodeGenerator.generateClientClass(
-                    "client-classes:.",      // classpath
                     client.script.getName(), // test name
                     pImports,
                     client.script.getSource(),

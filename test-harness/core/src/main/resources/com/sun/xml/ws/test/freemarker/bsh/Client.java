@@ -16,9 +16,15 @@ public class Client${stage} {
     // TODO
     static List<URL> wsdlUrls = new ArrayList<URL>();
 
+<#if serviceClassName??>
     static ${serviceClassName} ${serviceVarName} = new ${serviceClassName}();
+</#if>
+<#if portType??>
     static ${portType} ${varName} = ${serviceName}.${getPortMethod}();
+</#if>
+<#if varName??>
     static URI ${varName}Address = createUri("${address}");
+</#if>
 
     // injected from bsh scripts
 ${client_setUp_script}
