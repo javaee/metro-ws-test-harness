@@ -28,8 +28,13 @@ public class Deploy${stage} {
 
     static javax.xml.ws.Endpoint deploy() throws Exception {
         List<Source> metadata = new ArrayList<Source>();
-<#list metadata_files as metadata_file>
-        metadata.add(new StreamSource(new File("${metadata_file}")));
+<#list wsdlDocs as metadata_file>
+        metadata.add(
+            new StreamSource(
+                Deploy${stage}.class.getResourceAsStream("/WEB-INF/wsdl/${metadata_file}"),
+                Deploy${stage}.class.getResource("/WEB-INF/wsdl/${metadata_file}").toString()
+            )
+        );
 </#list>
 
 // properties = {

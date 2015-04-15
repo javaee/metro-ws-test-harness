@@ -1,0 +1,3 @@
+<#list testcases as testcase>
+. ${testcase}
+</#list>

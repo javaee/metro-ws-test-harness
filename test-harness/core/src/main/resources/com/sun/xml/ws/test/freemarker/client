@@ -3,10 +3,8 @@
 # stage: ${stage}
 L_STATUS=0
 
-if [ "$failFast" = "true" ]; then
-    if [ "$G_STATUS" = "1" ]; then
-       return 1
-    fi;
+if [ "$failFast" = "true" ] && [ "$G_STATUS" = "1" ]
+    then return 1
 fi;
 
 if [ "$skipTests" != "true" ]; then
@@ -22,15 +20,19 @@ if [ "$skipTests" != "true" ]; then
     log "Running ${testName}"
 
     # to be sure the directory is there (used in classpath ...)
+    #rm -rf client-classes - wsimport can generate sources
     mkdirp client-classes
 
     CLIENT_CLASSPATH=${classpath}:$SHARED_LIB
 
-    # compile generated client sources
-    compileShared
-    compileClientClasses "client-source"
-    compileClientClasses "../src/common"
-    compileClientClasses "../src/client"
+     # compile generated client sources
+    mkdirp client-source
+
+    collectSources $SHARED_DIR/src/ client-source
+    collectSources ../src/common client-source
+    collectSources ../src/client client-source
+    collectSources bsh/${clientClass}${stage}.java client-source
+    collectSources bsh/Util.java client-source
 
     # copy resources
     if [ -d ../src/resources ]; then
@@ -38,8 +40,10 @@ if [ "$skipTests" != "true" ]; then
     fi
 
     # compile generated bash.Client#.java
-    r javac -XDignore.symbol.file -cp $CLIENT_CLASSPATH -d client-classes bsh/${clientClass}${stage}.java bsh/Util.java
+    # bsh/${clientClass}${stage}.java bsh/Util.java
+    r javac $TOOL_JAVA_OPTS -XDignore.symbol.file -cp client-source:$SHARED_DIR/lib/* -d client-classes `find client-source -name "*.java"`
+    compileModuleInfos client-source client-classes
 
-    runjava $CLIENT_CLASSPATH bsh.${clientClass}${stage}
+    runClient $CLIENT_CLASSPATH bsh.${clientClass}${stage}
 fi;
 

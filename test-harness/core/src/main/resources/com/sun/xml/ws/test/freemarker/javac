@@ -28,12 +28,12 @@ CLIENT_CLASSPATH=${classpath}
 CLIENT_CLASSPATH=$CLIENT_CLASSPATH:$SHARED_LIB
 
 # compile generated client sources
-compileShared
-#compileClientClasses "client-source"
-compileClientClasses "../src/common"
-#compileClientClasses "../src/client"
+mkdirp shared-source
+cp -R -v $SHARED_DIR/src/* shared-source >> log.txt 2>&1
 
-r javac \
+collectSources ../src/common shared-source
+
+r javac $TOOL_JAVA_OPTS \
 <#list params as param>
         ${param} <#if param_has_next>\</#if>
 </#list>

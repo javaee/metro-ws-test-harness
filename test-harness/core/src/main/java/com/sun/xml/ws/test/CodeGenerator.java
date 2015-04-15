@@ -121,9 +121,11 @@ public class CodeGenerator {
 
     public static void allTestsDone(String dir) {
         if (!generateTestSources) return;
-        FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, chdir(dir), "runall");
+        new FreeMarkerTemplate(id, 0, chdir(dir), "runall").writeFileTo(chdir(dir), "/runall");
+
+        FreeMarkerTemplate runall = new FreeMarkerTemplate(id, 0, chdir(dir), "testcases");
         runall.put("testcases", testcases);
-        runall.writeFileTo(chdir(dir), "/runall");
+        runall.writeFileTo(chdir(dir), "/testcases");
     }
 
     private static List<String> toFilenames(List<String> absolutePaths) {
@@ -161,9 +163,13 @@ public class CodeGenerator {
         deploy.put("classpath", classpath);
 
         // applicable if starting from wsdl - required to copy resources
+        List<String> wsdlDocs = getWSDLDocs(params);
         if (fromwsdl) {
-            deploy.put("wsdlDocs", getWSDLDocs(params));
+            deploy.put("wsdlDocs", wsdlDocs);
+        } else {
+            deploy.put("wsdlDocsFromJava", wsdlDocs);
         }
+        deploy.put("packagePrefix", id.replaceAll("\\.", "/"));
 
         // applicable for annotations @Provider/wsdlLocation
         if (params.containsKey("wsdlLocation")) {
@@ -192,6 +198,7 @@ public class CodeGenerator {
             }
             deployClass.put(key, value);
         }
+        deployClass.put("wsdlDocs", wsdlDocs);
         String port = "" + (8888 + deployedServices);
         shutdownPortList.add(port);
         deployClass.put("shutdownPort", port);
@@ -203,7 +210,7 @@ public class CodeGenerator {
 
     protected static void copySunJaxwsXML(String serviceDirectory) {
         String source = workDir + "/services/" + serviceDirectory + "/war/WEB-INF/sun-jaxws.xml";
-        source = source.replaceAll("testcases-no-harness", "testcases");
+        source = source.replaceAll("no-harness", "testcases");
         String destination = workDir + "/../src/" + serviceDirectory + "/sun-jaxws.xml";
         try {
             SourcesCollector.copy(new File(source), new File(destination));
@@ -250,13 +257,13 @@ public class CodeGenerator {
         String testId = testcaseDir.substring(beginIndex).replaceAll("/", ".");
         CodeGenerator.id = testId;
 
-        // testcases-no-harness/fromjava/nosei
+        // no-harness/fromjava/nosei
         String destDir = chdir(testcaseDir);
 
-        // testcases-no-harness/fromjava/nosei/work
+        // no-harness/fromjava/nosei/work
         CodeGenerator.workDir = destDir + "/work";
 
-        // testcases-no-harness/fromjava/nosei
+        // no-harness/fromjava/nosei
         cleanDirectory(destDir);
 
         SourcesCollector.ensureDirectoryExists(CodeGenerator.workDir);
@@ -300,9 +307,7 @@ public class CodeGenerator {
 
     // move everything out of (harness) testcases directory
     public static String chdir(String dir) {
-        // to avoid multiple replacements ...
-        dir = dir.replaceAll("/testcases-no-harness", "/testcases");
-        return dir.replaceAll("/testcases", "/testcases-no-harness");
+        return dir.replaceAll("/testcases", "/no-harness");
     }
 
     private static List<String> chdir(List<String> list) {

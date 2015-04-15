@@ -25,6 +25,12 @@ cpwsdl ../src/$SVC_DIR ${doc}
     </#list>
 </#if>
 
+<#if wsdlDocsFromJava??>
+    <#list wsdlDocsFromJava as doc>
+cpwsdl services/$SVC_DIR/war/WEB-INF/wsdl ${doc}
+    </#list>
+</#if>
+
 <#if wsdlLocation??>
 cpwsdl ../src/$SVC_DIR ${wsdlLocation}
 cpwsdl ../src/$SVC_DIR sun-jaxws.xml
@@ -35,10 +41,31 @@ cpclasses "../src/$SVC_DIR/*.xml"
 
 SERVER_CLASSPATH=${classpath}:$SHARED_LIB:.
 
-compileShared
+mkdirp shared-source
+cp -R -v $SHARED_DIR/src/* shared-source >> log.txt 2>&1
 
-r javac -cp ${classpath} bsh/Deploy${stage}.java
+mkdirp deploy-source
+mkdirp deploy-classes
 
-runjavabg $SERVER_CLASSPATH bsh.Deploy${stage}
+collectSources shared-source deploy-source/
+collectSources ../src/$SVC_DIR deploy-source/
+
+#mkdirp deploy-source/${packagePrefix}/$SVC_DIR
+#cp -R -v ../src/$SVC_DIR/* deploy-source/${packagePrefix}/$SVC_DIR  >> log.txt 2>&1
+## hack to get compiled server sources from ../src/server
+#cp -R -v services/$SVC_DIR/war/WEB-INF/classes/* sources-deploy/  >> log.txt 2>&1
+cp -R -v services/$SVC_DIR/war/WEB-INF/classes/* deploy-classes/  >> log.txt 2>&1
+
+collectSources services/$SVC_DIR/gen-src/ deploy-source
+collectSources bsh/Deploy${stage}.java deploy-source
+
+# existing module-info.class makes the compilation fail ...
+rm -rfv deploy-classes/module-info.class >> log.txt 2>&1
+rm -rfv deploy-source/module-info.class >> log.txt 2>&1
+
+r javac $TOOL_JAVA_OPTS -d deploy-classes -cp deploy-source deploy-source/bsh/Deploy${stage}.java
+compileModuleInfos deploy-source deploy-classes
+
+runServer $SERVER_CLASSPATH bsh.Deploy${stage}
 
 r sleep 3

@@ -3,19 +3,27 @@
 # stage: ${stage}
 export CTX=${serviceId}:${stage}-client
 
+# clean the log
+if [ -f log.txt ]; then
+    mv log.txt log-`date +%Y-%m-%d_%H-%M-%S`.txt
+fi;
+
+. shared
+
 G_STATUS=0
 L_STATUS=0
 <#if shutdownPorts??>
     <#list shutdownPorts as port>
-wget http://127.0.0.1:${port}/stop
+wget http://127.0.0.1:${port}/stop > /dev/null 2>&1
     </#list>
 </#if>
 
-echo "==================================================================== global variables ============"
-echo "      G_STATUS=[$G_STATUS] ~ result so far of current testcase"
-echo "         debug=[$debug] ~ silent / verbose mode"
-echo "      failFast=[$failFast] ~ if true it won't continue with other tests for given webservice"
-echo "     skipTests=[$skipTests] ~ run tests just up to deploy / all (inncluding client tests)"
-echo "useNamedModule=[$useNamedModule] ~ run as unnamed module / named (including module-info.java)"
-echo "=================================================================================================="
+clean client-classes
+clean client-source
+clean services
+clean ../mods
+clean ../mods-server
+clean deploy-source
+clean deploy-classes
+clean shared-source
 
