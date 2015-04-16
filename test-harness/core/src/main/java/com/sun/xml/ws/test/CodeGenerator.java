@@ -279,6 +279,10 @@ public class CodeGenerator {
     }
 
     protected static void cleanDirectory(String dir) {
+        if (!dir.contains("jaxws-ri/tests/unit")) {
+            abort("Trying to delete user files [" + dir + "]. Check you specified properly test to be run.");
+        }
+
         try {
             File f = new File(dir);
             if (f.exists()) {
@@ -291,6 +295,11 @@ public class CodeGenerator {
     }
 
     static void delete(File f) throws IOException {
+        String absolutePath = f.getAbsolutePath();
+        if (!absolutePath.contains("jaxws-ri/tests/unit")) {
+            abort("Trying to delete user files [" + absolutePath + "]. Check you specified properly test to be run.");
+        }
+
         if (f.isDirectory()) {
             for (File c : f.listFiles())
                 delete(c);
@@ -298,6 +307,10 @@ public class CodeGenerator {
         System.out.println("deleting file [" + f + "]");
         if (!f.delete())
             throw new FileNotFoundException("Failed to delete file: " + f);
+    }
+
+    private static void abort(String message) {
+        throw new RuntimeException(message);
     }
 
     protected static void copySources(String srcDir) {
