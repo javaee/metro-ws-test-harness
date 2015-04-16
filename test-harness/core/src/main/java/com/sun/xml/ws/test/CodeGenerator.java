@@ -550,8 +550,14 @@ public class CodeGenerator {
 
     public static void testStarting(File workDir) {
         String path = workDir.getPath();
-        //path = chdir(path);
-        int i = path.indexOf("/work");
+
+        int i = -1;
+        if (path.endsWith("/work")) {
+            i = path.lastIndexOf("/work");
+        } else if (path.contains("/work/")) {
+            i = path.lastIndexOf("/work/");
+        }
+
         if (i != -1) {
             path = path.substring(0, i);
         }
