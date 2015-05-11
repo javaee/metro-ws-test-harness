@@ -110,7 +110,6 @@ public class ClientExecutor extends Executor {
         importPackage(ns, "javax.xml.transform.stream");
         importPackage(ns, "java.util");
         importPackage(ns, "java.util.concurrent");
-        importPackage(ns, "java.net");
         // if there's any client package, put them there
         importPackage(ns, context.descriptor.name + ".client");
         if (context.descriptor.common != null && context.descriptor.common.exists()) {
