@@ -3,6 +3,7 @@ package bsh;
 <#list pImports as imp>
 import ${imp};
 </#list>
+import java.net.URL;
 import java.net.URI;
 
 import static junit.framework.TestCase.*;

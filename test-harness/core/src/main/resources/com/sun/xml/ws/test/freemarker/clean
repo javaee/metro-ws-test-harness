@@ -12,9 +12,10 @@ fi;
 
 G_STATUS=0
 L_STATUS=0
+
 <#if shutdownPorts??>
     <#list shutdownPorts as port>
-wget http://127.0.0.1:${port}/stop > /dev/null 2>&1
+wget http://127.0.0.1:$((STOP_PORT+${port_index}))/stop > /dev/null 2>&1 |true
     </#list>
 </#if>
 

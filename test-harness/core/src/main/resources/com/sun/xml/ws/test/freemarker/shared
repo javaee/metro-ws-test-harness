@@ -163,9 +163,9 @@ function runServer() {
         rm -rf deploy-classes
         mv tmp deploy-classes
 
-        r java -mp deploy-classes -m server/$CLAZZ  >> log.txt 2>&1 &
+        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp deploy-classes -m server/$CLAZZ  >> log.txt 2>&1 &
     else
-        r java -cp deploy-classes $CLAZZ  >> log.txt 2>&1 &
+        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -cp deploy-classes $CLAZZ  >> log.txt 2>&1 &
     fi;
 }
 
@@ -186,9 +186,9 @@ function runClient() {
         rm -rf client-classes
         mv tmp client-classes
 
-        r java -mp client-classes -m client/$CLAZZ  >> log.txt 2>&1
+        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp client-classes -m client/$CLAZZ  >> log.txt 2>&1
     else
-        r java -cp client-classes $CLAZZ  >> log.txt 2>&1
+        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -cp client-classes $CLAZZ  >> log.txt 2>&1
     fi;
 }
 

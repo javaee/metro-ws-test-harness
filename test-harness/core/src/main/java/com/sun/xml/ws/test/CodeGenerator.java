@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Class responsible for generation of bash scripts and java sources to
@@ -471,13 +472,21 @@ public class CodeGenerator {
     }
 
 
-    public static String fixPort(String value) {
-        if (value.contains("http://localhost:8080")) {
-            String fixed = value.replaceAll("http://localhost:8080", "http://localhost:" + getFreePort());
-            fixedServiceURLs.put(value, fixed);
+    public static String getContextPath(String address) {
+        if (address.contains("http://localhost:")) {
+            String fixed = address.replaceAll("http://localhost:(\\d)+/", "");
             return fixed;
         }
-        return value;
+        return address;
+    }
+
+    public static String fixPort(String address) {
+        if (address.contains("http://localhost:")) {
+            String fixed = address.replaceAll(":(\\d)+/", ":\\$PORT/");
+            fixedServiceURLs.put(address, fixed);
+            return fixed;
+        }
+        return address;
     }
 
     public static int getFreePort() {
@@ -518,17 +527,18 @@ public class CodeGenerator {
         }
         templateParams.put("endpointImpl", "" + testEndpoint.className.replaceAll("\\$", "."));
         templateParams.put("endpointAddress", "" + CodeGenerator.fixPort(endpointAddress));
+        templateParams.put("endpointContextPath", "" + CodeGenerator.getContextPath(endpointAddress));
         generateDeploy(templateParams, war.classDir.getAbsolutePath(), fromwsdl);
     }
 
-    // if the value is recognized as a client url, which was previously changed, it returns chnaged value,
+    // if the value is recognized as a client url, which was previously changed, it returns changed value,
     // otherwise returns original value
     public static String fixedURL(String value) {
         if (value.startsWith("http://")) {
             for (String partToBeFixed : fixedServiceURLs.keySet()) {
                 if (value.contains(partToBeFixed)) {
                     String fixed = fixedServiceURLs.get(partToBeFixed);
-                    return value.replaceAll(partToBeFixed, fixed);
+                    return value.replaceAll(partToBeFixed, Matcher.quoteReplacement(fixed));
                 }
             }
         }

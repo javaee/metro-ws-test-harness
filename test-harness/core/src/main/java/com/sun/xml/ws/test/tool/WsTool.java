@@ -151,7 +151,9 @@ public abstract class WsTool extends Assert {
                 p = CodeGenerator.toRelativePath(p);
 
                 // handle inner classes
-                p = p.replaceAll("\\$", "\\\\\\$");
+                if (!p.startsWith("http://")) {
+                    p = p.replaceAll("\\$", "\\\\\\$");
+                }
 
                 // ugly - "move" source wsdl to no-harness/ .. / .. /src dir
                 if (p.startsWith("../") && !p.startsWith("../src")) {

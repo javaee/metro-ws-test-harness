@@ -6,6 +6,13 @@ export CTX=${serviceId}:${stage}-run
 L_STATUS=0
 export G_STATUS=0
 
+if [ "$PORT" = "" -o "$STOP_PORT" = "" ]; then
+    echo "Variable PORT or STOP_PORT not defined. It is required for WS deployment.";
+    echo "PORT=$PORT"
+    echo "STOP_PORT=$STOP_PORT"
+    return 1;
+fi
+
 cd ${workdir}
 
 . shared
@@ -52,11 +59,11 @@ logStepStatus
     <#if  shutdownPorts?has_content>
 if [ "$debug" = "true" ]; then
     <#list shutdownPorts as port>
-    wget http://127.0.0.1:${port}/stop
+    wget http://127.0.0.1:$((STOP_PORT+${port_index}))/stop
     </#list>
 else
     <#list shutdownPorts as port>
-   wget http://127.0.0.1:${port}/stop >> log.txt 2>&1
+   wget http://127.0.0.1:$((STOP_PORT+${port_index}))/stop >> log.txt 2>&1
     </#list>
 fi;
     </#if>

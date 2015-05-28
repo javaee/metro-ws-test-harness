@@ -20,10 +20,14 @@ import java.util.concurrent.Executors;
 // freemarker template
 public class Deploy${stage} {
 
+    private static int DEPLOY_PORT = Integer.valueOf(System.getProperty("deployPort"));
+    private static int STOP_PORT = Integer.valueOf(System.getProperty("stopPort"));
+
     public static void main(String[] args) throws Throwable {
         Endpoint e = deploy();
         System.out.println("Endpoint [" + e + "] successfully deployed.");
-        new EndpointStopper(${shutdownPort}, e);
+        System.out.println("Deploying endpoint STOPPER to [http://localhost:" + STOP_PORT + "/stop]");
+        new EndpointStopper(STOP_PORT, e);
     }
 
     static javax.xml.ws.Endpoint deploy() throws Exception {
@@ -57,7 +61,9 @@ public class Deploy${stage} {
         javax.xml.ws.Endpoint endpoint = javax.xml.ws.Endpoint.create(endpointImpl);
         endpoint.setMetadata(metadata);
         endpoint.setProperties(properties);
-        endpoint.publish("${endpointAddress}");
+        String address = "http://localhost:" + DEPLOY_PORT + "/${endpointContextPath}";
+        System.out.println("Deploying endpoint to [" + address + "]");
+        endpoint.publish(address);
         return endpoint;
     }
 }
