@@ -51,6 +51,6 @@ echo "TOTAL_STEPS = $TOTAL_STEPS , TOTAL_PASSED = $TOTAL_PASSED , TOTAL_FAILED =
 echo "PASSED = $PASSED , FAILED = $FAILED , skipTests = $skipTests"
 
 END=$(date +%s)
-DIFF=$(( $END - $START ))
-echo "It took $DIFF seconds"
+DIFF=$((($END - $START) / 60)):$((($END - $START) % 60))
+echo "It took $DIFF minutes"
 echo "=================================================================================================="
