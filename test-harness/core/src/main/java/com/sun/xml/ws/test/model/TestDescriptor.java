@@ -252,13 +252,21 @@ public class TestDescriptor {
 
     static {
         URL url = World.class.getResource("test-descriptor.rnc");
+        Schema d = null;
+        // if it fails, go on ... - quick fix for jigsaw runtime, relaxNG service not discovered
         try {
-            descriptorSchema = new RelaxNgCompactSyntaxVerifierFactory().compileSchema(url.toExternalForm());
-        } catch (SAXParseException e) {
-            throw new Error("unable to parse test-descriptor.rnc at line " + e.getLineNumber(), e);
-        } catch (Exception e) {
-            throw new Error("unable to parse test-descriptor.rnc", e);
+            try {
+                d = new RelaxNgCompactSyntaxVerifierFactory().compileSchema(url.toExternalForm());
+            } catch (SAXParseException e) {
+                throw new Error("unable to parse test-descriptor.rnc at line " + e.getLineNumber(), e);
+            } catch (Exception e) {
+                throw new Error("unable to parse test-descriptor.rnc", e);
+            }
+        } catch (Throwable t) {
+            System.out.println("ERROR INITIALIZING RELAX-NG");
+            t.printStackTrace();
         }
+        descriptorSchema = d;
     }
 
 
