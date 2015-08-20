@@ -55,6 +55,8 @@ collectSources ../src/$SVC_DIR deploy-source/
 ## hack to get compiled server sources from ../src/server
 #cp -R -v services/$SVC_DIR/war/WEB-INF/classes/* sources-deploy/  >> log.txt 2>&1
 cp -R -v services/$SVC_DIR/war/WEB-INF/classes/* deploy-classes/  >> log.txt 2>&1
+echo "= COPYing utility classes ======" >> log.txt
+cp -R -v $SHARED_DIR/classes/* deploy-classes/  >> log.txt 2>&1
 
 collectSources services/$SVC_DIR/gen-src/ deploy-source
 collectSources bsh/Deploy${stage}.java deploy-source
