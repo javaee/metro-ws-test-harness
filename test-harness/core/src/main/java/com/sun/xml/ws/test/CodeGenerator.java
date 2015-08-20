@@ -214,7 +214,10 @@ public class CodeGenerator {
         source = source.replaceAll("no-harness", "testcases");
         String destination = workDir + "/../src/" + serviceDirectory + "/sun-jaxws.xml";
         try {
-            SourcesCollector.copy(new File(source), new File(destination));
+            File sourceFile = new File(source);
+            if (sourceFile.exists()) {
+                SourcesCollector.copy(sourceFile, new File(destination));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
