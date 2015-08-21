@@ -4,28 +4,31 @@ import static junit.framework.TestCase.*;
 
 public class ClientJUnit${stage} {
 
-    public static void main(String[] args) throws Throwable {
-
-        ${className} test =
-          new ${className}(${constructorArg});
-
-        try {
-<#if injectedProperties??>
-    <#list injectedProperties?keys as key>
-            System.setProperty("${key}", "${injectedProperties[key]}");
-    </#list>
-</#if>
-
-            invoke(test, "setUp");
-
 <#list methods as m>
+    private static void test_${m}() throws Exception {
+        ${className} test =
+            new ${className}(${constructorArg});
+
+         try {
+<#if injectedProperties??>
+<#list injectedProperties?keys as key>
+            System.setProperty("${key}", "${injectedProperties[key]}");
+</#list>
+</#if>
+            invoke(test, "setUp");
             test.${m}();
+
+            System.out.println("= TEST PASSED: ClientJUnit${stage} / ${m}");
+        } finally{
+            invoke(test, "tearDown");
+        }
+    }
 </#list>
 
-            System.out.println("= TEST PASSED: ClientJUnit${stage}");
-        } finally{
-           invoke(test, "tearDown");
-        }
+    public static void main(String[] args) throws Throwable {
+<#list methods as m>
+        test_${m}();
+</#list>
     }
 
     static void invoke(Object target, String method) throws java.lang.reflect.InvocationTargetException,
