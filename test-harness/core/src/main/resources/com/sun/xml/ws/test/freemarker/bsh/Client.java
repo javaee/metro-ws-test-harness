@@ -12,6 +12,8 @@ import static bsh.Util.*;
 
 public class Client${stage} {
 
+    private static int DEPLOY_PORT = Integer.valueOf(System.getProperty("deployPort"));
+
     static String home = "${home}";
 
     // TODO
@@ -31,9 +33,9 @@ public class Client${stage} {
 ${client_setUp_script}
 
     static URI createUri(String s) {
-        try{
+        try {
             return new URI(s);
-        }catch(Throwable t){
+        } catch(Throwable t){
             throw new RuntimeException(t);
         }
     }

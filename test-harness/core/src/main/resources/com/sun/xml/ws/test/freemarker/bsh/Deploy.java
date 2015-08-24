@@ -20,8 +20,8 @@ import java.util.concurrent.Executors;
 // freemarker template
 public class Deploy${stage} {
 
-    private static int DEPLOY_PORT = Integer.valueOf(System.getProperty("deployPort"));
-    private static int STOP_PORT = Integer.valueOf(System.getProperty("stopPort"));
+    private static int DEPLOY_PORT = Integer.valueOf(System.getProperty("deployPort")) + ${svcNO};
+    private static int STOP_PORT = Integer.valueOf(System.getProperty("stopPort")) + ${svcNO};
 
     public static void main(String[] args) throws Throwable {
         Endpoint e = deploy();

@@ -87,7 +87,8 @@ public class CodeGenerator {
     // it is changed while being deployed (method fixPort)
     private static int deployedServices = 0;
     private static int freePort = 8080;
-    private static Map<String, String> fixedServiceURLs = new HashMap<String, String>();
+    private static Map<String, String> fixedServiceURLsBASH = new HashMap<String, String>();
+    private static Map<String, String> fixedServiceURLsJava = new HashMap<String, String>();
 
     public static void setGenerateTestSources(boolean generateTestSources) {
         CodeGenerator.generateTestSources = generateTestSources;
@@ -116,7 +117,8 @@ public class CodeGenerator {
         clean.writeFile();
 
         shutdownPortList.clear();
-        fixedServiceURLs.clear();
+        fixedServiceURLsBASH.clear();
+        fixedServiceURLsJava.clear();
         deployedServices = 0;
     }
 
@@ -200,9 +202,9 @@ public class CodeGenerator {
             deployClass.put(key, value);
         }
         deployClass.put("wsdlDocs", wsdlDocs);
-        String port = "" + (8888 + deployedServices);
+        String port = "" + deployedServices;
         shutdownPortList.add(port);
-        deployClass.put("shutdownPort", port);
+        deployClass.put("svcNO", port);
         deployClass.writeFileTo(workDir + "/bsh", "Deploy" + scriptOrder + ".java");
 
         addScript(filename);
@@ -434,7 +436,7 @@ public class CodeGenerator {
         clientClass.put("contents", pContents);
         for (String key : varMap.keySet()) {
             String value = varMap.get(key);
-            value = fixedURL(value);
+            value = fixedURLJava(value);
             clientClass.put(key, value);
         }
         clientClass.writeFileTo(workDir + "/bsh", "Client" + scriptOrder + ".java");
@@ -483,13 +485,18 @@ public class CodeGenerator {
         return address;
     }
 
-    public static String fixPort(String address) {
+    public static void fixPort(String address) {
         if (address.contains("http://localhost:")) {
-            String fixed = address.replaceAll(":(\\d)+/", ":\\$PORT/");
-            fixedServiceURLs.put(address, fixed);
-            return fixed;
+/*            String fixed = address.replaceAll(":(\\d)+/", ":\\$PORT/");*/
+            String fixedBASH = address.replaceAll(
+                        ":" + freePort + "/",
+                        ":\\$((PORT + "+ deployedServices +"))/");
+            String fixedJAVA = address.replaceAll(
+                        ":" + freePort + "/",
+                        ":\" + (DEPLOY_PORT + " + deployedServices + ") + \"/");
+            fixedServiceURLsBASH.put(address, fixedBASH);
+            fixedServiceURLsJava.put(address, fixedJAVA);
         }
-        return address;
     }
 
     public static int getFreePort() {
@@ -529,18 +536,34 @@ public class CodeGenerator {
             templateParams.put("svcLOCAL", "" + qname.getLocalPart());
         }
         templateParams.put("endpointImpl", "" + testEndpoint.className.replaceAll("\\$", "."));
-        templateParams.put("endpointAddress", "" + CodeGenerator.fixPort(endpointAddress));
+        // templateParams.put("endpointAddress", "" + CodeGenerator.fixPort(endpointAddress));
+        // fix and remember address for tooltime ...
+        CodeGenerator.fixPort(endpointAddress);
         templateParams.put("endpointContextPath", "" + CodeGenerator.getContextPath(endpointAddress));
         generateDeploy(templateParams, war.classDir.getAbsolutePath(), fromwsdl);
     }
 
     // if the value is recognized as a client url, which was previously changed, it returns changed value,
     // otherwise returns original value
-    public static String fixedURL(String value) {
+    public static String fixedURLBASH(String value) {
         if (value.startsWith("http://")) {
-            for (String partToBeFixed : fixedServiceURLs.keySet()) {
+            for (String partToBeFixed : fixedServiceURLsBASH.keySet()) {
                 if (value.contains(partToBeFixed)) {
-                    String fixed = fixedServiceURLs.get(partToBeFixed);
+                    String fixed = fixedServiceURLsBASH.get(partToBeFixed);
+                    return value.replaceAll(partToBeFixed, Matcher.quoteReplacement(fixed));
+                }
+            }
+        }
+        return value;
+    }
+
+    // if the value is recognized as a client url, which was previously changed, it returns changed value,
+    // otherwise returns original value
+    public static String fixedURLJava(String value) {
+        if (value.startsWith("http://")) {
+            for (String partToBeFixed : fixedServiceURLsJava.keySet()) {
+                if (value.contains(partToBeFixed)) {
+                    String fixed = fixedServiceURLsJava.get(partToBeFixed);
                     return value.replaceAll(partToBeFixed, Matcher.quoteReplacement(fixed));
                 }
             }

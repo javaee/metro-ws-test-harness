@@ -144,8 +144,7 @@ public abstract class WsTool extends Assert {
                     String dir = params.get(i + 1);
                     mkdirs.add(dir);
                 }
-                // TODO: Miran relative paths!
-                p = CodeGenerator.fixedURL(p);
+                p = CodeGenerator.fixedURLBASH(p);
 
                 // change absolute path to relative
                 p = CodeGenerator.toRelativePath(p);
