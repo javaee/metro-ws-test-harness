@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 # service id: ${serviceId}
 # stage: ${stage}
+cd "$(dirname "$0")"
+
 export CTX=${serviceId}:${stage}-run
 # global testcase status
 L_STATUS=0

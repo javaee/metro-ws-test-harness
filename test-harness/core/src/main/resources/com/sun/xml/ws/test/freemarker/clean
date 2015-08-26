@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 # service id: ${serviceId}
 # stage: ${stage}
+export SERVICE_ID=${serviceId}
 export CTX=${serviceId}:${stage}-client
 
 # clean the log

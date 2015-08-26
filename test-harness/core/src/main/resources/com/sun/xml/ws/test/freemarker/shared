@@ -152,9 +152,11 @@ function runServer() {
 
     if [ "$useNamedModule" = "true" ]; then
 
-        if [ -f "deploy-classes/module-info.java" ]; then
-            cp -v deploy-classes/module-info.java deploy-source
-        fi
+#        if [ -f "deploy-classes/module-info.java" ]; then
+#            cp -v deploy-classes/module-info.java deploy-source
+#        fi
+
+        cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-server.java deploy-source/module-info.java
         r javac -d deploy-classes deploy-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server
@@ -178,6 +180,7 @@ function runClient() {
 
     if [ "$useNamedModule" = "true" ]; then
 
+        cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-client.java client-source/module-info.java
         r javac -d client-classes/ client-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server

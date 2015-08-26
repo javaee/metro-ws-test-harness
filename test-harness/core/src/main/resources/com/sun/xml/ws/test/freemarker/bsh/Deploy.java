@@ -36,7 +36,7 @@ public class Deploy${stage} {
         metadata.add(
             new StreamSource(
                 Deploy${stage}.class.getResourceAsStream("/WEB-INF/wsdl/${metadata_file}"),
-                Deploy${stage}.class.getResource("/WEB-INF/wsdl/${metadata_file}").toString()
+                "file://WEB-INF/wsdl/${metadata_file}"
             )
         );
 </#list>
