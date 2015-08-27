@@ -156,14 +156,14 @@ function runServer() {
 #            cp -v deploy-classes/module-info.java deploy-source
 #        fi
 
-        cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-server.java deploy-source/module-info.java
+        r cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-server.java deploy-source/module-info.java
         r javac -d deploy-classes deploy-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server
-        mkdirp tmp/server
-        mv deploy-classes/* tmp/server
-        rm -rf deploy-classes
-        mv tmp deploy-classes
+        r mkdirp tmp/server
+        r mv deploy-classes/* tmp/server
+        r rm -rf deploy-classes
+        r mv tmp deploy-classes
 
         r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp deploy-classes -m server/$CLAZZ  >> log.txt 2>&1 &
     else
@@ -180,14 +180,14 @@ function runClient() {
 
     if [ "$useNamedModule" = "true" ]; then
 
-        cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-client.java client-source/module-info.java
+        r cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-client.java client-source/module-info.java
         r javac -d client-classes/ client-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server
-        mkdirp tmp/client
-        mv client-classes/* tmp/client
-        rm -rf client-classes
-        mv tmp client-classes
+        r mkdirp tmp/client
+        r mv client-classes/* tmp/client
+        r rm -rf client-classes
+        r mv tmp client-classes
 
         r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp client-classes -m client/$CLAZZ  >> log.txt 2>&1
     else
