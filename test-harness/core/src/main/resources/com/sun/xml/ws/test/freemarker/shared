@@ -70,15 +70,15 @@ function cpwsdl() {
     rm -rf $WSDL_DIR/$2 > /dev/null 2>&1 | true
 
     # make actual copy ...
-    cp -v $1/$2 $WSDL_DIR/$2 > /dev/null 2>&1 | true
+    cp $1/$2 $WSDL_DIR/$2 > /dev/null 2>&1 | true
 }
 
 function cpclasses() {
     mkdirp deploy-classes
     log "copying [$1] to [deploy-classes/]"
 #    log "copying [$1] to [services/$SVC_DIR/war/WEB-INF/classes/]"
-#    cp -v $1 services/$SVC_DIR/war/WEB-INF/classes/ > /dev/null 2>&1 | true
-    cp -v $1 deploy-classes > /dev/null 2>&1 | true
+#    cp  $1 services/$SVC_DIR/war/WEB-INF/classes/ > /dev/null 2>&1 | true
+    cp $1 deploy-classes > /dev/null 2>&1 | true
 }
 
 #function prepareModule() {
@@ -148,15 +148,15 @@ function runServer() {
     CLAZZ=$2
 
     # unpacking testutil to module's classes
-    cp -R -v $SHARED_DIR/classes/* deploy-classes/ >> log.txt 2>&1
+    cp -R $SHARED_DIR/classes/* deploy-classes/ >> log.txt 2>&1
 
     if [ "$useNamedModule" = "true" ]; then
 
 #        if [ -f "deploy-classes/module-info.java" ]; then
-#            cp -v deploy-classes/module-info.java deploy-source
+#            cp deploy-classes/module-info.java deploy-source
 #        fi
 
-        r cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-server.java deploy-source/module-info.java
+        r cp $SHARED_DIR/module-info/$SERVICE_ID/module-info-server.java deploy-source/module-info.java
         r javac -d deploy-classes deploy-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server
@@ -176,20 +176,20 @@ function runClient() {
     CLAZZ=$2
 
     # unpacking testutil to module's classes
-    cp -R -v $SHARED_DIR/classes/* client-classes/ >> log.txt 2>&1
+    cp -R $SHARED_DIR/classes/* client-classes/ >> log.txt 2>&1
 
     if [ "$useNamedModule" = "true" ]; then
 
-        r cp -v $SHARED_DIR/module-info/$SERVICE_ID/module-info-client.java client-source/module-info.java
+        r cp $SHARED_DIR/module-info/$SERVICE_ID/module-info-client.java client-source/module-info.java
         r javac -d client-classes/ client-source/module-info.java >> log.txt 2>&1
 
         # prepareModule classes-deploy server
         r mkdirp tmp/client
-        r mv client-classes/* tmp/client
-        r rm -rf client-classes
-        r mv tmp client-classes
+        r cp -Rf client-classes/* tmp/client
+        r rm -rf client-classes-module|true
+        r mv tmp client-classes-module
 
-        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp client-classes -m client/$CLAZZ  >> log.txt 2>&1
+        r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -mp client-classes-module -m client/$CLAZZ  >> log.txt 2>&1
     else
         r java -DdeployPort=$PORT -DstopPort=$STOP_PORT -cp client-classes $CLAZZ  >> log.txt 2>&1
     fi;
@@ -225,7 +225,7 @@ function cpp() {
     echo " [$FILE] > [$TARGET_FILE]" >> log.txt 2>&1
 
     mkdirp $TARGET_DIR
-    cp -R -v $FILE $TARGET_DIR/ >> log.txt 2>&1
+    cp -R $FILE $TARGET_DIR/ >> log.txt 2>&1
 }
 
 function targetPath() {
