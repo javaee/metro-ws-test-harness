@@ -103,11 +103,11 @@ public class Util {
             }
         } else {
             String pwd = System.getenv("PWD");
-            File f =  new File(pwd + "/client-classes/client/" + path);
+            File f =  new File(pwd + "/client-classes-module/client/" + path);
             if (f.exists()) {
                 return f;
             } else {
-                throw new RuntimeException("No resource found! resource: " + path + ", path = " + pwd);
+                throw new RuntimeException("No resource found! resource: [" + pwd + "/" + path + "]");
             }
         }
     }
