@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2015 Sun Microsystems, Inc. All rights reserved.
+ * Copyright (c) 2015-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * http://glassfish.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
+ * file and include the License file at packager/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
  *
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -33,7 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.xml.ws.test;
 
 import com.sun.xml.ws.test.container.WAR;
@@ -76,19 +79,19 @@ public class CodeGenerator {
     private static String workDir;
 
     // scripts for one "testcase" (= 1 test-desriptor.xml)
-    private static List<String> testcaseScripts = new ArrayList<String>();
+    private static final List<String> testcaseScripts = new ArrayList<>();
 
     // all tests
-    private static List<String> testcases = new ArrayList<String>();
-    private static List<String> shutdownPortList = new ArrayList<String>();
+    private static final List<String> testcases = new ArrayList<>();
+    private static final List<String> shutdownPortList = new ArrayList<>();
 
     // if just one service is being deployed, it's always on 8080 port + endpoint stopper at 8888.
     // if multiple services deployed, we have to change port of second (and next ones) to avoid conflict
     // it is changed while being deployed (method fixPort)
     private static int deployedServices = 0;
-    private static int freePort = 8080;
-    private static Map<String, String> fixedServiceURLsBASH = new HashMap<String, String>();
-    private static Map<String, String> fixedServiceURLsJava = new HashMap<String, String>();
+    private static final int freePort = 8080;
+    private static final Map<String, String> fixedServiceURLsBASH = new HashMap<>();
+    private static final Map<String, String> fixedServiceURLsJava = new HashMap<>();
 
     public static void setGenerateTestSources(boolean generateTestSources) {
         CodeGenerator.generateTestSources = generateTestSources;
@@ -132,7 +135,7 @@ public class CodeGenerator {
     }
 
     private static List<String> toFilenames(List<String> absolutePaths) {
-        List<String> testcasesRelative = new ArrayList<String>();
+        List<String> testcasesRelative = new ArrayList<>();
         for (String s : absolutePaths) {
             testcasesRelative.add(s.substring(s.lastIndexOf('/') + 1));
         }
@@ -140,7 +143,7 @@ public class CodeGenerator {
     }
 
     private static List<String> toRelativePath(List<String> absolutePaths) {
-        List<String> testcasesRelative = new ArrayList<String>();
+        List<String> testcasesRelative = new ArrayList<>();
         for (String s : absolutePaths) {
             testcasesRelative.add(toRelativePath(s));
         }
@@ -191,7 +194,7 @@ public class CodeGenerator {
 
         //obsoleteDeployCLass(contents, className);
 
-        FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java");
+        FreeMarkerTemplate deployClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Deploy.java_");
         for (String key : params.keySet()) {
             Object value = params.get(key);
             if (value instanceof List) {
@@ -227,7 +230,7 @@ public class CodeGenerator {
 
     protected static List<String> getWSDLDocs(Map<String, Object> params) {
         List<String> list = chdir((List<String>) params.get("metadata_files"));
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         String prefix = "WEB-INF/wsdl/";
         for (String file : list) {
             int pos = file.lastIndexOf(prefix) + prefix.length();
@@ -276,10 +279,10 @@ public class CodeGenerator {
         copySources(testcaseDir);
 
         // generate common classes
-        new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Util.java").writeFileTo(workDir + "/bsh", "Util.java");
-        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/TestCase.java").writeFileTo(
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Util.java_").writeFileTo(workDir + "/bsh", "Util.java");
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/TestCase.java_").writeFileTo(
                 workDir + "/junit/framework", "TestCase.java");
-        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/Assert.java").writeFileTo(
+        new FreeMarkerTemplate(id, scriptOrder, workDir, "junit/framework/Assert.java_").writeFileTo(
                 workDir + "/junit/framework", "Assert.java");
 
     }
@@ -330,7 +333,7 @@ public class CodeGenerator {
     }
 
     private static List<String> chdir(List<String> list) {
-        List<String> changed = new ArrayList<String>();
+        List<String> changed = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             String s = list.get(i);
             s = chdir(s);
@@ -340,7 +343,7 @@ public class CodeGenerator {
     }
 
     private static List<String> moveToSrc2(List<String> list) {
-        List<String> changed = new ArrayList<String>();
+        List<String> changed = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             String s = list.get(i);
             s = CodeGenerator.moveToSrc2(s);
@@ -430,7 +433,7 @@ public class CodeGenerator {
         File dir = new File(workDir + "/bsh");
         dir.mkdir();
 
-        FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Client.java");
+        FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/Client.java_");
         clientClass.put("testName", testName);
         clientClass.put("pImports", pImports);
         clientClass.put("contents", pContents);
@@ -450,13 +453,13 @@ public class CodeGenerator {
         File dir = new File(workDir + "/bsh");
         dir.mkdir();
 
-        FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/ClientJUnit.java");
+        FreeMarkerTemplate clientClass = new FreeMarkerTemplate(id, scriptOrder, workDir, "bsh/ClientJUnit.java_");
         String testClassName = ts.getName();
         clientClass.put("className", testClassName);
         String constructorArg = hasNoArgConstructor(testClass)? "" : "\"" + testClassName + "\"";
         clientClass.put("constructorArg", constructorArg);
         clientClass.put("injectedProperties", injectedProperties);
-        List<String> tests = new ArrayList<String>();
+        List<String> tests = new ArrayList<>();
         for(int i=0; i<ts.testCount(); i++) {
             Test t = ts.testAt(i);
             String method = t.toString();
@@ -507,7 +510,7 @@ public class CodeGenerator {
                                              Map<String, Object> props, String endpointAddress,
                                              String wsdlLocation, boolean fromwsdl) {
 
-        Map<String, Object> templateParams = new HashMap<String, Object>();
+        Map<String, Object> templateParams = new HashMap<>();
 
         // ugly hack:
         // in case explicit wsdlLocation (in java annotation) exists
@@ -518,7 +521,7 @@ public class CodeGenerator {
             templateParams.put("wsdlLocation", wsdlLocation.replaceAll("WEB-INF/wsdl/", ""));
         }
 
-        List<String> metadata_files = new ArrayList<String>();
+        List<String> metadata_files = new ArrayList<>();
         for (Source source : metadata) {
             metadata_files.add(source.getSystemId().replaceAll("file:", ""));
         }
