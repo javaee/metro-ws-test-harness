@@ -53,8 +53,8 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+//import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+//import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -272,8 +272,8 @@ public class WSTestMojo extends AbstractMojo {
     @Component
     private ArtifactFactory artifactFactory;
 
-    @Component
-    private ArtifactResolver resolver;
+  //  @Component
+   // private ArtifactResolver resolver;
 
     @Component
     private MavenProject project;
@@ -424,7 +424,7 @@ public class WSTestMojo extends AbstractMojo {
             }
         }
 
-        cmd.createArg().setLine("-cp " + getHarnessClassPath());
+      //  cmd.createArg().setLine("-cp " + getHarnessClassPath());
         cmd.createArg().setValue("com.sun.xml.ws.test.Main");
         if (project.getFile() != null) {
             cmd.createArg().setLine("-report " + resultsDirectory.getAbsolutePath());
@@ -573,16 +573,16 @@ public class WSTestMojo extends AbstractMojo {
         return Os.isFamily(Os.FAMILY_WINDOWS) ? "java.exe" : "java";
     }
 
-    private String getHarnessClassPath() throws MojoExecutionException {
+/*    private String getHarnessClassPath() throws MojoExecutionException {
         StringBuilder sb = new StringBuilder();
         for (Artifact a : getHarnessLib()) {
             sb.append(a.getFile().getAbsolutePath());
             sb.append(File.pathSeparator);
         }
         return sb.substring(0, sb.length() - 1);
-    }
+    }*/
 
-    private Set<Artifact> getHarnessLib() throws MojoExecutionException {
+ /*   private Set<Artifact> getHarnessLib() throws MojoExecutionException {
         Artifact harnessLib = artifactFactory.createBuildArtifact(HARNESS_GID, HARNESS_AID, harnessVersion, "jar");
         Artifact dummyArtifact =
                 artifactFactory.createBuildArtifact("javax.xml.ws", "jaxws-api", JAXWS_API_VERSION, "jar");
@@ -599,7 +599,7 @@ public class WSTestMojo extends AbstractMojo {
             throw new MojoExecutionException("Couldn't download artifact: " + e.getMessage(), e);
         }
         return arr.getArtifacts();
-    }
+    }*/
 
     private boolean isToplink() {
         return Databinding.TOPLINK == databinding;

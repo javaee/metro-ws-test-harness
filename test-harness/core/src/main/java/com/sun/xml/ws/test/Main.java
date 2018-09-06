@@ -50,7 +50,6 @@ import com.sun.xml.ws.test.container.gf.GlassfishContainer;
 import com.sun.xml.ws.test.container.invm.InVmContainer;
 import com.sun.xml.ws.test.container.javase.JavaSeContainer;
 import com.sun.xml.ws.test.container.local.LocalApplicationContainer;
-import com.sun.xml.ws.test.emma.Emma;
 import com.sun.xml.ws.test.model.TestDescriptor;
 import com.sun.xml.ws.test.tool.WsTool;
 import com.sun.xml.ws.test.util.FileUtil;
@@ -67,7 +66,7 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.junit.ParallelTestSuite;
+//import org.kohsuke.junit.ParallelTestSuite;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -165,8 +164,6 @@ public class Main {
     @Option(name = "-concurrent-side-effect-free", usage = "Run all side-effect free tests as concurrent")
     boolean concurrentSideEffectFree = false;
 
-    @Option(name = "-emma", usage = "Generate emma coverage report")
-    File emma = null;
 
     @Option(name = "-version", usage = "Specify the target JAX-WS version being tested. This determines test exclusions", handler = VersionNumberHandler.class)
     VersionNumber version = null;
@@ -382,9 +379,6 @@ public class Main {
                     System.err.println("Shutting JavaSeContainer down.");
                 }
             }
-            if (World.emma != null) {
-                World.emma.write(emma);
-            }
             CodeGenerator.testCaseDone();
             CodeGenerator.allTestsDone(tests.get(0));
         }
@@ -395,7 +389,6 @@ public class Main {
      */
     private void fillWorld() throws Exception {
         World.debug = this.debug;
-        World.emma = emma != null ? new Emma() : null;
 
         Realm runtime = World.runtime;
         Realm tool = World.tool;
@@ -835,7 +828,7 @@ public class Main {
     private TestSuite createTestSuite() {
         if (parallel > 1) {
             System.err.println("Running tests in " + parallel + " threads");
-            return new ParallelTestSuite();
+            return new TestSuite();
         } else {
             return new TestSuite();
         }

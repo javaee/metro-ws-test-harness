@@ -36,7 +36,6 @@
 
 package com.sun.xml.ws.test;
 
-import com.sun.xml.ws.test.emma.Emma;
 import org.apache.tools.ant.Project;
 import org.codehaus.classworlds.ClassRealm;
 
@@ -88,8 +87,4 @@ public final class World {
      */
     public static boolean debug = false;
 
-    /**
-     * @see Main#emma
-     */
-    public static Emma emma = null;
 }

@@ -85,7 +85,7 @@ public class Realm {
             ClassLoader pcl = ClassLoader.getSystemClassLoader();
             if(parent!=null)
                 pcl = parent.getClassLoader();
-            classLoader = World.emma!=null ? World.emma.createInstrumentingClassLoader() : new AntClassLoader2();
+            classLoader = new AntClassLoader2(); 
             classLoader.setParent(pcl);
             classLoader.setProject(World.project);
             classLoader.setClassPath(classPath);
