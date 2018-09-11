@@ -47,14 +47,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import org.apache.maven.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-//import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-//import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -76,6 +74,13 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * Executes tests written for WS Test Harness.
@@ -263,17 +268,15 @@ public class WSTestMojo extends AbstractMojo {
     @Parameter(readonly = true, defaultValue = "${localRepository}")
     private ArtifactRepository localRepo;
 
-    @Parameter(readonly = true, defaultValue = "${project.remoteArtifactRepositories}")
-    private List<ArtifactRepository> remoteRepos;
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}",
+            readonly = true)
+    private List<RemoteRepository> remoteRepos;
 
     @Parameter(readonly = true, defaultValue = "${project.pluginArtifactRepositories}")
     private List<ArtifactRepository> pluginRepos;
 
     @Component
     private ArtifactFactory artifactFactory;
-
-  //  @Component
-   // private ArtifactResolver resolver;
 
     @Component
     private MavenProject project;
@@ -286,6 +289,19 @@ public class WSTestMojo extends AbstractMojo {
 
     @Component
     private ArtifactMetadataSource mdataSource;
+
+    /**
+     * The entry point to Aether.
+     */
+    @Component
+    private RepositorySystem repoSystem;
+
+    /**
+     * The current repository/network configuration of Maven.
+     */
+    @Parameter(defaultValue = "${repositorySystemSession}",
+            readonly = true)
+    private RepositorySystemSession repoSession;
 
     private File imageRoot = null;
 
@@ -424,7 +440,7 @@ public class WSTestMojo extends AbstractMojo {
             }
         }
 
-      //  cmd.createArg().setLine("-cp " + getHarnessClassPath());
+        cmd.createArg().setLine("-cp " + getHarnessClassPath());
         cmd.createArg().setValue("com.sun.xml.ws.test.Main");
         if (project.getFile() != null) {
             cmd.createArg().setLine("-report " + resultsDirectory.getAbsolutePath());
@@ -573,33 +589,36 @@ public class WSTestMojo extends AbstractMojo {
         return Os.isFamily(Os.FAMILY_WINDOWS) ? "java.exe" : "java";
     }
 
-/*    private String getHarnessClassPath() throws MojoExecutionException {
+    private String getHarnessClassPath() throws MojoExecutionException {
         StringBuilder sb = new StringBuilder();
         for (Artifact a : getHarnessLib()) {
             sb.append(a.getFile().getAbsolutePath());
             sb.append(File.pathSeparator);
         }
         return sb.substring(0, sb.length() - 1);
-    }*/
+    }
 
- /*   private Set<Artifact> getHarnessLib() throws MojoExecutionException {
-        Artifact harnessLib = artifactFactory.createBuildArtifact(HARNESS_GID, HARNESS_AID, harnessVersion, "jar");
-        Artifact dummyArtifact =
-                artifactFactory.createBuildArtifact("javax.xml.ws", "jaxws-api", JAXWS_API_VERSION, "jar");
-        ArtifactRepositoryPolicy always =
-                new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
-        ArtifactResolutionResult arr = null;
-        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>(pluginRepos);
-        repos.addAll(remoteRepos);
-        try {
-            arr = resolver.resolveTransitively(Collections.singleton(harnessLib), dummyArtifact,
-                    repos, localRepo, mdataSource);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Couldn't download artifact: " + e.getMessage(), e);
-        }
-        return arr.getArtifacts();
-    }*/
+    private Set<Artifact> getHarnessLib() throws MojoExecutionException {
+       org.eclipse.aether.artifact.DefaultArtifact harnessLib = new org.eclipse.aether.artifact.DefaultArtifact(HARNESS_GID,HARNESS_AID, null, "jar", harnessVersion);
+       Set<ArtifactRequest> dependenciesRequest = new HashSet<ArtifactRequest>();
+       ArtifactRequest request = new ArtifactRequest();
+       request.setArtifact(harnessLib);
+       request.setRepositories(remoteRepos);
+       dependenciesRequest.add(request);
+
+       List<ArtifactResult> resolvedDependencies;
+       try {
+           resolvedDependencies = repoSystem.resolveArtifacts(repoSession, dependenciesRequest);
+       } catch (ArtifactResolutionException ex) {
+           throw new MojoExecutionException(ex.getMessage(), ex);
+       }
+
+       Set<Artifact> artifacts = new HashSet<Artifact>();
+       for (ArtifactResult dependency : resolvedDependencies) {
+           artifacts.add(dependency.getArtifact());
+       }
+       return artifacts;
+    }
 
     private boolean isToplink() {
         return Databinding.TOPLINK == databinding;
