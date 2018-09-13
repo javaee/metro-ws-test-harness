@@ -69,18 +69,18 @@
                         <configuration>
                             <target>
                                 <property name="dest.dir" location="target/docs" />
-                                <taskdef name="htmlmacro" classname="com.sun.wts.tools.htmlmacro.HtmlMacroTask">
+                                <!--<taskdef name="htmlmacro" classname="com.sun.wts.tools.htmlmacro.HtmlMacroTask">
                                     <classpath>
                                         <fileset dir="lib" includes="*.jar" />
                                     </classpath>
-                                </taskdef>
+                                </taskdef>-->
                                 <mkdir dir="${dest.dir}" />
-                                <htmlmacro destdir="${dest.dir}">
+                                <!--<htmlmacro destdir="${dest.dir}">
                                     <documents dir="src/main/resources" includes="*.html" />
-                                    <!--property key="javaNetProjectName" value="htmlmacro" /-->
-                                </htmlmacro>
+                                </htmlmacro>-->
                                 <copy todir="${dest.dir}">
                                     <fileset dir="src/main/resources" includes="*.png" />
+                                    <fileset dir="src/main/resources" includes="*.html" />
                                     <fileset dir="../core/src/main/resources/com/sun/xml/ws/test" includes="*.rnc" />
                                 </copy>
                             </target>

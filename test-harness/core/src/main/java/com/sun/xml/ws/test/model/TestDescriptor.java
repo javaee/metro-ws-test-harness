@@ -549,7 +549,8 @@ public class TestDescriptor {
     private Document parse(File descriptor) throws DocumentException, SAXException, ParserConfigurationException, MalformedURLException {
         SAXParserFactory factory;
         if (descriptorSchema != null) {
-            factory = ValidatingSAXParserFactory.newInstance(descriptorSchema);
+            factory = new ValidatingSAXParserFactory(descriptorSchema);
+//            factory = SAXParserFactory.newInstance();
         } else {
             factory = SAXParserFactory.newInstance();
         }

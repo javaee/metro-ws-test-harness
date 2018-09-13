@@ -47,15 +47,18 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.thaiopensource.relaxng.impl.SchemaBuilderImpl;
-import com.thaiopensource.relaxng.impl.SchemaPatternBuilder;
+import com.thaiopensource.relaxng.pattern.SchemaBuilderImpl;
+import com.thaiopensource.relaxng.pattern.SchemaPatternBuilder;
 import com.thaiopensource.relaxng.parse.Parseable;
 import com.thaiopensource.relaxng.parse.compact.CompactParseable;
 import com.thaiopensource.validate.IncorrectSchemaException;
 import com.thaiopensource.xml.sax.DraconianErrorHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.thaiopensource.resolver.Resolver;
+import com.thaiopensource.resolver.BasicResolver;
 
+import com.thaiopensource.resolver.Input;
 
 /**
  * {@link org.iso_relax.verifier.VerifierFactory} implementation
@@ -74,10 +77,12 @@ public class RelaxNgCompactSyntaxVerifierFactory extends VerifierFactory {
 
     public Schema compileSchema(InputSource is) throws VerifierConfigurationException, SAXException, IOException {
         SchemaPatternBuilder spb = new SchemaPatternBuilder();
-        Parseable parseable = new CompactParseable(is, eh);
+        Input input = new Input();
+        input.setByteStream(is.getByteStream());
+        Parseable parseable = new CompactParseable(input, (Resolver)BasicResolver.getInstance(), eh);
         try {
                 return new SchemaImpl(SchemaBuilderImpl.parse(parseable, eh, dlf, spb, false), spb);
-        } catch (IncorrectSchemaException ex) {
+        } catch (Exception ex) {
             throw new SAXException(ex.getMessage());
         }
     }
