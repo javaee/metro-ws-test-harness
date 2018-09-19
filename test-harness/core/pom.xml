@@ -139,11 +139,6 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>
-        <!-- obsolete -->
-       <dependency>
-            <groupId>emma</groupId>
-            <artifactId>emma</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
