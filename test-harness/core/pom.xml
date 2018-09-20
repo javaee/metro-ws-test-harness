@@ -116,12 +116,8 @@
             <artifactId>istack-commons-test</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.thaiopensource</groupId>
+            <groupId>org.daisy.libs</groupId>
             <artifactId>jing</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.thaiopensource</groupId>
-            <artifactId>trang</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
